@@ -9,6 +9,8 @@
 - Integrate app with physical sensors to further automate process (Fishhawk)
 - "Outbox" system: Data can be recorded offline and later published
 - Use of data to create depth maps, temperature maps, etc.
+- Export as CSV, JSON
+- Repeatable results, proper commenting
 
 ## Possible Functionality
 
@@ -21,7 +23,18 @@
 - Will be hosted at champydb.jojudge.com for testing phase, final domain name/server yet to be decided
 - Data will be stored in metric units; user will be able to choose between metric and imperial.
     - Worth allowing individual units to be chosen?
-- All registered sensors will store their data in one collection 
+- Include Lake Champlain Sea Grant Logo
+- Earth and Environmental Science logo
+- Addistional info for sensors
+
+## Maps
+
+- 2d: Depth vs Temp
+- 2d: Map view (pin of where measurements are taken)
+- 3d: Point cloud (depth = y, pos = x + z, temp = color) [last]
+- Date limiting
+- Graph anomalies per unit of time
+- Black/whitelist sensors
 
 ## Example Reading
 
@@ -37,7 +50,8 @@ sensorReading = {
         "alt": ((altitude above sea level, m, optional)),
         "altRange": ((max possible distance from alt, m, optional))
     },
-    "time": ((unix timestamp in UTC, also holds date)),
+    "timeCreate": ((unix timestamp in UTC, also holds date)),
+    "timeSubmit": ((unix timestamp in UTC, also holds date)),
     "value": ((value))
 };
 
