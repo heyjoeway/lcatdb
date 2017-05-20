@@ -1,0 +1,31 @@
+{
+  "name": "champy-db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joseph14078/champy-db.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Joseph14078/champy-db/issues"
+  },
+  "homepage": "https://github.com/Joseph14078/champy-db#readme",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "body-parser": "^1.17.2",
+    "client-sessions": "^0.8.0",
+    "express": "^4.15.3",
+    "jsonschema": "^1.1.1",
+    "mongodb": "^2.2.26",
+    "winston": "^2.3.1"
+  }
+}

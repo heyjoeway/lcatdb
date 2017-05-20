@@ -1,0 +1,74 @@
+{
+    "definitions": {
+        "textShort": {
+          "type": "string",
+          "pattern": "^[!<>\r\n]*$"
+        },
+        "textLong": {
+          "type": "string",
+          "pattern": "^[!<>]*$"
+        }
+    },
+	"properties": {
+		"username": {
+            "type": "string",
+            "pattern": "^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_]{1,15}$"
+        },
+
+		"email": {
+            "type": "string",
+            "format": "email"
+        },
+
+        "password": {
+            "description": "Hash of password, not actual password.",
+            "type": "string",
+            "pattern": "^[^]{6,}$"
+        },
+
+		"first": { "$ref": "#/definitions/textShort" },
+		"last": { "$ref": "#/definitions/textShort" },
+
+        "organizations": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/textShort" }
+        },
+
+        "phone": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "location": { "$ref": "#/definitions/textShort" }
+                },
+                "required": ["number"]
+            }
+        },
+
+        "description": {
+            "type": "object",
+            "properties": {
+                "short": { "$ref": "#/definitions/textShort" },
+                "long": { "$ref": "#/definitions/textLong" }
+            }
+        },
+
+        "picture": {
+            "type": "string",
+            "format": "uri"
+        },
+        
+        "creation": { "type": "number"},
+
+        "verfied": { "type": "boolean" }
+	},
+	"required": [
+        "username",
+        "email",
+        "password",
+        "description",
+        "creation",
+        "verified"
+    ]
+}
