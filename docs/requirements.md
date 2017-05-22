@@ -39,8 +39,7 @@
 ## Example Reading
 
 ```
-sensorReading = {
-    "sensor": ((sensor id))
+configReading = {
     "creator": ((user id)),
     "publisher": ((user id)),
     "location": {
@@ -52,7 +51,7 @@ sensorReading = {
     },
     "timeCreate": ((unix timestamp in UTC, also holds date)),
     "timeSubmit": ((unix timestamp in UTC, also holds date)),
-    "value": ((value))
+    "values": ((value))
 };
 
 depthValue = {
@@ -65,3 +64,11 @@ tempValue = {
     "tempRange": ((max possible distance from temp, c, optional))
 };
 ```
+
+# Flow
+
+User -> Configuration -> Sensors
+
+A configuration is a group of sensors whos readings will always be taken in tandem with one another. It can be shared among multipe users. Sensors can be added to the configuration, but can never be modified after the initial creation. They can only be removed if there is no data associated with them.
+
+Sensors will be specific to the configuration, and as such will be stored in the key 'sensors'. 
