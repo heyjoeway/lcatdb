@@ -46,15 +46,19 @@ const Winston = require('winston');
 Winston.level = Config.log.level;
 
 const MongoClient = require('mongodb').MongoClient;
-const ObjectId = require('mongodb').ObjectId; // Used for getting internal MongoDB post ids
+const objectId = require('mongodb').ObjectId; // Used for getting internal MongoDB post ids
 
-const express = require('express');
-const app = express();
+const Express = require('express');
+const app = Express();
 const bodyParser = require('body-parser');
 
 const validate = require('jsonschema').validate;
 
 const Session = require('client-sessions');
+
+const mustache = require('mustache-express');
+
+// Champy-DB specific modules
 
 const Auth = require('./auth.js');
 
@@ -62,7 +66,7 @@ const Auth = require('./auth.js');
 // Mongo/Express init
 // ============================================================================
 
-var db;
+var db, users, configurations;
 
 // Connect to database.
 MongoClient.connect(
@@ -73,6 +77,10 @@ MongoClient.connect(
         );
 
 	    db = database;
+        
+        // Get collections
+        users = db.collection('users');
+        // configurations = db.collection('configurations');
 
         // Initialize HTTP server.
 	    app.listen(Config.port, () => {
@@ -80,6 +88,7 @@ MongoClient.connect(
 	    });
     }
 );
+
 
 // ============================================================================
 // Express setup
@@ -95,32 +104,71 @@ app.use(Session({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
-app.get('')
+// ----------------------------------------------------------------------------
+
+app.engine('mustache', mustache());
+app.set('view engine', 'mustache');
+app.set('views', __dirname + '/views/');
+
+// app.get('')
+
+// ----------------------------------------------------------------------------
+
+// If user is logged in, show them their dashboard.
+// Otherwise, just show the homepage.
+app.get('/', function(req, res) {
+    if (req.session && req.session.username) {
+        res.redirect('/dashboard');
+    } else {
+        res.sendFile(STATIC + 'home.html');
+    }
+});
 
 // ----------------------------------------------------------------------------
 
 app.get('/login', function(req, res) {
-    // TODO: Handle invalid login
-    res.sendFile(STATIC + 'login.html');
+    let data = {
+        "invalid": typeof(req.query.invalid) != typeof(undefined)
+    };
+
+    res.render('login', data);
+
+    Winston.debug("Login page accessed.", {
+        "data": data
+    });
 });
 
 // ----------------------------------------------------------------------------
 
 app.get('/register', function(req, res) {
-    // TODO: Handle invalid login
-    res.sendFile(STATIC + 'register.html');
+    req.session.reset();
+
+    let data = {
+        "anyErrors": false
+    };
+
+    for (var key in req.query) {
+        data[key] = true;
+        data.anyErrors = true;
+    }
+
+    Winston.debug("Registration page accessed.", {
+        "data": data
+    });
+
+    res.render('register', data);
 });
 
 // ----------------------------------------------------------------------------
 
-app.post('/registerdo', (req, res) => { Auth.register(req, res, db); });
-app.post('/logindo', (req, res) => { Auth.login(req, res, db); });
+app.post('/registerdo', (req, res) => { Auth.register(req, res, users); });
+app.post('/logindo', (req, res) => { Auth.login(req, res, users); });
 app.get('/logout', Auth.logout);
 
 // ----------------------------------------------------------------------------
 
 sessionGet('/dashboard', function(req, res, body) {
-    res.send('YAY');
+    res.render('dashboard', body);
 });
 
 // ----------------------------------------------------------------------------

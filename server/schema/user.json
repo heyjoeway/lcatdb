@@ -9,6 +9,7 @@
           "pattern": "^[!<>]*$"
         }
     },
+    "type": "object",
 	"properties": {
 		"username": {
             "type": "string",
@@ -21,9 +22,9 @@
         },
 
         "password": {
-            "description": "Hash of password, not actual password.",
+            "description": "Validates the user-input password as well as the hash. Hash is stored. Minimum password length is 6 characters.",
             "type": "string",
-            "pattern": "^[^]{6,}$"
+            "pattern": "^.{6,}$"
         },
 
 		"first": { "$ref": "#/definitions/textShort" },
@@ -31,7 +32,8 @@
 
         "organizations": {
             "type": "array",
-            "items": { "$ref": "#/definitions/textShort" }
+            "items": { "$ref": "#/definitions/textShort" },
+            "default": []
         },
 
         "phone": {
@@ -43,15 +45,17 @@
                     "location": { "$ref": "#/definitions/textShort" }
                 },
                 "required": ["number"]
-            }
+            },
+            "default": []
         },
 
-        "description": {
-            "type": "object",
-            "properties": {
-                "short": { "$ref": "#/definitions/textShort" },
-                "long": { "$ref": "#/definitions/textLong" }
-            }
+        "descShort": {
+            "$ref": "#/definitions/textShort",
+            "default": ""
+        },
+        "descLong": {
+            "$ref": "#/definitions/textLong",
+            "default": ""
         },
 
         "picture": {
@@ -61,14 +65,63 @@
         
         "creation": { "type": "number"},
 
-        "verfied": { "type": "boolean" }
+        "verified": {
+            "type": "boolean",
+            "default": false
+        },
+
+        "sensors": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "default": []
+        },
+
+        "timezone": {
+            "type": "number",
+            "minimum": -11,
+            "maximum": 14,
+            "multipleOf": 0.5
+        },
+
+        "publicity": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "first",
+                    "last",
+                    "email",
+                    "description",
+                    "creation",
+                    "timezone",
+                    "phone",
+                    "organizations"
+                ]
+            },
+            "default": [
+                "first",
+                "last",
+                "email",
+                "description",
+                "creation",
+                "timezone",
+                "phone",
+                "organizations"
+            ]
+        }
 	},
 	"required": [
         "username",
         "email",
         "password",
-        "description",
         "creation",
-        "verified"
+        "descShort",
+        "descLong",
+        "verified",
+        "sensors",
+        "timezone",
+        "publicity"
     ]
 }

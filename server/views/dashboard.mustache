@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    Welcome, {{username}}!<br>
+    <img src="{{picture}}" alt="Profile Picture"><br>
+    <h1>Profile</h1>
+    Username: {{username}}<br>
+    First Name: {{first}}<br>
+    Last Name: {{last}}<br>
+    E-mail: {{email}}<br>
+    Short Description: {{descShort}}<br>
+    Long Description: {{descLong}}<br>
+    Account created at: {{creation}}<br>
+    Is account verified?: {{verified}}<br>
+    Timezone: {{timezone}}<br>
+    Phones:<br>
+    {{#phone}}
+        Number: {{number}}<br>
+        Location: {{Location}}<br>
+        ------------------<br>
+    {{/phone}}
+    Organizations:<br>
+    {{#organizations}}
+        {{.}}<br>
+    {{/organizations}}
+    <br>
+    <a href="/logout">Logout</a>
+</body>

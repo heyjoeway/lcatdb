@@ -1,0 +1,52 @@
+{
+    "definitions": {
+        "textShort": {
+          "type": "string",
+          "pattern": "^[!<>\r\n]*$"
+        },
+        "textLong": {
+          "type": "string",
+          "pattern": "^[!<>]*$"
+        }
+    },
+    "type": "object",
+    "properties": {
+        "owner": {
+            "type": "string",
+            "description": "OID of the user who owns this configuration."
+        },
+        "members": {
+            "type": "object",
+            "patternProperties": {
+                "^$": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            },
+            "default": {}
+        },
+        "name": {
+            "$ref": { "$ref": "#/definitions/textShort" }
+        },
+        "sensors": {
+            "type": "object",
+            "patternProperties": {
+                "^$": {
+                    "type": "object",
+                    "properties": {
+                        "type": { "$ref": "#/definitions/textShort" },
+                        "name": { "$ref": "#/definitions/textShort" },
+                        "description": { "$ref": "#/definitions/textShort" },
+                        "model": { "$ref": "#/definitions/textShort" }
+                    }
+                }
+            }
+        },
+        "readings": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        }
+    }
+}

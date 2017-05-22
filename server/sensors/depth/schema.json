@@ -1,0 +1,14 @@
+{
+    "type": "object",
+    "properties": {
+        "depth": {
+            "type": "number",
+            "description": "Stored in meters."
+        },
+        "depthRange": {
+            "type": "number",
+            "description": "Max possible distance from depth. Stored in meters."
+        }
+    },
+    "required": ["depth"]
+}

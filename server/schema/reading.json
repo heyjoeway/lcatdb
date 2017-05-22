@@ -1,0 +1,61 @@
+{
+    "type": "object",
+    "properties": {
+        "creator": { "type": "string" },
+        "publisher": { "type": "string" },
+        "published": {
+            "type": "boolean",
+            "default": false
+        },
+        "location": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "type": "number",
+                    "minimum": -90,
+                    "maximum": 90
+                },
+                "long": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                },
+                "range": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Max error from lat/long in meters."
+                },
+                "alt": {
+                    "type": "number",
+                    "description": "Distance from sea level in meters."
+                },
+                "altRange": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Max error from alt in meters."
+                }
+            },
+            "required": ["lat", "long"],
+            "dependencies": {
+                "range": ["lat", "long"],
+                "altRange": "alt"
+            }
+        },
+        "timeCreated": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "timePublished": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "values": {
+            "type": "object",
+            "patternProperties": {
+                "^$": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}

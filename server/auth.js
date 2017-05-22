@@ -1,26 +1,46 @@
 const schemaUser = require('./schema/user.json');
 
+const defaults = require('json-schema-defaults');
 const validate = require('jsonschema').validate;
+
 const Winston = require('winston');
-const bcrypt = require('bcrypt');
+const Bcrypt = require('bcrypt');
 const Config = require('./config.json');
+
+// ============================================================================
+// REGISTRATION
+// ============================================================================
 
 function registerError(res, errors) {
     let errorString = JSON.stringify(errors);
     // Removes all [, ], and "
-    errorString = errorString.replace(/"|\[|\]/g, '') 
+    errorString = errorString.replace(/"|\[|\]/g, '').replace(/,/g, '&');
     res.redirect('/register?' + errorString);
 }
 
-exports.register = function(req, res, db) {
-    let newUser = {
-        "username": req.body.username,
-        "email": req.body.email,
-        "password": req.body.password,
-        "description": {},
-        "creation": Date.now(),
-        "verified": false
-    };
+/*
+ * Registers a user.
+ * req: express request object.
+ * res: express response object.
+ * users: mongoDB collection object.
+ */
+
+exports.register = function(req, res, users) {
+    let newUser = defaults(schemaUser);
+
+    [
+        newUser.username,
+        newUser.email,
+        newUser.password,
+        newUser.timezone,
+        newUser.creation
+    ] = [
+        req.body.username,
+        req.body.email,
+        req.body.password,
+        parseFloat(req.body.timezone),
+        Date.now()
+    ];
 
     let validity = validate(newUser, schemaUser);
     let errors = [];
@@ -33,7 +53,7 @@ exports.register = function(req, res, db) {
             { "email": newUser.email }
         ]}; 
 
-        db.collection('users').findOne(query, function(errFind, body) {
+        users.findOne(query, function(errFind, body) {
             if (body != null) {
                 errors.push('taken');
                 Winston.debug("Username or email already exists.", {
@@ -48,7 +68,7 @@ exports.register = function(req, res, db) {
             }
 
             // Password hashing
-            bcrypt.hash(newUser.password, Config.salt.rounds, function(errSalt, hash) {
+            Bcrypt.hash(newUser.password, Config.salt.rounds, function(errSalt, hash) {
                 if (errSalt) {
                     errors.push('unknown');
                     Winston.error("Error hashing password.", {
@@ -65,7 +85,7 @@ exports.register = function(req, res, db) {
                 newUser.password = hash;
 
                 // Saving to db
-                db.collection('users').save(newUser, function(errSave, result) {
+                users.save(newUser, function(errSave, result) {
                     if (errSave) {
                         errors.push('unknown');
                         Winston.error("Error saving new user to database.", {
@@ -87,7 +107,7 @@ exports.register = function(req, res, db) {
                 });
             });
         });
-    } else {
+    } else { // If input is not valid
         validity.errors.forEach(function(value, i, arr) {
             // Grab the actual property name instead of "instance.<property>"
             errors.push(value.property.split('.')[1]);
@@ -102,18 +122,31 @@ exports.register = function(req, res, db) {
     }
 };
 
-exports.login = function(req, res, db) {
+// ============================================================================
+// LOGIN
+// ============================================================================
+
+/*
+ * Logs-in a user.
+ * req: express request object.
+ * res: express response object.
+ * users: mongoDB collection object.
+ */
+
+exports.login = function(req, res, users) {
     let [username, password] = [req.body.username, req.body.password];
 
-    db.collection('users').findOne(
+    users.findOne(
         { "username": username },
         function(err, body) {
-            if (body == null) { // Invalid username
+            // Invalid username
+            if (body == null) { 
                 res.redirect('/login?invalid');
                 return;
             }
 
-            bcrypt.compare(password, body.password, function(err, result) {
+            // Compare password to hash (async)
+            Bcrypt.compare(password, body.password, function(err, result) {
                 if (result) {
                     req.session.username = username;
                     res.redirect('/dashboard');
@@ -125,7 +158,17 @@ exports.login = function(req, res, db) {
     );
 };
 
+// ============================================================================
+// LOGOUT
+// ============================================================================
+
+/*
+ * Logs-out a user.
+ * req: express request object.
+ * res: express response object.
+ */
+
 exports.logout = function(req, res) {
     req.session.reset();
-    res.redirect('/login');
+    res.redirect('/');
 };
