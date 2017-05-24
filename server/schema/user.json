@@ -1,14 +1,5 @@
 {
-    "definitions": {
-        "textShort": {
-          "type": "string",
-          "pattern": "^[!<>\r\n]*$"
-        },
-        "textLong": {
-          "type": "string",
-          "pattern": "^[!<>]*$"
-        }
-    },
+    "id": "/User",
     "type": "object",
 	"properties": {
 		"username": {
@@ -27,12 +18,18 @@
             "pattern": "^.{6,}$"
         },
 
-		"first": { "$ref": "#/definitions/textShort" },
-		"last": { "$ref": "#/definitions/textShort" },
+		"first": {
+            "$ref": "/Definitions/textShort",
+            "default": ""
+        },
+		"last": {
+            "$ref": "/Definitions/textShort",
+            "default": ""
+        },
 
         "organizations": {
             "type": "array",
-            "items": { "$ref": "#/definitions/textShort" },
+            "items": { "$ref": "/Definitions/textShort" },
             "default": []
         },
 
@@ -42,7 +39,7 @@
                 "type": "object",
                 "properties": {
                     "number": { "type": "string" },
-                    "location": { "$ref": "#/definitions/textShort" }
+                    "location": { "$ref": "/Definitions/textShort" }
                 },
                 "required": ["number"]
             },
@@ -50,11 +47,11 @@
         },
 
         "descShort": {
-            "$ref": "#/definitions/textShort",
+            "$ref": "/Definitions/textShort",
             "default": ""
         },
         "descLong": {
-            "$ref": "#/definitions/textLong",
+            "$ref": "/Definitions/textLong",
             "default": ""
         },
 
@@ -63,19 +60,11 @@
             "format": "uri"
         },
         
-        "creation": { "type": "number"},
+        "creation": { "$ref": "/Definitions/time" },
 
         "verified": {
             "type": "boolean",
             "default": false
-        },
-
-        "sensors": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "default": []
         },
 
         "timezone": {
@@ -112,15 +101,19 @@
             ]
         }
 	},
-	"required": [
+    "additionalProperties": false,
+    "required": [
         "username",
         "email",
         "password",
-        "creation",
+        "first",
+        "last",
+        "organizations",
+        "phone",
         "descShort",
         "descLong",
+        "creation",
         "verified",
-        "sensors",
         "timezone",
         "publicity"
     ]

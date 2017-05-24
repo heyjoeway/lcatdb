@@ -13,6 +13,9 @@
         {{#password}}
         <li>Invalid password. Passwords must be at least 6 characters long.</li>
         {{/password}}
+        {{#passwordMismatch}}
+        <li>Passwords do not match.</li>
+        {{/passwordMismatch}}
         {{#email}}
         <li>Invalid e-mail address.</li>
         {{/email}}
@@ -23,9 +26,10 @@
     {{/anyErrors}}
 
     <form action="/registerdo" method="post">
-        Username: <input type="text" name="username"><br>
-        Password: <input type="text" name="password"><br>
-        E-mail: <input type="text" name="email"><br>
+        Username: <input type="text" name="username" autofocus><br>
+        Password: <input type="password" name="password"><br>
+        Retype Password: <input type="password" name="passwordRetype"><br>
+        E-mail: <input type="email" name="email"><br>
         Timezone: <select value="0" name="timezone">
             <option value="0">GMT - Greenwich Mean Time (GMT)</option>
             <option value="0">UTC - Universal Coordinated Time (GMT)</option>

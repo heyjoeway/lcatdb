@@ -1,8 +1,19 @@
 {
+    "id": "/Reading",
     "type": "object",
     "properties": {
-        "creator": { "type": "string" },
-        "publisher": { "type": "string" },
+        "configuration": {
+            "$ref": "/Definitions/oid",
+            "description": "OID of the configuration this reading is associated with."
+        },
+        "creator": {
+            "$ref": "/Definitions/oid",
+            "description": "OID of the user who created this reading."
+        },
+        "publisher": {
+            "$ref": "/Definitions/oid", 
+            "description": "OID of the user who published this reading."
+        },
         "published": {
             "type": "boolean",
             "default": false
@@ -41,21 +52,12 @@
                 "altRange": "alt"
             }
         },
-        "timeCreated": {
-            "type": "integer",
-            "minimum": 0
-        },
-        "timePublished": {
-            "type": "integer",
-            "minimum": 0
-        },
+        "timeCreated": { "$ref": "/Definitions/time" },
+        "timePublished": { "$ref": "/Definitions/time" },
         "values": {
-            "type": "object",
-            "patternProperties": {
-                "^$": {
-                    "type": "object"
-                }
-            }
+            "type": "array",
+            "items": { "$ref": "/Value" },
+            "default": []
         }
     }
 }

@@ -1,11 +1,8 @@
-const schemaUser = require('./schema/user.json');
-
-const defaults = require('json-schema-defaults');
-const validate = require('jsonschema').validate;
+const Schema = require('./schema.js');
+const Config = require('./config.json');
 
 const Winston = require('winston');
 const Bcrypt = require('bcrypt');
-const Config = require('./config.json');
 
 // ============================================================================
 // REGISTRATION
@@ -26,7 +23,8 @@ function registerError(res, errors) {
  */
 
 exports.register = function(req, res, users) {
-    let newUser = defaults(schemaUser);
+    let newUser = Schema.defaultsKey("user");
+    let errors = [];
 
     [
         newUser.username,
@@ -42,11 +40,13 @@ exports.register = function(req, res, users) {
         Date.now()
     ];
 
-    let validity = validate(newUser, schemaUser);
-    let errors = [];
+    let validity = Schema.validateKey(newUser, "user");
 
-    // Schema Validity
-    if (validity.errors.length == 0) {
+    let passwordMismatch = req.body.password != req.body.passwordRetype;
+    if (passwordMismatch) errors.push("passwordMismatch");
+
+    // Schema Validity/Password Mismatch
+    if ((validity.errors.length == 0) && !passwordMismatch) {
         // Username/email conflict
         let query = {"$or": [
             { "username": newUser.username },
@@ -116,6 +116,8 @@ exports.register = function(req, res, users) {
             "username": newUser.username,
             "email": newUser.email,
             "errors": errors,
+            "passwordRetype": req.body.passwordRetype,
+            "passwordMismatch": passwordMismatch,
             "validity": validity
         });
         registerError(res, errors);

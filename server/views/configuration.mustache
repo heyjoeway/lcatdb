@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+    <title>Configuration</title>
+</head>
+<body>
+    {{#configuration}}
+    <h1>Configuration</h1>
+    Name: {{name}}<br>
+    ID: {{_id}}<br>
+    Owner: {{owner}}<br>
+    Creation: {{creation}}<br>
+    <h2>Members</h2>
+    <ul>
+        {{#members}}
+        <li>
+            UID: {{uid}}<br>
+            {{#canEdit}}
+            <a href="/configurations/{{_id}}/removeMember/{{uid}}">Remove</a>
+            {{/canEdit}}
+        </li>
+        {{/members}}
+    </ul>
+    {{#canEdit}}
+    <a href="/configurations/{{_id}}/addMember">Add New Member</a>
+    {{/canEdit}} 
+    <h2>Sensors</h2>
+    <ul>
+        {{#sensors}}
+        <li>
+            Name: {{name}}<br>
+            ID: {{oid}}<br>
+            Type: {{type}}<br>
+            Model: {{model}}<br>
+            Description: {{description}}
+        </li>
+        {{/sensors}}
+    </ul>
+    {{#canEdit}}
+    <a href="/configurations/{{_id}}/addSensor">Add New Sensor</a>
+    {{/canEdit}} 
+    <h2>Edits</h2>
+    <ul>
+        {{#edits}}
+        <li>{{time}}</li>
+        {{/edits}}
+    </ul>
+    {{/configuration}}
+</body>

@@ -46,13 +46,11 @@ const Winston = require('winston');
 Winston.level = Config.log.level;
 
 const MongoClient = require('mongodb').MongoClient;
-const objectId = require('mongodb').ObjectId; // Used for getting internal MongoDB post ids
+const ObjectId = require('mongodb').ObjectId; // Used for getting internal MongoDB post ids
 
 const Express = require('express');
 const app = Express();
 const bodyParser = require('body-parser');
-
-const validate = require('jsonschema').validate;
 
 const Session = require('client-sessions');
 
@@ -60,7 +58,23 @@ const mustache = require('mustache-express');
 
 // Champy-DB specific modules
 
+const Schema = require('./schema.js');
 const Auth = require('./auth.js');
+const Configurations = require('./configurations.js');
+
+// ============================================================================
+// Schema init
+// ============================================================================
+
+Schema.init({
+    "definitions": "./schema/definitions.json",
+    "configuration": "./schema/configuration.json",
+    "edit": "./schema/edit.json",
+    "reading": "./schema/reading.json",
+    "sensor": "./schema/sensor.json",
+    "user": "./schema/user.json",
+    "value": "./schema/value.json"   
+});
 
 // ============================================================================
 // Mongo/Express init
@@ -78,9 +92,11 @@ MongoClient.connect(
 
 	    db = database;
         
-        // Get collections
+        // Get collections and set up indexes
         users = db.collection('users');
-        // configurations = db.collection('configurations');
+        users.ensureIndex("username");
+        
+        configurations = db.collection('configurations');
 
         // Initialize HTTP server.
 	    app.listen(Config.port, () => {
@@ -167,8 +183,76 @@ app.get('/logout', Auth.logout);
 
 // ----------------------------------------------------------------------------
 
-sessionGet('/dashboard', function(req, res, body) {
-    res.render('dashboard', body);
+sessionGet('/dashboard', function(req, res, user) {
+    res.render('dashboard', user);
+});
+
+// ----------------------------------------------------------------------------
+
+sessionGet('/configurations', function(req, res, user) {
+    Configurations.getList(user, configurations, function(docs) {
+        res.render('configurationList', {
+            "configurations": docs
+        });
+    })
+});
+
+// ----------------------------------------------------------------------------
+
+sessionGet('/configurations/new', function(req, res, user) {
+    Configurations.new(user, configurations, function(id) {
+        res.redirect('/configurations/edit/' + id);
+    });
+});
+
+// ----------------------------------------------------------------------------
+
+/*
+ * Regex explanation:
+ * ^: Start of string.
+ * \/: '/', preceeded by the escape character ('\').
+ * configurations: Plain text.
+ * \/: Same as before.
+ * ([a-f]|[0-9]): Lowercase characters 'a' through 'f' and numbers 0 - 9.
+ * {24}: Match the above requirements 24 times.
+ * 
+ * This will match any mongoDB generated object ID.
+ */
+
+// app.get(/\/configurations\/[a-f0-9]{24}/g, function(req, res) {
+sessionGet('/configurations/([0-9a-f]{24})', function(req, res, user) {
+    let id = req.originalUrl.split('/')[2];
+    
+    configurations.findOne(
+        {'_id': ObjectId(id) },
+        function(err, configuration) {
+            if (err || configuration == null) {
+                Winston.warn('Error finding configuration.', {
+                    "username": user.username,
+                    "configuration": configuration,
+                    "errInternal": err,
+                    "id": id
+                });
+                res.render('configurationNF', {
+                    "user": user
+                });
+                return;
+            } else {
+                let canEdit = Configurations.canEdit(user, configuration);
+                Winston.debug('Rendering configuration page.', {
+                    "user": user,
+                    "configuration": configuration,
+                    "canEdit": canEdit,
+                    "id": id
+                });
+                res.render('configuration', {
+                    "user": user,
+                    "configuration": configuration,
+                    "canEdit": canEdit
+                });
+            }
+        }
+    );
 });
 
 // ----------------------------------------------------------------------------
@@ -182,10 +266,10 @@ function sessionGet(url, callback) {
 
 function sessionTest(req, res, success) {
     if (req.session && req.session.username) {
-        db.collection('users').findOne(
+        users.findOne(
             {'username': req.session.username},
-            function(err, body) {
-                success(req, res, body);
+            function(err, user) {
+                success(req, res, user);
             }
         );
     } else {

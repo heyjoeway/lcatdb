@@ -1,52 +1,38 @@
 {
-    "definitions": {
-        "textShort": {
-          "type": "string",
-          "pattern": "^[!<>\r\n]*$"
-        },
-        "textLong": {
-          "type": "string",
-          "pattern": "^[!<>]*$"
-        }
-    },
+    "id": "/Configuration",
     "type": "object",
     "properties": {
         "owner": {
-            "type": "string",
+            "$ref": "/Definitions/oid",
             "description": "OID of the user who owns this configuration."
         },
         "members": {
-            "type": "object",
-            "patternProperties": {
-                "^$": {
-                    "type": "integer",
-                    "minimum": 0
-                }
-            },
-            "default": {}
-        },
-        "name": {
-            "$ref": { "$ref": "#/definitions/textShort" }
-        },
-        "sensors": {
-            "type": "object",
-            "patternProperties": {
-                "^$": {
-                    "type": "object",
-                    "properties": {
-                        "type": { "$ref": "#/definitions/textShort" },
-                        "name": { "$ref": "#/definitions/textShort" },
-                        "description": { "$ref": "#/definitions/textShort" },
-                        "model": { "$ref": "#/definitions/textShort" }
-                    }
-                }
-            }
-        },
-        "readings": {
             "type": "array",
             "items": {
-                "type": "object"
-            }
+                "type": "object",
+                "properties": {
+                    "oid": { "$ref": "/Definitions/oid" },
+                    "role": { "type": "integer" } 
+                }
+            },
+            "default": []
+        },
+        "name": {
+            "$ref": "/Definitions/textShort",
+            "default": "New Configuration"
+        },
+        "sensors": {
+            "type": "array",
+            "items": { "$ref": "/Sensor" },
+            "default": []
+        },
+        "creation": { "type": "integer" },
+        "edits": {
+            "type": "array",
+            "items": { "$ref": "/Edit" },
+            "default": []
         }
-    }
+    },
+    "additionalProperties": false,
+    "minProperties": 6
 }

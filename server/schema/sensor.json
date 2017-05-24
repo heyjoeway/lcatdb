@@ -1,0 +1,11 @@
+{
+    "id": "/Sensor",
+    "type": "object",
+    "properties": {
+        "oid": { "$ref": "/Definitions/oid" },
+        "type": { "$ref": "/Definitions/textShort" },
+        "name": { "$ref": "/Definitions/textShort" },
+        "description": { "$ref": "/Definitions/textShort" },
+        "model": { "$ref": "/Definitions/textShort" }
+    }
+}
