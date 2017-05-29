@@ -3,7 +3,7 @@
     "type": "object",
     "properties": {
         "owner": {
-            "$ref": "/Definitions/oid",
+            "$ref": "/Definitions#/definitions/oid",
             "description": "OID of the user who owns this configuration."
         },
         "members": {
@@ -11,25 +11,25 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "oid": { "$ref": "/Definitions/oid" },
+                    "oid": { "$ref": "/Definitions#/definitions/oid" },
                     "role": { "type": "integer" } 
                 }
             },
             "default": []
         },
         "name": {
-            "$ref": "/Definitions/textShort",
+            "$ref": "/Definitions#/definitions/textShort",
             "default": "New Configuration"
         },
         "sensors": {
             "type": "array",
-            "items": { "$ref": "/Sensor" },
+            "items": { "$ref": "/Sensor#" },
             "default": []
         },
         "creation": { "type": "integer" },
         "edits": {
             "type": "array",
-            "items": { "$ref": "/Edit" },
+            "items": { "$ref": "/Edit#" },
             "default": []
         }
     },

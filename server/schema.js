@@ -1,6 +1,6 @@
-const JsonSchema = require('jsonschema');
+const Ajv = require('ajv');
 
-const validator = new JsonSchema.Validator();
+const validator = new Ajv({ "allErrors": true });
 const defaults = require('json-schema-defaults');
 const deepcopy = require('deepcopy');
 
@@ -15,7 +15,7 @@ exports.loadSchemaManifest = function(manifest) {
     Object.keys(manifest).forEach(function(key) {
         let val = manifest[key];
         schemas[key] = require(val);
-        validator.addSchema(schemas[key]);
+        validator.addSchema(schemas[key], key);
     });
 }
 
@@ -33,11 +33,7 @@ exports.init = function(manifest) {
 
 // ----------------------------------------------------------------------------
 
-exports.defaults = function(schema) {
-    return defaults(schema);
-};
-
-exports.defaultsKey = function(key) {
+exports.defaults = function(key) {
     let val = schemaDefaults[key];
 
     if (typeof(val) == 'undefined') {
@@ -50,10 +46,10 @@ exports.defaultsKey = function(key) {
 
 // ----------------------------------------------------------------------------
 
-exports.validate = function(any, schema) {
-    return validator.validate(any, schema);
+exports.validate = function(schema, data) {
+    return validator.validate(schema, data);
 }
 
-exports.validateKey = function(any, key) {
-    return validator.validate(any, schemas[key]);
+exports.errors = function() {
+    return validator.errors;
 }

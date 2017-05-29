@@ -1,19 +1,21 @@
 {
     "id": "/Definitions",
-    "textShort": {
-        "type": "string",
-        "pattern": "^[!<>\r\n]*$"
-    },
-    "textLong": {
-        "type": "string",
-        "pattern": "^[!<>]*$"
-    },
-    "oid": {
-        "type": "string",
-        "pattern": "^[0-9a-f]{24}$"
-    },
-    "time": {
-        "type": "integer",
-        "minimum": 0
+    "definitions": {
+        "textShort": {
+            "type": "string",
+            "pattern": "^[!<>\r\n]*$"
+        },
+        "textLong": {
+            "type": "string",
+            "pattern": "^[!<>]*$"
+        },
+        "oid": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{24}$"
+        },
+        "time": {
+            "type": "integer",
+            "minimum": 0
+        }
     }
 }

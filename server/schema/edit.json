@@ -6,10 +6,10 @@
         "diff": {
             "type": "object",
             "properties": {
-                "owner": { "$ref": "/Configuration/properties/owner" },
-                "members": { "$ref": "/Configuration/properties/members" },
-                "name": { "$ref": "/Configuration/properties/name" },
-                "sensors": { "$ref": "/Configuration/properties/sensors" }
+                "owner": { "$ref": "/Configuration#/properties/owner" },
+                "members": { "$ref": "/Configuration#/properties/members" },
+                "name": { "$ref": "/Configuration#/properties/name" },
+                "sensors": { "$ref": "/Configuration#/properties/sensors" }
             }    
         }
     },

@@ -19,17 +19,17 @@
         },
 
 		"first": {
-            "$ref": "/Definitions/textShort",
+            "$ref": "/Definitions#/definitions/textShort",
             "default": ""
         },
 		"last": {
-            "$ref": "/Definitions/textShort",
+            "$ref": "/Definitions#/definitions/textShort",
             "default": ""
         },
 
         "organizations": {
             "type": "array",
-            "items": { "$ref": "/Definitions/textShort" },
+            "items": { "$ref": "/Definitions#/definitions/textShort" },
             "default": []
         },
 
@@ -39,7 +39,7 @@
                 "type": "object",
                 "properties": {
                     "number": { "type": "string" },
-                    "location": { "$ref": "/Definitions/textShort" }
+                    "location": { "$ref": "/Definitions#/definitions/textShort" }
                 },
                 "required": ["number"]
             },
@@ -47,11 +47,11 @@
         },
 
         "descShort": {
-            "$ref": "/Definitions/textShort",
+            "$ref": "/Definitions#/definitions/textShort",
             "default": ""
         },
         "descLong": {
-            "$ref": "/Definitions/textLong",
+            "$ref": "/Definitions#/definitions/textLong",
             "default": ""
         },
 
@@ -60,7 +60,7 @@
             "format": "uri"
         },
         
-        "creation": { "$ref": "/Definitions/time" },
+        "creation": { "$ref": "/Definitions#/definitions/time" },
 
         "verified": {
             "type": "boolean",

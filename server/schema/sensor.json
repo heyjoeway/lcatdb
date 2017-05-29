@@ -2,10 +2,10 @@
     "id": "/Sensor",
     "type": "object",
     "properties": {
-        "oid": { "$ref": "/Definitions/oid" },
-        "type": { "$ref": "/Definitions/textShort" },
-        "name": { "$ref": "/Definitions/textShort" },
-        "description": { "$ref": "/Definitions/textShort" },
-        "model": { "$ref": "/Definitions/textShort" }
+        "oid": { "$ref": "/Definitions#/definitions/oid" },
+        "type": { "$ref": "/Definitions#/definitions/textShort" },
+        "name": { "$ref": "/Definitions#/definitions/textShort" },
+        "description": { "$ref": "/Definitions#/definitions/textShort" },
+        "model": { "$ref": "/Definitions#/definitions/textShort" }
     }
 }

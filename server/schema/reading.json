@@ -3,15 +3,15 @@
     "type": "object",
     "properties": {
         "configuration": {
-            "$ref": "/Definitions/oid",
+            "$ref": "/Definitions#/definitions/oid",
             "description": "OID of the configuration this reading is associated with."
         },
         "creator": {
-            "$ref": "/Definitions/oid",
+            "$ref": "/Definitions#/definitions/oid",
             "description": "OID of the user who created this reading."
         },
         "publisher": {
-            "$ref": "/Definitions/oid", 
+            "$ref": "/Definitions#/definitions/oid", 
             "description": "OID of the user who published this reading."
         },
         "published": {
@@ -49,11 +49,11 @@
             "required": ["lat", "long"],
             "dependencies": {
                 "range": ["lat", "long"],
-                "altRange": "alt"
+                "altRange": ["alt"]
             }
         },
-        "timeCreated": { "$ref": "/Definitions/time" },
-        "timePublished": { "$ref": "/Definitions/time" },
+        "timeCreated": { "$ref": "/Definitions#/definitions/time" },
+        "timePublished": { "$ref": "/Definitions#/definitions/time" },
         "values": {
             "type": "array",
             "items": { "$ref": "/Value" },
