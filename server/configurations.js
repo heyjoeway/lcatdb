@@ -23,15 +23,15 @@ exports.getList = function(user, configurations, callback) {
 
 // ----------------------------------------------------------------------------
 
-exports.find = function(configurations, id, success, failure) {
+exports.find = function(configurations, oid, success, failure) {
     configurations.findOne(
-        {'_id': ObjectId(id) },
+        { "_id": ObjectId(oid) },
         (err, configuration) => {
             if (err || configuration == null) {
                 Winston.warn('Error finding configuration.', {
                     "configuration": configuration,
                     "errInternal": err,
-                    "id": id
+                    "oid": oid.toString()
                 });
                 failure(err);
                 return;
@@ -74,18 +74,19 @@ exports.new = function(user, configurations, callback) {
 
 // ----------------------------------------------------------------------------
 
-exports.edit = function(user, configurations, id, data, success, failure) {
-    function fail(err) {
+exports.edit = function(user, configurations, oid, edit, success, failure) {
+    function fail(error) {
         Winston.debug("Failed to edit configuration.", {
             "username": user.username,
-            "id": id,
-            "data": data
+            "oid": oid.toString(),
+            "edit": edit,
+            "error": error
         });
 
-        failure(err);
+        failure(error);
     }
 
-    exports.find(id, configurations,
+    exports.find(configurations, oid,
         (configuration) => {
             let canEdit = exports.canEdit(user, configuration);
             if (!canEdit) {
@@ -95,37 +96,46 @@ exports.edit = function(user, configurations, id, data, success, failure) {
 
             // -----
 
-            let idOverwrite = newData.hasOwnProperty("_id") &&
-                ObjectId(newData["_id"]) != ObjectId(configuration["_id"]);
-            if (idOverwrite) {
-                fail({ "type": "idOverwrite" });
-                return;
-            }
-
-            // -----
-
-            let newData = merge.recursive(configuration, data);
-            let validity = Schema.validate('Configuration', configuration);
+            let editValidity = Schema.validate('ConfigurationEdit', edit);
             
-            if (!validity) {
-                fail({ "type": "validity", "data": Schema.errors() });
+            if (!editValidity) {
+                fail({ "type": "editValidity", "errors": Schema.errors() });
+                return;
+            }
+
+            // -----
+
+            let newData = merge.recursive(configuration, edit);
+
+            configuration.edits.push({
+                "time": Date.now(),
+                "changes": edit
+            });
+
+            let completeValidity = Schema.validate('Configuration', configuration);
+            
+            if (!completeValidity) {
+                fail({ "type": "completeValidity", "errors": Schema.errors() });
                 return;
             }
             
             // -----
 
-            let writeResult = configurations.update({'_id': ObjectId(id) }, newData);
-
-            if (writeResult.hasWriteConcernError()) {
-                fail({ "type": "write", "data": writeResult });
-                return;
-            }
-
-            // -----
-
-            success();
+            configurations.updateOne({'_id': ObjectId(oid) }, newData,
+                (errUpdate, writeResult) => {
+                    if (writeResult.result.ok == 1) {
+                        success();
+                        return;
+                    }
+                    fail({
+                        "type": "write",
+                        "result": writeResult.toString(),
+                        "error": errUpdate
+                    });
+                }
+            );
         },
-        (err) => { fail({ "type": "find", "data": err }) }
+        (error) => { fail({ "type": "find", "error": error }) }
     );
 }
 
@@ -144,11 +154,10 @@ exports.canEdit = function(user, configuration) {
     Winston.debug("Testing if user can edit this configuration.", {
         "username": user.username,
         "result": result,
-        "ownerId": ownerId,
-        "userId": userId,
-        "configuration": configuration
+        "ownerId": ownerId.toString(),
+        "userId": userId.toString(),
+        "configurationId": ObjectId(configuration['_id']).toString()
     });
 
     return result;
 };
-

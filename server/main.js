@@ -73,7 +73,7 @@ const Configurations = require('./configurations.js');
 Schema.init({
     "Definitions": "./schema/definitions.json",
     "Configuration": "./schema/configuration.json",
-    "Edit": "./schema/edit.json",
+    "ConfigurationEdit": "./schema/configurationEdit.json",
     "Reading": "./schema/reading.json",
     "Sensor": "./schema/sensor.json",
     "User": "./schema/user.json",
@@ -281,12 +281,12 @@ configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor');
 // Configuration edit (action)
 // ----------------------------------------------------------------------------
 
-sessionPost('/configurations/${configPattern}/editDo', (req, res, user) => {
+sessionPost(`/configurations/${configPattern}/editDo`, (req, res, user) => {
     let id = req.originalUrl.split('/')[2];
 
     Configurations.edit(user, configurations, id, req.body,
         () => { res.redirect(`/configurations/${id}`); },
-        (err) => { res.send("Error processing request."); }
+        (error) => { res.send(`Error processing request. (${error.type})`); }
     );
 });
 

@@ -5,6 +5,9 @@
 <body>
     {{#configuration}}
     <h1>Configuration</h1>
+    {{#canEdit}}
+    <a href="/configurations/{{_id}/edit">Edit Details</a>
+    {{/canEdit}}
     Name: {{name}}<br>
     ID: {{_id}}<br>
     Owner: {{owner}}<br>

@@ -3,15 +3,14 @@
     "definitions": {
         "textShort": {
             "type": "string",
-            "pattern": "^[!<>\r\n]*$"
+            "pattern": "^[^<>\r\n]*$"
         },
         "textLong": {
             "type": "string",
-            "pattern": "^[!<>]*$"
+            "pattern": "^[^<>]*$"
         },
         "oid": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{24}$"
+            "type": "object"
         },
         "time": {
             "type": "integer",

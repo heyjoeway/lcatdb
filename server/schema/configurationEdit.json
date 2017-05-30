@@ -1,0 +1,10 @@
+{
+    "id": "/ConfigurationEdit",
+    "type": "object",
+    "properties": {
+        "members": { "$ref": "/Configuration#/properties/members" },
+        "name": { "$ref": "/Configuration#/properties/name" },
+        "sensors": { "$ref": "/Configuration#/properties/sensors" }
+    },
+    "additionalProperties": false
+}

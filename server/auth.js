@@ -72,7 +72,8 @@ exports.findQuery = function(users, query, success, failure) {
         } else {
             Winston.debug("Found user.", {
                 "query": query,
-                "user": user
+                "oid": ObjectId(user['_id']).toString()
+                // "user": user
             });
             success(user);
         }

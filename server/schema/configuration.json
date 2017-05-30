@@ -2,6 +2,9 @@
     "id": "/Configuration",
     "type": "object",
     "properties": {
+        "_id": {
+            "$ref": "/Definitions#/definitions/oid"
+        },
         "owner": {
             "$ref": "/Definitions#/definitions/oid",
             "description": "OID of the user who owns this configuration."
@@ -12,7 +15,9 @@
                 "type": "object",
                 "properties": {
                     "oid": { "$ref": "/Definitions#/definitions/oid" },
-                    "role": { "type": "integer" } 
+                    "permissions": {
+                        "type": "array"
+                    } 
                 }
             },
             "default": []
@@ -26,13 +31,28 @@
             "items": { "$ref": "/Sensor#" },
             "default": []
         },
-        "creation": { "type": "integer" },
+        "creation": { "$ref": "/Definitions#/definitions/time" },
         "edits": {
             "type": "array",
-            "items": { "$ref": "/Edit#" },
+            "items": {
+                "type": "object",
+                "properties": {
+                    "time": { "$ref": "/Definitions#/definitions/time" },
+                    "changes": { "$ref": "/ConfigurationEdit#" }
+                },
+                "additionalProperties": false,
+                "required": ["time"]    
+            },
             "default": []
         }
     },
     "additionalProperties": false,
-    "minProperties": 6
+    "required": [
+        "owner",
+        "members",
+        "name",
+        "sensors",
+        "creation",
+        "edits"
+    ]
 }
