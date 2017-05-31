@@ -12,6 +12,7 @@ const Bcrypt = require('bcrypt');
 
 const Schema = require('./schema.js');
 const Config = require('./config.json');
+const Db = require('./db.js');
 
 // ============================================================================
 // FIND
@@ -19,7 +20,6 @@ const Config = require('./config.json');
 
 /* Finds a user by username and/or email.
  *
- * users: mongoDB collection object.
  * username: Undefined if wanting to search by email.
  * email: Undefined if wanting to search by username.
  * success: Callback to be run upon successful find. Parameters are:
@@ -28,18 +28,17 @@ const Config = require('./config.json');
  *      - err: mongoDB error object.
  */
 
-exports.find = function(users, username, email, success, failure) {
+exports.find = function(username, email, success, failure) {
     let query = { "$or": [] }; 
 
     if (username) query["$or"].push({ "username": username });
     if (email) query["$or"].push({ "email": email });
 
-    return exports.findQuery(users, query, success, failure);
+    return exports.findQuery(query, success, failure);
 }
 
 /* Finds a user by object ID.
  *
- * users: mongoDB collection object.
  * oid: ObjectId object or string.
  * success: Callback to be run upon successful find. Parameters are:
  *      - user: User object.
@@ -47,13 +46,12 @@ exports.find = function(users, username, email, success, failure) {
  *      - err: mongoDB error object.
  */
 
-exports.findOid = function(users, oid, success, failure) {
-    return exports.findQuery(users, { "_id": ObjectId(oid) }, success, failure);
+exports.findOid = function(oid, success, failure) {
+    return exports.findQuery({ "_id": ObjectId(oid) }, success, failure);
 }
 
 /* Finds a user by query.
  *
- * users: mongoDB collection object.
  * query: mongoDB query object.
  * success: Callback to be run upon successful find. Parameters are:
  *      - user: User object.
@@ -61,7 +59,9 @@ exports.findOid = function(users, oid, success, failure) {
  *      - err: mongoDB error object.
  */
 
-exports.findQuery = function(users, query, success, failure) {
+exports.findQuery = function(query, success, failure) {
+    let users = Db.collection('users');
+
     users.findOne(query, (error, user) => {
         if (user == null || error != null) {
             Winston.debug("Could not find user.", {
@@ -86,7 +86,6 @@ exports.findQuery = function(users, query, success, failure) {
 
 /* Registers a user.
  * 
- * users: mongoDB collection object.
  * data: data used to create new user. Requires the following properties:
  *      - username
  *      - email
@@ -100,7 +99,9 @@ exports.findQuery = function(users, query, success, failure) {
  *      Other properties may be included depending on the error type.
  */
 
-exports.register = function(users, data, success, failure) {
+exports.register = function(data, success, failure) {
+    let users = Db.collection('users');
+
     function fail(errors) {
         Winston.debug("Failed to register user.", {
             "data": data,
@@ -150,7 +151,7 @@ exports.register = function(users, data, success, failure) {
     }
 
     // Username/email conflict
-    exports.find(users, newUser.username, newUser.email,
+    exports.find(newUser.username, newUser.email,
         () => { // User found
             errors.push({ "type": "taken" });
             fail(errors);
@@ -197,7 +198,6 @@ exports.register = function(users, data, success, failure) {
 /* Validates a correct username and password combination.
  * Does not affect session.
  * 
- * users: mongoDB collection object.
  * username: Username of user.
  * password: Password of user. (Not hash)
  * success: Callback to be run upon successful validation. Parameters are:
@@ -208,12 +208,14 @@ exports.register = function(users, data, success, failure) {
  *      Can also conatin additional properties depending on the type.
  */
 
-exports.login = function(users, username, password, success, failure) {
+exports.login = function(username, password, success, failure) {
+    let users = Db.collection('users');
+
     function fail(error) {
         failure(error)
     }
 
-    exports.find(users, username, undefined,
+    exports.find(username, undefined,
         (user) => { // User found
             Bcrypt.compare(password, user.password, function(err, result) {
                 if (result) { // Pasword valid

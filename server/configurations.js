@@ -1,12 +1,35 @@
-const Schema = require('./schema.js');
+// ============================================================================
+// IMPORTS
+// ============================================================================
 
 const Winston = require('winston');
 const ObjectId = require('mongodb').ObjectId;
 const merge = require('merge');
 
 // ----------------------------------------------------------------------------
+// Champy-DB specific modules
+// ----------------------------------------------------------------------------
 
-exports.getList = function(user, configurations, callback) {
+const Schema = require('./schema.js');
+const Db = require('./db.js');
+
+// ============================================================================
+// FINDING/LISTING
+// ============================================================================
+
+/**
+ * Gets a list of configurations associated with a given user.
+ * TODO: Search if a member of a configuration. Currently only searches if
+ * owner.
+ * 
+ * @param {object} user - User object.
+ * @param {function} callback - Callback to be run once configurations are found. Parameters are:
+ *      - list: Array of configuration objects associated with user.
+ */
+
+exports.getList = function(user, callback) {
+    let configurations = Db.collection('configurations');
+
     let query = { "owner": ObjectId(user["_id"]) };
     let cursor = configurations.find(query);
     cursor.toArray(function(err, list) {
@@ -21,16 +44,26 @@ exports.getList = function(user, configurations, callback) {
     });
 };
 
-// ----------------------------------------------------------------------------
+/**
+ * Finds a configuration by object ID.
+ *
+ * @param {(object|string)} oid - ObjectId object or string.
+ * @param {function} success - Callback to be run upon successful find. Parameters are:
+ *      - configuration: Configuration object.
+ * @param {function} failure - Callback to be run if no configuration is found. Parameters are:
+ *      - err: mongoDB error object.
+ */
 
-exports.find = function(configurations, oid, success, failure) {
+exports.find = function(oid, success, failure) {
+    let configurations = Db.collection('configurations');
+
     configurations.findOne(
         { "_id": ObjectId(oid) },
         (err, configuration) => {
             if (err || configuration == null) {
                 Winston.warn('Error finding configuration.', {
                     "configuration": configuration,
-                    "errInternal": err,
+                    "errInt ernal": err,
                     "oid": oid.toString()
                 });
                 failure(err);
@@ -40,9 +73,22 @@ exports.find = function(configurations, oid, success, failure) {
     );
 }
 
-// ----------------------------------------------------------------------------
+// ============================================================================
+// CREATION/EDITING
+// ============================================================================
 
-exports.new = function(user, configurations, callback) {
+/**
+ * Creates a new Configuration in a collection and provides the new oid.
+ * 
+ * @param {object} user - User object.
+ * @param {object} configurations - mongoDB collection object.
+ * @param {function} callback - Callback to be run upon successful creation. Parameters are:
+ *      - oid: ObjectId of the new configuration.
+ */
+
+exports.new = function(user, callback) {
+    let configurations = Db.collection('configurations');
+
     let newConfiguration = Schema.defaults("Configuration");
     
     [
@@ -66,15 +112,27 @@ exports.new = function(user, configurations, callback) {
             "username": user.username,
             "newConfiguration": newConfiguration
         });
-        // Run callback with the id string to the new configuration
+        // Run callback with the oid of the new configuration
         // as the parameter
-        callback(result.ops[0]["_id"]);
+        callback(ObjectId(result.ops[0]["_id"]));
     })
 };
 
 // ----------------------------------------------------------------------------
 
-exports.edit = function(user, configurations, oid, edit, success, failure) {
+/**
+ * Edits a configuration in a collection.
+ * 
+ * @param {object} user - User object.
+ * @param {object} configurations - mongoDB collection object.
+ * @param {(object|string)} oid - ObjectId object or string of the configuration to edit.
+ * @param {function} success - Callback to be run upon successful edit.
+ * @param {function} failure - Callback to be run upon failure.
+ */
+
+exports.edit = function(user, oid, edit, success, failure) {
+    let configurations = Db.collection('configurations');
+
     function fail(error) {
         Winston.debug("Failed to edit configuration.", {
             "username": user.username,
@@ -86,7 +144,7 @@ exports.edit = function(user, configurations, oid, edit, success, failure) {
         failure(error);
     }
 
-    exports.find(configurations, oid,
+    exports.find(oid,
         (configuration) => {
             let canEdit = exports.canEdit(user, configuration);
             if (!canEdit) {
@@ -140,6 +198,12 @@ exports.edit = function(user, configurations, oid, edit, success, failure) {
 }
 
 // ----------------------------------------------------------------------------
+
+/**
+ * Tests if user is able to edit a configuration.
+ * @param {object} user - User object
+ * @param {object} configuration - Configuration object
+ */
 
 exports.canEdit = function(user, configuration) {
     let ownerId = ObjectId(configuration.owner);

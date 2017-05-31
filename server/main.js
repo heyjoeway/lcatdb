@@ -65,6 +65,7 @@ const mustache = require('mustache-express');
 const Schema = require('./schema.js');
 const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
+const Db = require('./db.js');
 
 // ============================================================================
 // SCHEMA INIT
@@ -84,31 +85,14 @@ Schema.init({
 // MONGO/EXPRESS INIT
 // ============================================================================
 
-var db, users, configurations;
-
-// Connect to database.
-MongoClient.connect(
-    Config.db.uri,
-    (error, database) => {
-	    if (error) return Winston.error(
-            'Could not connect to database.', { "error": error }
-        );
-
-	    db = database;
-        
-        // Get collections and set up indexes
-        users = db.collection('users');
-        users.ensureIndex("username");
-        
-        configurations = db.collection('configurations');
-
-        // Initialize HTTP server.
-	    app.listen(Config.port, () => {
-		    Winston.info('Server listening.', { "port" : Config.port });
-	    });
-    }
+Db.connect(
+    () => { // Success
+        app.listen(Config.port, () => {
+            Winston.info('Server listening.', { "port" : Config.port });
+        });
+    },
+    (error) => { }
 );
-
 
 // ============================================================================
 // EXPRESS INIT
@@ -171,7 +155,7 @@ app.get('/login', (req, res) => {
 // ----------------------------------------------------------------------------
 
 app.post('/logindo', (req, res) => {
-    Auth.login(users, req.body.username, req.body.password, 
+    Auth.login(req.body.username, req.body.password, 
         (oid) => { // Success
             req.session.oid = oid.toString();
             res.redirect('/dashboard');
@@ -206,7 +190,7 @@ app.get('/register', (req, res) => {
 // ----------------------------------------------------------------------------
 
 app.post('/registerdo', (req, res) => {
-    Auth.register(users, req.body,
+    Auth.register(req.body,
         (oid) => { // Success
             req.session.oid = oid.toString();
             res.redirect('/dashboard');
@@ -249,7 +233,7 @@ sessionGet('/dashboard', (req, res, user) => {
 // ----------------------------------------------------------------------------
 
 sessionGet('/configurations', (req, res, user) => {
-    Configurations.getList(user, configurations, (docs) => {
+    Configurations.getList(user, (docs) => {
         res.render('configurationList', {
             "configurations": docs
         });
@@ -284,7 +268,7 @@ configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor');
 sessionPost(`/configurations/${configPattern}/editDo`, (req, res, user) => {
     let id = req.originalUrl.split('/')[2];
 
-    Configurations.edit(user, configurations, id, req.body,
+    Configurations.edit(user, id, req.body,
         () => { res.redirect(`/configurations/${id}`); },
         (error) => { res.send(`Error processing request. (${error.type})`); }
     );
@@ -295,7 +279,7 @@ sessionPost(`/configurations/${configPattern}/editDo`, (req, res, user) => {
 // ----------------------------------------------------------------------------
 
 sessionGet('/configurations/new', (req, res, user) => {
-    Configurations.new(user, configurations, (id) => {
+    Configurations.new(user, (id) => {
         res.redirect(`/configurations/${id}/edit`);
     });
 });
@@ -370,7 +354,7 @@ function configurationGet(url, success) {
 function configurationTest(req, res, user, success) {
     let id = req.originalUrl.split('/')[2];
 
-    Configurations.find(configurations, id,
+    Configurations.find(id,
         (configuration) => { // Success
             success(req, res, user, configuration);
         },
@@ -436,7 +420,7 @@ function sessionTest(req, res, success) {
 
     if (req.session && req.session.oid) {
         let oid = ObjectId(req.session.oid);
-        Auth.findOid(users, oid,
+        Auth.findOid(oid,
             (user) => { // Success
                 success(req, res, user);
             },
