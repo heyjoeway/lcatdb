@@ -122,6 +122,8 @@ exports.new = function(user, callback) {
 
 /**
  * Edits a configuration in a collection.
+ * TODO: Push edit history using a mongoDB push and not pulling the whole log
+ * each time.
  * 
  * @param {object} user - User object.
  * @param {object} configurations - mongoDB collection object.
@@ -166,6 +168,7 @@ exports.edit = function(user, oid, edit, success, failure) {
             let newData = merge.recursive(configuration, edit);
 
             configuration.edits.push({
+                "uid": ObjectId(user['_id']),
                 "time": Date.now(),
                 "changes": edit
             });
@@ -201,6 +204,8 @@ exports.edit = function(user, oid, edit, success, failure) {
 
 /**
  * Tests if user is able to edit a configuration.
+ * TODO: Replace with a more fleshed-out permission system.
+ * 
  * @param {object} user - User object
  * @param {object} configuration - Configuration object
  */

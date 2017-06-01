@@ -2,7 +2,8 @@
     "id": "/Sensor",
     "type": "object",
     "properties": {
-        "oid": { "$ref": "/Definitions#/definitions/oid" },
+        "_id": { "$ref": "/Definitions#/definitions/oid" },
+        "owner": { "$ref": "/Definitions#/definitions/oid" },
         "type": {
             "$ref": "/Definitions#/definitions/textShort"
         },
@@ -11,17 +12,30 @@
             "default": "New Sensor"
         },
         "description": {
-            "$ref": "/Definitions#/definitions/textShort",
+            "$ref": "/Definitions#/definitions/textLong",
             "default": ""
         },
         "model": {
             "$ref": "/Definitions#/definitions/textShort",
             "default": ""
+        },
+        "edits": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "time": { "$ref": "/Definitions#/definitions/time" },
+                    "changes": { "$ref": "/SensorEdit#" }
+                },
+                "additionalProperties": false,
+                "required": ["time"]
+            },
+            "default": []
         }
     },
     "additionalProperties": false,
     "required": [
-        "oid",
+        "owner",
         "type",
         "name",
         "description",

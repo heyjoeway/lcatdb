@@ -15,6 +15,20 @@
         "time": {
             "type": "integer",
             "minimum": 0
+        },
+        "configurationPerms": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "addMember",
+                    "removeMember",
+                    "addSensor",
+                    "removeSensor",
+                    "editName"
+                ]
+            },
+            "default": []
         }
     }
 }

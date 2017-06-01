@@ -15,10 +15,10 @@
                 "type": "object",
                 "properties": {
                     "oid": { "$ref": "/Definitions#/definitions/oid" },
-                    "permissions": {
-                        "type": "array"
-                    } 
-                }
+                    "permissions": { "$ref": "/Definitions#/definitions/configurationPerms" } 
+                },
+                "additionalProperties": false,
+                "required": ["oid", "permissions"]
             },
             "default": []
         },
@@ -37,6 +37,7 @@
             "items": {
                 "type": "object",
                 "properties": {
+                    "uid": { "$ref": "/Definitions#/definitions/oid" },
                     "time": { "$ref": "/Definitions#/definitions/time" },
                     "changes": { "$ref": "/ConfigurationEdit#" }
                 },
