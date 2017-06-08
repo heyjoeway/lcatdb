@@ -4,7 +4,7 @@
 
 const Winston = require('winston');
 const ObjectId = require('mongodb').ObjectId;
-const merge = require('merge');
+const deepmerge = require('deepmerge');
 
 // ----------------------------------------------------------------------------
 // Champy-DB specific modules
@@ -12,6 +12,7 @@ const merge = require('merge');
 
 const Schema = require('./schema.js');
 const Db = require('./db.js');
+const Sensor = require('./sensor.js');
 
 // ============================================================================
 // FINDING/LISTING
@@ -63,7 +64,7 @@ exports.find = function(oid, success, failure) {
             if (err || configuration == null) {
                 Winston.warn('Error finding configuration.', {
                     "configuration": configuration,
-                    "errInt ernal": err,
+                    "errInternal": err,
                     "oid": oid.toString()
                 });
                 failure(err);
@@ -121,30 +122,34 @@ exports.new = function(user, callback) {
 // ----------------------------------------------------------------------------
 
 /**
- * Edits a configuration in a collection.
+ * Edits a Configuration in the collection.
  * TODO: Push edit history using a mongoDB push and not pulling the whole log
  * each time.
  * 
  * @param {object} user - User object.
- * @param {object} configurations - mongoDB collection object.
  * @param {(object|string)} oid - ObjectId object or string of the configuration to edit.
+ * @param {object} edit - Data to edit the Configuration with..
  * @param {function} success - Callback to be run upon successful edit.
  * @param {function} failure - Callback to be run upon failure.
  */
 
 exports.edit = function(user, oid, edit, success, failure) {
-    let configurations = Db.collection('configurations');
 
     function fail(error) {
         Winston.debug("Failed to edit configuration.", {
             "username": user.username,
-            "oid": oid.toString(),
+            "oid": (oid || "").toString(),
             "edit": edit,
             "error": error
         });
 
         failure(error);
     }
+
+    try { oid = ObjectId(oid); }
+    catch(e) { return fail({ "type": "badId", "exception": e }); }
+
+    let configurations = Db.collection('configurations');
 
     exports.find(oid,
         (configuration) => {
@@ -165,39 +170,109 @@ exports.edit = function(user, oid, edit, success, failure) {
 
             // -----
 
-            let newData = merge.recursive(configuration, edit);
+            exports.canAddSensorMulti(user, edit.sensors, () => {
+                // Custom array merge function ensures all arrays are concatenated.
+                // e.g:
+                // >> let test1 = { "test": [ 1, 2, 3 ]}
+                // >> let test2 = { "test": [ 4, 5, 6 ]}
+                // >> deepmerge(test1, test2, { ... })
+                // { "test": [ 1, 2, 3, 4, 5, 6 ] }
+                
+                let newData = deepmerge(configuration, edit, {
+                    arrayMerge: (dest, src) => { return dest.concat(src) }
+                });
 
-            configuration.edits.push({
-                "uid": ObjectId(user['_id']),
-                "time": Date.now(),
-                "changes": edit
-            });
+                configuration.edits.push({
+                    "uid": ObjectId(user['_id']),
+                    "time": Date.now(),
+                    "changes": edit
+                });
 
-            let completeValidity = Schema.validate('Configuration', configuration);
-            
-            if (!completeValidity) {
-                fail({ "type": "completeValidity", "errors": Schema.errors() });
-                return;
-            }
-            
+                let completeValidity = Schema.validate('Configuration', configuration);
+                
+                if (!completeValidity) {
+                    fail({ "type": "completeValidity", "errors": Schema.errors() });
+                    return;
+                }
+                
+                // -----
+
+                configurations.updateOne({'_id': ObjectId(oid) }, newData,
+                    (errUpdate, writeResult) => {
+                        if (errUpdate || writeResult.result.ok != 1) {
+                            console.log(errUpdate);
+                            return fail({
+                                "type": "write",
+                                "result": (writeResult || "").toString(),
+                                "error": errUpdate
+                            });
+                        }
+                        
+                        success();
+                    }
+                );
+
+            }, fail);
+
             // -----
 
-            configurations.updateOne({'_id': ObjectId(oid) }, newData,
-                (errUpdate, writeResult) => {
-                    if (writeResult.result.ok == 1) {
-                        success();
-                        return;
-                    }
-                    fail({
-                        "type": "write",
-                        "result": writeResult.toString(),
-                        "error": errUpdate
-                    });
-                }
-            );
         },
         (error) => { fail({ "type": "find", "error": error }) }
     );
+}
+
+exports.canAddSensor = function(user, sid, success, failure) {
+    function fail(error) {
+        Winston.debug("Cannot add sensor.", {
+            "error": error
+        });
+        failure(error);
+        return error;
+    }
+    
+    Sensor.find(sid,
+        (sensor) => {
+            let ownerId = ObjectId(sensor.owner);
+            let userId = ObjectId(user["_id"]);
+            let result = ownerId.equals(userId);
+
+            if (!result) return fail({ "type": "mismatch" });
+
+            success();
+        },
+        (error) => { fail({ "type": "find", "error": error }) }
+    );
+}
+
+exports.canAddSensorMulti = function(user, sidArray, success, failure) {
+    function fail(error) {
+        Winston.debug("Could not add one or more sensors.", {
+            "error": error,
+            "sidArray": sidArray
+        });
+        failure(error);
+        return error;
+    }
+
+    if (typeof sidArray == "undefined") return success();
+
+    let responsesLeft = sidArray.length;
+    let hasFailed = false;
+
+    sidArray.forEach((sid) => {
+        exports.canAddSensor(user, sid,
+            () => {
+                if (hasFailed) return;
+                responsesLeft--;
+                if (responsesLeft == 0) success();
+            },
+            (error) => {
+                if (hasFailed) return;
+                fail(error);
+                hasFailed = true;
+            }
+        )
+    });
 }
 
 // ----------------------------------------------------------------------------
@@ -208,6 +283,7 @@ exports.edit = function(user, oid, edit, success, failure) {
  * 
  * @param {object} user - User object
  * @param {object} configuration - Configuration object
+ * @returns {bool} result
  */
 
 exports.canEdit = function(user, configuration) {
@@ -215,8 +291,8 @@ exports.canEdit = function(user, configuration) {
     let userId = ObjectId(user["_id"]);
     let result = ownerId.equals(userId);
 
-    if (!result) configuration.members.some(function(member, i, arr) {
-        result = ownerId.equals(ObjectId(member.uid));
+    if (!result) configuration.members.some((member) => {
+        result = userId.equals(ObjectId(member.uid));
         return result;
     });
 
@@ -229,4 +305,31 @@ exports.canEdit = function(user, configuration) {
     });
 
     return result;
+};
+
+// ----------------------------------------------------------------------------
+
+/**
+ * Adds a pre-existing Sensor to a configuration.
+ * 
+ * @param {object} user
+ * @param {string|object} cid
+ * @param {string|object} sid
+ * @param {function} success
+ * @param {function} failure
+ */
+
+exports.addSensor = function(user, cid, sid, success, failure) {
+    function fail(error) {
+        Winston.debug("Failed to add sensor to configuration.", {
+            "error": error
+        });
+        failure(error);
+    }
+
+    let data = {
+        "sensors": [sid.toString()]
+    };
+
+    exports.edit(user, cid, data, success, failure);
 };

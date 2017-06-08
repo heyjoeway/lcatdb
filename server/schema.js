@@ -1,6 +1,16 @@
 const Ajv = require('ajv');
 
-const validator = new Ajv({ "allErrors": true });
+
+// WARNING
+// removeAdditional will modify validated data in place, removing any 
+// additional properties (in areas where additionalProperties: true exists)
+// in the relevant schema).
+// USE WITH CAUTION
+
+const validator = new Ajv({
+    "allErrors": true,
+    "removeAdditional": true
+});
 const defaults = require('json-schema-defaults');
 const deepcopy = require('deepcopy');
 

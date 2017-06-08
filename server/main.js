@@ -66,6 +66,7 @@ const Schema = require('./schema.js');
 const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
+const Sensor = require('./sensor.js');
 
 // ============================================================================
 // SCHEMA INIT
@@ -77,6 +78,7 @@ Schema.init({
     "ConfigurationEdit": "./schema/configurationEdit.json",
     "Reading": "./schema/reading.json",
     "Sensor": "./schema/sensor.json",
+    "SensorEdit": "./schema/sensorEdit.json",
     "User": "./schema/user.json",
     "Value": "./schema/value.json"   
 });
@@ -275,6 +277,27 @@ sessionPost(`/configurations/${configPattern}/editDo`, (req, res, user) => {
 });
 
 // ----------------------------------------------------------------------------
+// Add Sensor to Configuration (action)
+// ----------------------------------------------------------------------------
+
+sessionPost(`/configurations/${configPattern}/addSensorDo`, (req, res, user) => {
+    function fail(error) {
+        res.send(`Error processing request. (${error.type})`);
+    }
+
+    let cid = req.originalUrl.split('/')[2];
+
+    let sid;
+    try { sid = ObjectId(req.body.sid); }
+    catch(e) { return fail({ "type": "badId", "exception": "e" }); }
+
+    Configurations.edit(user, cid, { "sensors": [ sid ] },
+        () => { res.redirect(`/configurations/${cid}`); },
+        fail
+    );
+});
+
+// ----------------------------------------------------------------------------
 // New configuration (action)
 // ----------------------------------------------------------------------------
 
@@ -283,6 +306,175 @@ sessionGet('/configurations/new', (req, res, user) => {
         res.redirect(`/configurations/${id}/edit`);
     });
 });
+
+// ----------------------------------------------------------------------------
+// Sensors (pages)
+// ----------------------------------------------------------------------------
+
+/* Regex is the same as for Configurations. */
+
+let sensorPattern = '([0-9a-f]{24})';
+
+sensorRender(`/sensors/${sensorPattern}`, 'sensor');
+sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit');
+
+sessionGet('/sensors/new', (req, res, user) => {
+    res.render('sensorNew', {
+        "user": user,
+        "types": [
+            {
+                "type": "depth",
+                "name": "Depth"
+            },
+            {
+                "type": "temperature",
+                "name": "Temperature"
+            }
+        ], // TODO
+        "typeFirst": "depth", // TODO
+        "configuration": req.query.configuration
+    });
+});
+// sensorRender(`/sensors/${sensorPattern}/new`, 'addSensor');
+
+// ----------------------------------------------------------------------------
+// Sensor edit (action)
+// ----------------------------------------------------------------------------
+
+sessionPost(`/sensors/${sensorPattern}/editDo`, (req, res, user) => {
+    let id = req.originalUrl.split('/')[2];
+
+    Sensor.edit(user, id, req.body,
+        () => {
+            let url = `/sensors/${id}`;
+            if (req.query.configuration)
+                url = `/configurations/${req.query.configuration}`
+            res.redirect(url);
+        },
+        (error) => { res.send(`Error processing request. (${error.type})`); }
+    );
+});
+
+// ----------------------------------------------------------------------------
+// New Sensor (action)
+// ----------------------------------------------------------------------------
+
+sessionPost('/sensors/newDo', (req, res, user) => {
+    Sensor.new(user, req.body, req.body.configuration,
+        (id) => {
+            let url = `/sensors/${id}/edit`
+            if (req.query.configuration)
+                url += `?configuration=${req.query.configuration}`
+            res.redirect(url);
+        },
+        (error) => {
+            res.send("Error creating new sensor."); // TODO
+        }
+    );
+});
+
+// ============================================================================
+// SENSORS
+// ============================================================================
+
+/* Renders a Mustache template with user/sensor information when the
+ * URL is matched. A layer for app.get.
+ * 
+ * url: Express routing URL or regex.
+ * template: Mustache template to be rendered in the case of the URL matching.
+ * Information will be passed for rendering with the following properties:
+ *      - user: User object.
+ *      - sensor: sensor object.
+ * 
+ * In the case that the URL does not match, sensorTest will render the
+ * template 'sensorNF'.
+ */
+
+function sensorRender(url, template) {
+    sensorGet(url, (req, res, user, sensor) => {
+        let canEdit = Sensor.canEdit(user, sensor);
+
+        Winston.debug('Rendering sensor page.', {
+            "user": user,
+            "sensor": sensor,
+            "canEdit": canEdit,
+            "configuration": req.query.configuration            
+        });
+
+        res.render(template, {
+            "user": user,
+            "sensor": sensor,
+            "canEdit": canEdit,
+            "configuration": req.query.configuration
+        });
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+/* Provides a layer to app.get which handles the relevant sensor.
+ * 
+ * url: Express routing URL or regex.
+ * success: Callback run upon successful session test. Parameters are:
+ *      - req: Express request object.
+ *      - res: Express response object.
+ *      - user: User object.
+ *      - sensor: Sensor object.
+ */
+
+function sensorGet(url, success) {
+    sessionGet(url, function(req, res, user) {
+        sensorTest(req, res, user, success);
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+/* Provides a layer to app.post which handles the relevant sensor.
+ * 
+ * url: Express routing URL or regex.
+ * success: Callback run upon successful session test. Parameters are:
+ *      - req: Express request object.
+ *      - res: Express response object.
+ *      - user: User object.
+ *      - sensor: Sensor object.
+ */
+
+function sensorPost(url, success) {
+    sessionPost(url, function(req, res, user) {
+        sensorTest(req, res, user, success);
+    });
+}
+
+
+// ----------------------------------------------------------------------------
+
+/* Tests if the current sensor is valid. Responds if not.
+ * Also tests if the current session is valid. (Using sessionTest.)
+ * 
+ * req: Express request object.
+ * res: Express response object.
+ * user: User object.
+ * success: Callback run upon successful session test. Parameters are:
+ *      - req: Same as before.
+ *      - res: Same as before.
+ *      - user: User object.
+ */
+
+function sensorTest(req, res, user, success) {
+    let id = req.originalUrl.split('/')[2];
+
+    Sensor.find(id,
+        (sensor) => { // Success
+            success(req, res, user, sensor);
+        },
+        () => { // Failure
+            res.render('sensorNF', {
+                "user": user
+            });
+        }
+    );
+}
 
 // ============================================================================
 // CONFIGURATIONS
@@ -419,7 +611,10 @@ function sessionTest(req, res, success) {
     }
 
     if (req.session && req.session.oid) {
-        let oid = ObjectId(req.session.oid);
+        let oid;
+        try { oid = ObjectId(req.session.oid); }
+        catch(e) { return fail({ "type": "badId", "exception": e }); }
+        
         Auth.findOid(oid,
             (user) => { // Success
                 success(req, res, user);

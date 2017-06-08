@@ -1,0 +1,10 @@
+{
+    "id": "/SensorEdit",
+    "type": "object",
+    "properties": {
+        "name": { "$ref": "/Sensor#/properties/name" },
+        "description": { "$ref": "/Sensor#/properties/description" },
+        "model": { "$ref": "/Sensor#/properties/model" }
+    },
+    "additionalProperties": false
+}

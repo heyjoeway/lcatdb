@@ -4,7 +4,8 @@
 </head>
 <body>
     Configuration ID: {{configuration._id}}<br>
-    <form action="./addSensorDo" method="post">
-
+    <form action="/configurations/{{configuration._id}}/addSensorDo" method="post">
+        Sensor ID: <input type="text" name="sid">
+        <input type="submit" value="Submit">
     </form>
 </body>

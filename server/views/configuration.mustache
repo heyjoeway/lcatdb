@@ -29,17 +29,12 @@
     <h2>Sensors</h2>
     <ul>
         {{#sensors}}
-        <li>
-            Name: {{name}}<br>
-            ID: {{oid}}<br>
-            Type: {{type}}<br>
-            Model: {{model}}<br>
-            Description: {{description}}
-        </li>
+        <li><a href="/sensors/{{.}}">{{.}}</a></li>
         {{/sensors}}
     </ul>
     {{#canEdit}}
-    <a href="/configurations/{{_id}}/addSensor">Add New Sensor</a>
+    <a href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
+    <a href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
     {{/canEdit}} 
     <h2>Edits</h2>
     <ul>

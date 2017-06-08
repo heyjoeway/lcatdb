@@ -100,7 +100,6 @@ exports.findQuery = function(query, success, failure) {
  */
 
 exports.register = function(data, success, failure) {
-    let users = Db.collection('users');
 
     function fail(errors) {
         Winston.debug("Failed to register user.", {
@@ -110,8 +109,9 @@ exports.register = function(data, success, failure) {
         failure(errors);
     }
 
+    let users = Db.collection('users');
+
     let newUser = Schema.defaults("User");
-    let errors = [];
 
     [
         newUser.username,
@@ -126,7 +126,8 @@ exports.register = function(data, success, failure) {
         parseFloat(data.timezone),
         Date.now()
     ];
-
+User
+    let errors = [];
     let validity = Schema.validate('User', newUser);
 
     let passwordMismatch = data.password != data.passwordRetype;
@@ -180,8 +181,7 @@ exports.register = function(data, success, failure) {
                     Winston.debug('Successfully registered new user.', {
                         "username": newUser.username,
                         "email": newUser.email,
-                        "oidString": oid.toString(),
-                        "oid": oid
+                        "oidString": oid.toString()
                     });
 
                     success(oid);

@@ -28,7 +28,7 @@
         },
         "sensors": {
             "type": "array",
-            "items": { "$ref": "/Sensor#" },
+            "items": { "$ref": "/Definitions#/definitions/oid" },
             "default": []
         },
         "creation": { "$ref": "/Definitions#/definitions/time" },

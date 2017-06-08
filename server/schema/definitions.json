@@ -29,6 +29,13 @@
                 ]
             },
             "default": []
+        },
+        "sensorType": {
+            "$ref": "/Definitions#/definitions/textShort",
+            "enum": [
+                "depth",
+                "temperature"
+            ]
         }
     }
 }
