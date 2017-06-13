@@ -1,4 +1,5 @@
-{
+{   
+    "id": "/SensorDepth",
     "type": "object",
     "properties": {
         "depth": {

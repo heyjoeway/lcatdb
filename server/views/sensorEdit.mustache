@@ -8,7 +8,12 @@
     <form action="./editDo{{#configuration}}?configuration={{.}}{{/configuration}}" method="post">
         Name: <input type="text" name="name" value="{{sensor.name}}"><br>
         Description: <input type="text" name="description" value="{{sensor.description}}"><br>
-        Model: <input type="text" name="model" value="{{sensor.model}}"><br>
+        Model: <input type="text" name="model" value="{{sensor.model}}" list="models"><br>
+        <datalist id="models">
+            {{#models}}
+            <option>{{name}}</option>
+            {{/models}}
+        </datalist>
         <input type="submit" value="Submit"><br>
     </form>
     {{/canEdit}}

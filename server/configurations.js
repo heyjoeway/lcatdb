@@ -74,6 +74,39 @@ exports.find = function(oid, success, failure) {
     );
 }
 
+// TODO: Retrieve only necessary information
+exports.getSensorList = function(configuration, success, failure) {
+    function fail(error) {
+        Winston.debug("Could not retrieve sensor list.", {
+            "error": error
+        });
+        failure(error);
+    }
+
+    let result = [];
+    let sensorsLeft = configuration.sensors.length;
+    let hasFailed = false;
+
+    configuration.sensors.forEach((id) => {
+        Sensor.find(ObjectId(id),
+            (sensor) => {
+                if (hasFailed) return;
+
+                result.push(sensor)
+                sensorsLeft--;
+                if (sensorsLeft == 0)
+                    success(result);
+            },
+            (error) => {
+                if (hasFailed) return;
+
+                fail(error);
+                hasFailed = true;                
+            }
+        );
+    });
+};
+
 // ============================================================================
 // CREATION/EDITING
 // ============================================================================
@@ -90,7 +123,7 @@ exports.find = function(oid, success, failure) {
 exports.new = function(user, callback) {
     let configurations = Db.collection('configurations');
 
-    let newConfiguration = Schema.defaults("Configuration");
+    let newConfiguration = Schema.defaults('/Configuration');
     
     [
         newConfiguration.owner,
@@ -161,7 +194,7 @@ exports.edit = function(user, oid, edit, success, failure) {
 
             // -----
 
-            let editValidity = Schema.validate('ConfigurationEdit', edit);
+            let editValidity = Schema.validate('/ConfigurationEdit', edit);
             
             if (!editValidity) {
                 fail({ "type": "editValidity", "errors": Schema.errors() });
@@ -188,7 +221,7 @@ exports.edit = function(user, oid, edit, success, failure) {
                     "changes": edit
                 });
 
-                let completeValidity = Schema.validate('Configuration', configuration);
+                let completeValidity = Schema.validate('/Configuration', configuration);
                 
                 if (!completeValidity) {
                     fail({ "type": "completeValidity", "errors": Schema.errors() });

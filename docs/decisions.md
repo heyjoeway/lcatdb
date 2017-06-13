@@ -81,6 +81,13 @@ The Sensor will have a profile that can be viewed, as well. To keep users on pat
     "type": {
         "schema": "SchemaId",
         "provider": "./path/to/js"
+        "models": {
+            "key": {
+                "name": "Human Readable Name",
+                "description": "descripton",
+                "img": "./path/to/image"
+            }
+        }
     }
 }
 ```
@@ -92,7 +99,6 @@ Data needed:
 - Value: 
 
 ```
-exports.inputTemplate = function(user) { return htmlString };
+exports.inputTemplate = function(user, configuration, sensor) { return htmlString };
 exports.outputTemplate = function(user, value) { return htmlString };
-exports.stringify = function(user, value) { return string };
 ```

@@ -13,10 +13,14 @@ const deepmerge = require('deepmerge');
 const Schema = require('./schema.js');
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
+const SensorTypes = require('./sensorTypes.js');
 
-// exports.init = function(manifest) {
-
-// };
+/** 
+ * Tests if a user can edit a certain sensor.
+ * 
+ * @param {object} user
+ * @param {object} sensor
+ */
 
 exports.canEdit = function(user, sensor) {
     let ownerId = ObjectId(sensor.owner);
@@ -99,19 +103,23 @@ exports.new = function(user, data, cid, success, failure) {
         failure(errors);
     }
 
-    let sensors = Db.collection('sensors');
+    let type = data.type;
+    if (!SensorTypes.isValidType(type))
+        return fail({ "type": "invalidType" });
 
-    let newSensor = Schema.defaults('Sensor');
+    // ---
+
+    let newSensor = Schema.defaults('/Sensor');
 
     [
         newSensor.owner,
         newSensor.type
     ] = [
         ObjectId(user["_id"]),
-        data.type
+        type
     ];
 
-    let validity = Schema.validate('Sensor', newSensor);
+    let validity = Schema.validate('/Sensor', newSensor);
 
     if (!validity) {
         let validityErrors = Schema.errors() || [];
@@ -130,6 +138,9 @@ exports.new = function(user, data, cid, success, failure) {
         return;
     }
 
+    // ---    
+
+    let sensors = Db.collection('sensors');
     sensors.insertOne(newSensor, (errSave, result) => {
         if (errSave) {
             errors.push({ "type": "sensorSave", "errSave": errSave });
@@ -190,7 +201,7 @@ exports.edit = function(user, oid, edit, success, failure) {
 
             // -----
 
-            let editValidity = Schema.validate('SensorEdit', edit);
+            let editValidity = Schema.validate('/SensorEdit', edit);
             
             if (!editValidity) {
                 fail({ "type": "editValidity", "errors": Schema.errors() });
@@ -211,7 +222,7 @@ exports.edit = function(user, oid, edit, success, failure) {
 
             // -----
 
-            let completeValidity = Schema.validate('Sensor', sensor);
+            let completeValidity = Schema.validate('/Sensor', sensor);
             
             if (!completeValidity) {
                 fail({ "type": "completeValidity", "errors": Schema.errors() });

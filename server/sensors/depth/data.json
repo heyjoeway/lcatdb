@@ -1,0 +1,10 @@
+{
+    "name": "Depth",
+    "models": [
+        {
+            "name": "Generic Depth Sensor",
+            "description": "A generic depth sensor.",
+            "img": "/sensors/depth/generic.png"
+        }
+    ]
+}

@@ -50,14 +50,22 @@
             "dependencies": {
                 "range": ["lat", "long"],
                 "altRange": ["alt"]
-            }
+            },
+            "additionalProperties": false
         },
         "timeCreated": { "$ref": "/Definitions#/definitions/time" },
         "timePublished": { "$ref": "/Definitions#/definitions/time" },
         "values": {
             "type": "array",
-            "items": { "$ref": "/Value" },
-            "default": []
+            "items": { 
+                "type": "object",
+                "properties": {
+                    "sensor": { "$ref": "/Definitions#/definitions/oid" },
+                    "data": { "type": "object" }
+                },
+                "additionalProperties": false
+            }
         }
-    }
+    },
+    "additionalProperties": false
 }

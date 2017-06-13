@@ -1,0 +1,10 @@
+{
+    "name": "Temperature",
+    "models": [
+        {
+            "name": "Generic Temperature Sensor",
+            "description": "A generic temperature sensor.",
+            "img": "/sensors/Temperature/generic.png"
+        }
+    ]
+}

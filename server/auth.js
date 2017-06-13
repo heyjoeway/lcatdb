@@ -111,7 +111,7 @@ exports.register = function(data, success, failure) {
 
     let users = Db.collection('users');
 
-    let newUser = Schema.defaults("User");
+    let newUser = Schema.defaults('/User');
 
     [
         newUser.username,
@@ -128,7 +128,7 @@ exports.register = function(data, success, failure) {
     ];
 User
     let errors = [];
-    let validity = Schema.validate('User', newUser);
+    let validity = Schema.validate('/User', newUser);
 
     let passwordMismatch = data.password != data.passwordRetype;
     if (passwordMismatch) errors.push({ "type": "passwordMismatch" });

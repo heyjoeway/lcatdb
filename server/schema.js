@@ -1,5 +1,16 @@
-const Ajv = require('ajv');
+// ============================================================================
+// IMPORTS
+// ============================================================================
 
+const defaults = require('json-schema-defaults');
+const deepcopy = require('deepcopy');
+const fs = require('fs');
+
+// ============================================================================
+// VALIDATION
+// ============================================================================
+
+const Ajv = require('ajv');
 
 // WARNING
 // removeAdditional will modify validated data in place, removing any 
@@ -11,38 +22,50 @@ const validator = new Ajv({
     "allErrors": true,
     "removeAdditional": true
 });
-const defaults = require('json-schema-defaults');
-const deepcopy = require('deepcopy');
 
-// ----------------------------------------------------------------------------
+
+// ============================================================================
+// SETUP
+// ============================================================================
 
 const schemas = {};
 const schemaDefaults = {};
 
-// ----------------------------------------------------------------------------
+// ============================================================================
+// FUNCTIONS
+// ============================================================================
 
-exports.loadSchemaManifest = function(manifest) {
-    Object.keys(manifest).forEach(function(key) {
-        let val = manifest[key];
-        schemas[key] = require(val);
-        validator.addSchema(schemas[key], key);
-    });
+/**
+ * Generates defaults for all loaded schemas.
+ */
+exports.defaultsGen = function(schema) {
+    let key = schema["id"];
+    schemaDefaults[key] = defaults(schema);
 }
 
-exports.defaultsGen = function() {
-    Object.keys(schemas).forEach(function(key) {
-        let val = schemas[key];
-        schemaDefaults[key] = defaults(val);
-    });
+exports.addSchema = function(schema) {
+    validator.addSchema(schema);
+    exports.defaultsGen(schema);
 }
 
+/**
+ * Loads schema manifest and generates defaults.
+ */
 exports.init = function(manifest) {
-    exports.loadSchemaManifest(manifest);
-    exports.defaultsGen();
+    fs.readdirSync('./schema/').forEach((path) => {
+        let schema = require("./schema/" + path);
+        exports.addSchema(schema);
+    });
 }
 
 // ----------------------------------------------------------------------------
 
+/**
+ * Get the default object for the specified manifest.
+ * 
+ * @param {string} key - Key of required manifest.
+ * @returns {object} - Defaults object.
+ */
 exports.defaults = function(key) {
     let val = schemaDefaults[key];
 
@@ -56,10 +79,22 @@ exports.defaults = function(key) {
 
 // ----------------------------------------------------------------------------
 
+/**
+ * Passthrough for the ajv validate function.
+ * 
+ * @param {string} schema - ID of schema
+ * @param {object} data
+ * @returns {bool}
+ */
 exports.validate = function(schema, data) {
     return validator.validate(schema, data);
 }
 
+/**
+ * Passthrough for ajv errors.
+ * 
+ * @returns {object} - ajv error object.
+ */
 exports.errors = function() {
     return validator.errors;
 }

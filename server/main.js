@@ -67,21 +67,14 @@ const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
 const Sensor = require('./sensor.js');
+const SensorTypes = require('./sensorTypes.js');
 
 // ============================================================================
 // SCHEMA INIT
 // ============================================================================
 
-Schema.init({
-    "Definitions": "./schema/definitions.json",
-    "Configuration": "./schema/configuration.json",
-    "ConfigurationEdit": "./schema/configurationEdit.json",
-    "Reading": "./schema/reading.json",
-    "Sensor": "./schema/sensor.json",
-    "SensorEdit": "./schema/sensorEdit.json",
-    "User": "./schema/user.json",
-    "Value": "./schema/value.json"   
-});
+Schema.init();
+SensorTypes.init();
 
 // ============================================================================
 // MONGO/EXPRESS INIT
@@ -259,7 +252,7 @@ sessionGet('/configurations', (req, res, user) => {
 
 let configPattern = '([0-9a-f]{24})';
 
-configurationRender(`/configurations/${configPattern}`, 'configuration');
+configurationRender(`/configurations/${configPattern}`, 'configuration', true);
 configurationRender(`/configurations/${configPattern}/edit`, 'configurationEdit');
 configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor');
 
@@ -316,22 +309,15 @@ sessionGet('/configurations/new', (req, res, user) => {
 let sensorPattern = '([0-9a-f]{24})';
 
 sensorRender(`/sensors/${sensorPattern}`, 'sensor');
-sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit');
+sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit', true);
 
 sessionGet('/sensors/new', (req, res, user) => {
+    let types = SensorTypes.getTypesMustache();
+
     res.render('sensorNew', {
         "user": user,
-        "types": [
-            {
-                "type": "depth",
-                "name": "Depth"
-            },
-            {
-                "type": "temperature",
-                "name": "Temperature"
-            }
-        ], // TODO
-        "typeFirst": "depth", // TODO
+        "types": types,
+        "typeFirst": types[0].key,
         "configuration": req.query.configuration
     });
 });
@@ -390,20 +376,29 @@ sessionPost('/sensors/newDo', (req, res, user) => {
  * template 'sensorNF'.
  */
 
-function sensorRender(url, template) {
+function sensorRender(url, template, needsModels) {
     sensorGet(url, (req, res, user, sensor) => {
         let canEdit = Sensor.canEdit(user, sensor);
+        let type = sensor.type;
+        let typeName = SensorTypes.getTypeName(type);
+
+        let models;
+        if (needsModels) models = SensorTypes.getModelsList(type);
 
         Winston.debug('Rendering sensor page.', {
             "user": user,
+            "typeName": typeName,
             "sensor": sensor,
+            "models": models,
             "canEdit": canEdit,
             "configuration": req.query.configuration            
         });
 
         res.render(template, {
             "user": user,
+            "typeName": typeName,
             "sensor": sensor,
+            "models": models,
             "canEdit": canEdit,
             "configuration": req.query.configuration
         });
@@ -493,21 +488,35 @@ function sensorTest(req, res, user, success) {
  * template 'configurationNF'.
  */
 
-function configurationRender(url, template) {
+function configurationRender(url, template, needsSensorList) {
+    function fail(error) {
+        Winston.debug("Could not render configuration.", {
+            "error": error
+        });
+    }
+
     configurationGet(url, (req, res, user, configuration) => {
-        let canEdit = Configurations.canEdit(user, configuration);
+        function render(sensors) {
+            let canEdit = Configurations.canEdit(user, configuration);
 
-        Winston.debug('Rendering configuration page.', {
-            "user": user,
-            "configuration": configuration,
-            "canEdit": canEdit
-        });
+            Winston.debug('Rendering configuration page.', {
+                "user": user,
+                "configuration": configuration,
+                "canEdit": canEdit,
+                "sensors": sensors
+            });
 
-        res.render(template, {
-            "user": user,
-            "configuration": configuration,
-            "canEdit": canEdit
-        });
+            res.render(template, {
+                "user": user,
+                "configuration": configuration,
+                "canEdit": canEdit,
+                "sensors": sensors
+            });
+        }
+
+        if (!needsSensorList) render();
+
+        Configurations.getSensorList(configuration, render, fail);
     });
 }
 
