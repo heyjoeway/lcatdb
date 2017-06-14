@@ -4,9 +4,9 @@ exports.inputTemplate = function(user, configuration, sensor) {
     let sid = ObjectId(sensor['_id']);
 
     return `
-Temperature: <input name="${sid}.temperature"><br>
+Temperature: <input name="values.${sid}.temperature"><br>
 <div class="sensor_input_more">
-    Temperature Range: <input name="${sid}.temperatureRange"><br>
+    Temperature Range: <input name="values.${sid}.temperatureRange"><br>
 </div><br>
 `;
 }

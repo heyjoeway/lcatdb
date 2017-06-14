@@ -68,6 +68,7 @@ const Configurations = require('./configurations.js');
 const Db = require('./db.js');
 const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js');
+const Reading = require('./reading.js');
 
 // ============================================================================
 // SCHEMA INIT
@@ -291,6 +292,132 @@ sessionPost(`/configurations/${configPattern}/addSensorDo`, (req, res, user) => 
 });
 
 // ----------------------------------------------------------------------------
+// Take a Reading (Page)
+// ----------------------------------------------------------------------------
+
+configurationGet(`/configurations/${configPattern}/reading`, (req, res, user, configuration) => {
+    Configurations.getSensorList(configuration, 
+        (sensors) => {
+            let canEdit = Configurations.canEdit(user, configuration);
+
+            sensors.forEach((sensor) => {
+                sensor.html = SensorTypes.getInputTemplate(
+                    sensor.type, user, configuration, sensor
+                );
+            });
+
+            Winston.debug('Rendering configuration reading page.', {
+                "user": user,
+                "configuration": configuration,
+                "canEdit": canEdit,
+                "sensors": sensors
+            });
+
+            res.render('configurationReading', {
+                "user": user,
+                "configuration": configuration,
+                "canEdit": canEdit,
+                "sensors": sensors,
+                "timeCurrent": Date.now()
+            });
+        }, 
+        (error) => {
+            Winston.debug("Failed to render configuration reading page.", {
+                "error": error
+            })
+        }
+    );
+});
+
+// ----------------------------------------------------------------------------
+// Take a Reading (Page)
+// ----------------------------------------------------------------------------
+
+configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user, configuration) => {
+    function fail(error) {
+        Winston.debug('Error creating new reading', {
+            "error": error
+        });
+        res.send(`Error creating new reading. (${error.type})`);
+    }
+
+    function success(rid) {
+        res.redirect(`/readings/${rid}`);
+    }
+
+    // ----
+
+    // Reorganize Sensor data
+
+    function setPath(obj, path, val) {
+        let pathArray = path.split('.');
+        let lastCrumb = pathArray.pop();
+        pathArray.forEach((crumb) => {
+            if (typeof obj[crumb] == 'undefined')
+                obj[crumb] = {};
+            obj = obj[crumb];
+        });
+        obj[lastCrumb] = val;
+    }
+
+    let rawData = req.body;
+    let newData = {};
+
+    Object.keys(rawData).forEach((key) => {
+        setPath(newData, key, rawData[key]);
+    });
+
+
+    let oldValues = newData.values;
+    newData.values = [];
+
+    let valueKeys = Object.keys(oldValues);
+    let valuesLeft = valueKeys.length; 
+    let hasFailed = false;
+
+    valueKeys.forEach((key) => {
+        let sid = ObjectId(key);
+        Sensor.find(sid,
+            (sensor) => {
+                if (hasFailed) return;
+                newData.values.push({
+                    "sensor": sid,
+                    "type": sensor.type,
+                    "data": oldValues[key]
+                });
+
+                if (--valuesLeft == 0)
+                    Reading.new(
+                        user,
+                        configuration,
+                        newData,
+                        success,
+                        fail
+                    );
+            },
+            (error) => {
+                if (hasFailed) return;
+                fail({ "type": "sensorFind", "error": error });
+                hasFailed = true;
+            }
+        );
+    });
+
+    // ----
+
+});
+
+// ----------------------------------------------------------------------------
+// Reading (Page)
+// ----------------------------------------------------------------------------
+
+/* Regex is the same as for Configurations. */
+
+let readingPattern = '([0-9a-f]{24})';
+
+readingRender(`/readings/${readingPattern}`, 'reading');
+
+// ----------------------------------------------------------------------------
 // New configuration (action)
 // ----------------------------------------------------------------------------
 
@@ -358,6 +485,92 @@ sessionPost('/sensors/newDo', (req, res, user) => {
         }
     );
 });
+
+// ============================================================================
+// READINGS
+// ============================================================================
+
+/* Renders a Mustache template with user/reading information when the
+ * URL is matched. A layer for app.get.
+ * 
+ * url: Express routing URL or regex.
+ * template: Mustache template to be rendered in the case of the URL matching.
+ * Information will be passed for rendering with the following properties:
+ *      - user: User object.
+ *      - sensor: sensor object.
+ * 
+ * In the case that the URL does not match, sensorTest will render the
+ * template 'readingNF'.
+ */
+
+function readingRender(url, template) {
+    readingGet(url, (req, res, user, reading) => {
+        reading.values.forEach((value) => {
+            value.html = SensorTypes.getOutputTemplate(
+                value.type, user, value.data
+            );
+        });
+
+        Winston.debug('Rendering reading page.', {
+            "user": user,
+            "reading": reading        
+        });
+
+        res.render(template, {
+            "user": user,
+            "reading": reading
+        });
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+/* Provides a layer to app.get which handles the relevant reading.
+ * 
+ * url: Express routing URL or regex.
+ * success: Callback run upon successful session test. Parameters are:
+ *      - req: Express request object.
+ *      - res: Express response object.
+ *      - user: User object.
+ *      - reading: reading object.
+ */
+
+function readingGet(url, success) {
+    sessionGet(url, function(req, res, user) {
+        readingTest(req, res, user, success);
+    });
+}
+
+
+// ----------------------------------------------------------------------------
+
+/* Tests if the current reading is valid. Responds if not.
+ * Also tests if the current session is valid. (Using sessionTest.)
+ * 
+ * req: Express request object.
+ * res: Express response object.
+ * user: User object.
+ * success: Callback run upon successful session test. Parameters are:
+ *      - req: Same as before.
+ *      - res: Same as before.
+ *      - user: User object.
+ */
+
+function readingTest(req, res, user, success) {
+    let id = req.originalUrl.split('/')[2];
+
+    Reading.find(id,
+        (reading) => { // Success
+            success(req, res, user, reading);
+        },
+        () => { // Failure
+            res.render('readingNF', {
+                "user": user
+            });
+        }
+    );
+}
+
 
 // ============================================================================
 // SENSORS
@@ -534,6 +747,24 @@ function configurationRender(url, template, needsSensorList) {
 
 function configurationGet(url, success) {
     sessionGet(url, function(req, res, user) {
+        configurationTest(req, res, user, success);
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+/* Provides a layer to app.post which handles the relevant configuration.
+ * 
+ * url: Express routing URL or regex.
+ * success: Callback run upon successful session test. Parameters are:
+ *      - req: Express request object.
+ *      - res: Express response object.
+ *      - user: User object.
+ *      - configuration: Configuration object.
+ */
+
+function configurationPost(url, success) {
+    sessionPost(url, function(req, res, user) {
         configurationTest(req, res, user, success);
     });
 }

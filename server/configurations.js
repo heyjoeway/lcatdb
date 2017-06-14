@@ -182,8 +182,6 @@ exports.edit = function(user, oid, edit, success, failure) {
     try { oid = ObjectId(oid); }
     catch(e) { return fail({ "type": "badId", "exception": e }); }
 
-    let configurations = Db.collection('configurations');
-
     exports.find(oid,
         (configuration) => {
             let canEdit = exports.canEdit(user, configuration);
@@ -229,6 +227,8 @@ exports.edit = function(user, oid, edit, success, failure) {
                 }
                 
                 // -----
+            
+               let configurations = Db.collection('configurations');
 
                 configurations.updateOne({'_id': ObjectId(oid) }, newData,
                     (errUpdate, writeResult) => {

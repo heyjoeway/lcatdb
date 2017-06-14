@@ -42,3 +42,19 @@ exports.getTypeName = function(type) {
 exports.getModelsList = function(type) {
     return types[type].data.models;
 }
+
+exports.getInputTemplate = function(type, user, configuration, sensor) {
+    return types[type].provider.inputTemplate(
+        user, configuration, sensor
+    );
+};
+
+exports.getOutputTemplate = function(type, user, value) {
+    return types[type].provider.outputTemplate(
+        user, value
+    );
+};
+
+exports.getSchemaId = function(type) {
+    return types[type].schemaId;
+}

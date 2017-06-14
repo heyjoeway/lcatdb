@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<head>
+    <title>New Reading</title>
+</head>
+<body>
+    <h1>New Reading</h1>
+    Configuration Name: {{configuration.name}}<br>
+    Configuration Id: {{configuration._id}}<br>
+    <br>
+    {{#canEdit}}
+    <form action="./readingDo" method="post">
+        Latitude: <input type="number" name="location.lat" min="-90" max="90"><br>
+        Longitude: <input type="number" name="location.long" min="-180" max="180"><br>
+        Range (Optional): <input type="number" name="location.range" min="0"><br>
+        Altitude (Optional): <input type="number" name="location.alt"><br>
+        Altitude Range (Optional): <input type="number" name="location.altRange" min="0"><br>
+        Time Created: <input type="number" name="timeCreated" value="{{timeCurrent}}"><br>
+        <h2>Values</h2>
+        {{#sensors}}
+            Sensor Name: {{name}}<br>
+            Sensor Id: {{_id}}<br>
+            {{{html}}}
+            <br>
+        {{/sensors}}
+        <input type="submit" name="publish" value="Save and Publish">
+    </form>
+    {{/canEdit}}
+    {{^canEdit}}
+    <p>Sorry, you do not have permission to create a reading.
+    {{/canEdit}}
+</body>

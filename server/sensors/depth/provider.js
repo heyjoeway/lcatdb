@@ -4,10 +4,10 @@ exports.inputTemplate = function(user, configuration, sensor) {
     let sid = ObjectId(sensor['_id']);
 
     return `
-Depth: <input name="${sid}.depth"><br>
+Depth: <input name="values.${sid}.depth"><br>
 <div class="sensor_input_more">
-    Depth Range: <input name="${sid}.depthRange"><br>
-</div><br>
+    Depth Range: <input name="values.${sid}.depthRange"><br>
+</div>
 `;
 }
 

@@ -7,7 +7,7 @@
             "description": "Stored in meters."
         },
         "depthRange": {
-            "type": "number",
+            "type": ["number", "null"],
             "description": "Max possible distance from depth. Stored in meters."
         }
     },

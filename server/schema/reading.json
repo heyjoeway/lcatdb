@@ -32,16 +32,16 @@
                     "maximum": 180
                 },
                 "range": {
-                    "type": "number",
+                    "type": ["number", "null"],
                     "minimum": 0,
                     "description": "Max error from lat/long in meters."
                 },
                 "alt": {
-                    "type": "number",
+                    "type": ["number", "null"],
                     "description": "Distance from sea level in meters."
                 },
                 "altRange": {
-                    "type": "number",
+                    "type": ["number", "null"],
                     "minimum": 0,
                     "description": "Max error from alt in meters."
                 }
@@ -61,6 +61,7 @@
                 "type": "object",
                 "properties": {
                     "sensor": { "$ref": "/Definitions#/definitions/oid" },
+                    "type": { "$ref": "/Definitions#/definitions/sensorType" },
                     "data": { "type": "object" }
                 },
                 "additionalProperties": false

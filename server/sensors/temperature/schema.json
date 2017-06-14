@@ -7,7 +7,7 @@
             "description": "Stored in Celsius."
         },
         "temperatureRange": {
-            "type": "number",
+            "type": ["number", "null"],
             "description": "Max possible distance from temperature. Stored in Celsius."
         }
     },

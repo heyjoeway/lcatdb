@@ -16,11 +16,13 @@ const Ajv = require('ajv');
 // removeAdditional will modify validated data in place, removing any 
 // additional properties (in areas where additionalProperties: true exists)
 // in the relevant schema).
+// Same with coerceTypes.
 // USE WITH CAUTION
 
 const validator = new Ajv({
     "allErrors": true,
-    "removeAdditional": true
+    "removeAdditional": true,
+    "coerceTypes": true
 });
 
 
