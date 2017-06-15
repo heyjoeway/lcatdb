@@ -24,3 +24,4 @@ Details manual tests to be carried out in order to ensure proper functionality o
     - Should notify the user that the email is invalid.
 9. Attempt to register with a malformed email.
     - Should notify the user that the email is invalid.
+

@@ -13,6 +13,7 @@ const deepmerge = require('deepmerge');
 const Schema = require('./schema.js');
 const Db = require('./db.js');
 const Sensor = require('./sensor.js');
+const Utils = require('./utils.js');
 
 // ============================================================================
 // FINDING/LISTING
@@ -83,11 +84,16 @@ exports.getSensorList = function(configuration, success, failure) {
         failure(error);
     }
 
+    let sensors = configuration.sensors;
+
+    if (typeof sensors == 'undefined' || sensors.length == 0)
+        success([]);
+
     let result = [];
-    let sensorsLeft = configuration.sensors.length;
+    let sensorsLeft = sensors.length;
     let hasFailed = false;
 
-    configuration.sensors.forEach((id) => {
+    sensors.forEach((id) => {
         Sensor.find(ObjectId(id),
             (sensor) => {
                 if (hasFailed) return;
@@ -160,18 +166,17 @@ exports.new = function(user, callback) {
  * each time.
  * 
  * @param {object} user - User object.
- * @param {(object|string)} oid - ObjectId object or string of the configuration to edit.
+ * @param {(object|string)} cid - ObjectId object or string of the configuration to edit.
  * @param {object} edit - Data to edit the Configuration with..
  * @param {function} success - Callback to be run upon successful edit.
  * @param {function} failure - Callback to be run upon failure.
  */
 
-exports.edit = function(user, oid, edit, success, failure) {
-
+exports.edit = function(user, cid, edit, success, failure) {
     function fail(error) {
         Winston.debug("Failed to edit configuration.", {
             "username": user.username,
-            "oid": (oid || "").toString(),
+            "cid": (cid || "").toString(),
             "edit": edit,
             "error": error
         });
@@ -179,25 +184,21 @@ exports.edit = function(user, oid, edit, success, failure) {
         failure(error);
     }
 
-    try { oid = ObjectId(oid); }
+    try { cid = ObjectId(cid); }
     catch(e) { return fail({ "type": "badId", "exception": e }); }
 
-    exports.find(oid,
+    exports.find(cid,
         (configuration) => {
             let canEdit = exports.canEdit(user, configuration);
-            if (!canEdit) {
-                fail({ "type": "canEdit" });
-                return;
-            }
+            if (!canEdit)
+                return fail({ "type": "canEdit" });
 
             // -----
 
             let editValidity = Schema.validate('/ConfigurationEdit', edit);
             
-            if (!editValidity) {
-                fail({ "type": "editValidity", "errors": Schema.errors() });
-                return;
-            }
+            if (!editValidity)
+                return fail({ "type": "editValidity", "errors": Schema.errors() });
 
             // -----
 
@@ -227,19 +228,17 @@ exports.edit = function(user, oid, edit, success, failure) {
                 }
                 
                 // -----
-            
-               let configurations = Db.collection('configurations');
 
-                configurations.updateOne({'_id': ObjectId(oid) }, newData,
+                let configurations = Db.collection('configurations');
+
+                configurations.updateOne({'_id': ObjectId(cid) }, newData,
                     (errUpdate, writeResult) => {
-                        if (errUpdate || writeResult.result.ok != 1) {
-                            console.log(errUpdate);
+                        if (errUpdate || writeResult.result.ok != 1)
                             return fail({
                                 "type": "write",
                                 "result": (writeResult || "").toString(),
                                 "error": errUpdate
                             });
-                        }
                         
                         success();
                     }
@@ -279,7 +278,7 @@ exports.canAddSensor = function(user, sid, success, failure) {
 
 exports.canAddSensorMulti = function(user, sidArray, success, failure) {
     function fail(error) {
-        Winston.debug("Could not add one or more sensors.", {
+        Winston.debug('Could not add one or more sensors.', {
             "error": error,
             "sidArray": sidArray
         });
@@ -287,7 +286,8 @@ exports.canAddSensorMulti = function(user, sidArray, success, failure) {
         return error;
     }
 
-    if (typeof sidArray == "undefined") return success();
+    if (typeof sidArray == 'undefined' || sidArray.length == 0)
+        return success();
 
     let responsesLeft = sidArray.length;
     let hasFailed = false;
@@ -366,3 +366,62 @@ exports.addSensor = function(user, cid, sid, success, failure) {
 
     exports.edit(user, cid, data, success, failure);
 };
+
+/**
+ * @param {array} reqs
+ */
+exports.mustachify = function(user, configuration, success, failure, needs = []) {
+    function fail(error) {
+        Winston.debug('Error preparing configuration for mustache.', {
+            "error": error
+        });
+        failure(error);
+    }
+ 
+    // ----
+
+    let hasFailed = false;
+    let tasks = needs.length + 1;
+
+    function progress() {
+        tasks--;
+        if (tasks == 0) success(configuration);
+    }
+
+    // ----
+
+    configuration.creation = Utils.prettyTime(
+        configuration.creation, user.timezone
+    );
+
+    progress();
+    
+    // ----
+
+    if (needs.includes('sensors')) {
+        exports.getSensorList(configuration,
+            (sensors) => {
+                console.log(sensors);
+                configuration.sensors = sensors;
+                progress();
+            },
+            (error) => {
+                if (!hasFailed) {
+                    fail({ "type": "sensorList", "error": error });
+                    hasFailed = true;
+                }
+            }
+        );
+    }
+
+    // ----
+
+    if (needs.includes('edits.time')) {
+        configuration.edits.forEach((edit) => {
+            edit.time = Utils.prettyTime(
+                edit.time, user.timezone
+            );
+        });
+        progress();
+    }
+}

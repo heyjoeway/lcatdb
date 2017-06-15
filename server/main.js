@@ -253,7 +253,7 @@ sessionGet('/configurations', (req, res, user) => {
 
 let configPattern = '([0-9a-f]{24})';
 
-configurationRender(`/configurations/${configPattern}`, 'configuration', true);
+configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'edits.time']);
 configurationRender(`/configurations/${configPattern}/edit`, 'configurationEdit');
 configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor');
 
@@ -701,7 +701,7 @@ function sensorTest(req, res, user, success) {
  * template 'configurationNF'.
  */
 
-function configurationRender(url, template, needsSensorList) {
+function configurationRender(url, template, needs) {
     function fail(error) {
         Winston.debug("Could not render configuration.", {
             "error": error
@@ -709,27 +709,25 @@ function configurationRender(url, template, needsSensorList) {
     }
 
     configurationGet(url, (req, res, user, configuration) => {
-        function render(sensors) {
-            let canEdit = Configurations.canEdit(user, configuration);
+        Configurations.mustachify(user, configuration,
+            (configuration) => {
+                let canEdit = Configurations.canEdit(user, configuration);
 
-            Winston.debug('Rendering configuration page.', {
-                "user": user,
-                "configuration": configuration,
-                "canEdit": canEdit,
-                "sensors": sensors
-            });
+                Winston.debug('Rendering configuration page.', {
+                    "user": user,
+                    "configuration": configuration,
+                    "canEdit": canEdit
+                });
 
-            res.render(template, {
-                "user": user,
-                "configuration": configuration,
-                "canEdit": canEdit,
-                "sensors": sensors
-            });
-        }
+                res.render(template, {
+                    "user": user,
+                    "configuration": configuration,
+                    "canEdit": canEdit
+                });
+            },
+            fail, needs
+        )
 
-        if (!needsSensorList) render();
-
-        Configurations.getSensorList(configuration, render, fail);
     });
 }
 

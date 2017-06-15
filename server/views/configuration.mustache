@@ -27,21 +27,21 @@
     {{#canEdit}}
     <a href="/configurations/{{_id}}/addMember">Add New Member</a>
     {{/canEdit}} 
-    {{/configuration}}
     <h2>Sensors</h2>
     <ul>
         {{#sensors}}
         <li><a href="/sensors/{{_id}}">{{name}}</a></li>
         {{/sensors}}
     </ul>
-    {{#configuration.canEdit}}
+    {{#canEdit}}
     <a href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
     <a href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
-    {{/configuration.canEdit}} 
+    {{/canEdit}} 
     <h2>Edits</h2>
     <ul>
-        {{#configuration.edits}}
+        {{#edits}}
         <li>{{time}}</li>
-        {{/configuration.edits}}
+        {{/edits}}
     </ul>
+    {{/configuration}}
 </body>

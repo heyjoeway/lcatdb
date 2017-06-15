@@ -126,7 +126,7 @@ exports.register = function(data, success, failure) {
         parseFloat(data.timezone),
         Date.now()
     ];
-User
+
     let errors = [];
     let validity = Schema.validate('/User', newUser);
 
