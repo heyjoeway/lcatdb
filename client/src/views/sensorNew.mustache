@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <head>
-    <title>New Sensor</title>
+    <title><!--title--> - New Sensor</title>
+    <!--head-->
 </head>
 <body>
+    <!--nav-->
+
     <h1>New Sensor</h1>
     <form action="/sensors/newDo{{#configuration}}?configuration={{.}}{{/configuration}}" method="post">
         Type: <select name="type" value="{{typeFirst}}">
@@ -13,4 +16,7 @@
         Add to Configuration: <input type="text" name="configuration" value="{{configuration}}"><br>
         <input type="submit" value="Submit">
     </form>
+
+    <!--footer-->
+    <!--scripts-->
 </body>

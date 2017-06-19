@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+    <title><!--title--> - Add Existing Sensor</title>
+    <!--head-->
+</head>
+<body>
+    <!--nav-->
+
+    <div>
+        <h1>Add New Sensor</h1>
+        <a href="/configuration/{{configuration._id}}">&larr; Back to Configuration ({{configuration._id}}</a><br>
+        <form action="/configurations/{{configuration._id}}/addSensorDo" method="post">
+            Sensor ID: <input type="text" name="sid">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <!--footer-->
+    <!--scripts-->
+</body>

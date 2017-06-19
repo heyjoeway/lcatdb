@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+    <title><!--title--> - Login</title>
+    <!--head-->
+</head>
+<body>
+    <!--nav-->
+
+    <div>
+        <h1>Login</h1>
+        {{#invalid}}
+        <p>Invaild username or password.</p>
+        {{/invalid}}
+        <form action="/logindo" method="post">
+            Username: <input type="text" name="username" value=""><br>
+            Password: <input type="password" name="password" value=""><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <!--footer-->
+    <!--scripts-->
+</body>

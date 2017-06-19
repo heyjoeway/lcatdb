@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <head>
-    <title>Edit Configuration</title>
+    <title><!--title--> - Edit Configuration</title>
+    <!--head-->
 </head>
 <body>
+    <!--nav-->
+
     <h1>Edit Configuration</h1>
     {{#canEdit}}
     <form action="./editDo" method="post">
@@ -13,4 +16,7 @@
     {{^canEdit}}
     <p>Sorry, you do not have permission to edit this configuration.
     {{/canEdit}}
+
+    <!--footer-->
+    <!--scripts-->
 </body>
