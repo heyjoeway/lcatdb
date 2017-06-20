@@ -14,7 +14,7 @@
  * - Write all JS objects in valid JSON format. Use quotes (") around keys.
 */
 
-const STATIC = __dirname + '/public/';
+const STATIC = __dirname + '/www/';
 
 // ============================================================================
 // CONFIG

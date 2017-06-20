@@ -29,8 +29,11 @@ var config = {};
 config.clean = {};
 config.clean.www = [
     "./build/www/**/*.*",
-    "./tmp/www/**/*.*",
     "./tmp/www/**/*.*"
+];
+config.clean.views = [
+    "./build/views/**/*.*",
+    "./tmp/views/**/*.*"
 ];
 
 config.sass = {};
@@ -44,33 +47,38 @@ config.sass.www = {
     }]
 };
 
+let replacements = [{
+    from: "<!--head-->",
+    to: fs.readFileSync(TEMPLATES_DIR + "head.html", "utf8")
+}, {
+    from: "<!--nav-->",
+    to: fs.readFileSync(TEMPLATES_DIR + "nav.html", "utf8")
+}, {
+    from: "<!--footer-->",
+    to: fs.readFileSync(TEMPLATES_DIR + "footer.html", "utf8")
+}, {
+    from: "<!--scripts-->",
+    to: fs.readFileSync(TEMPLATES_DIR + "scripts.html", "utf8")
+}, {
+    from: "<!--title-->",
+    to: TITLE
+}, {
+    from: "<!--version-->",
+    to: PACKAGE.version
+}];
+
 config.replace = {};
 config.replace.www = {
     expand: true,
     src: [WWW_SRC + "pages/*.html"],
     dest: WWW_TMP,
-    replacements: [{
-        from: "<!--head-->",
-        to: fs.readFileSync(WWW_SRC + "templates/head.html", "utf8")
-    }, {
-        from: "<!--nav-->",
-        to: fs.readFileSync(WWW_SRC + "templates/nav.html", "utf8")
-    }, {
-        from: "<!--footer-->",
-        to: fs.readFileSync(WWW_SRC + "templates/footer.html", "utf8")
-    }, {
-        from: "<!--scripts-->",
-        to: fs.readFileSync(WWW_SRC + "templates/scripts.html", "utf8")
-    }, {
-        from: "<!--sidebar_normal-->",
-        to: fs.readFileSync(WWW_SRC + "templates/sidebar_normal.html", "utf8")
-    }, {
-        from: "<!--title-->",
-        to: TITLE
-    }, {
-        from: "<!--version-->",
-        to: PACKAGE.version
-    }]
+    replacements: replacements
+};
+config.replace.views = {
+    expand: true,
+    src: [VIEWS_SRC + "*.mustache"],
+    dest: VIEWS_TMP,
+    replacements: replacements
 };
 
 config.htmlmin = {};
@@ -87,6 +95,21 @@ config.htmlmin.www = {
         "src": ["**/*.html"],
         "dest": WWW_BUILD,
         "ext": ".html"
+    }]
+};
+config.htmlmin.views = {
+    options: {
+        removeComments: true,
+        collapseWhitespace: true,
+        conservativeCollapse: true,
+        removeEmptyAttributes: true
+    },
+    files: [{
+        "expand": true,
+        "cwd": VIEWS_TMP,
+        "src": ["**/*.mustache"],
+        "dest": VIEWS_BUILD,
+        "ext": ".mustache"
     }]
 };
 
@@ -168,7 +191,8 @@ require('load-grunt-tasks')(grunt); // Automatically loads all grunt tasks.
 // jfc why isn't this just included by default
 
 grunt.registerTask('default', [
-    "www-clean"
+    "www-clean",
+    "views-clean"
 ]);
 
 grunt.registerTask('www-clean', [
@@ -183,6 +207,16 @@ grunt.registerTask('www', [
     'babel:www',
     'uglify:www',
     'copy:www'
+]);
+
+grunt.registerTask('views-clean', [
+    'clean:views',
+    'views'
+]);
+
+grunt.registerTask('views', [
+    'replace:views',
+    'htmlmin:views'
 ]);
 
 };
