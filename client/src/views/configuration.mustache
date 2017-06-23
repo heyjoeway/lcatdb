@@ -1,50 +1,74 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - Configuration</title>
     <!--head-->
+    <title><!--title--> - Configuration</title>
 </head>
 <body>
     <!--nav-->
 
-    <div>
+    <div class="container">
     {{#configuration}}
-        <h1>Configuration</h1>
+        <h2 style="display: inline-block;vertical-align: middle">Configuration</h2>
         {{#canEdit}}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a role="button" class="btn btn-primary btn-lg" href="/configurations/{{_id}}/reading">Take Reading</a>
+        <br class="visible-xxs">
         {{/canEdit}}
-        Name: {{name}}<br>
-        ID: {{_id}}<br>
-        Owner: {{owner}}<br>
-        Creation Time: {{creation}}<br>
-        <a href="/configurations/{{_id}}/edit">Edit Details</a><br>
-        <a href="/configurations/{{_id}}/reading">Take Reading</a><br>
-        <h2>Members</h2>
-        <ul>
-            {{#members}}
-            <li>
-                UID: {{uid}}<br>
-                {{#canEdit}}
-                <a href="/configurations/{{_id}}/removeMember/{{uid}}">Remove</a>
-                {{/canEdit}}
-            </li>
-            {{/members}}
-        </ul>
-        {{#canEdit}}
-        <a href="/configurations/{{_id}}/addMember">Add New Member</a>
-        {{/canEdit}} 
-        <h2>Sensors</h2>
-        <ul>
+        <br>
+
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Name</div>
+            <div>{{name}}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">ID</div>
+            <div>{{_id}}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Owner</div>
+            <div>
+                <a href="/profile/{{owner}}">{{owner}}</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Creation Time</div>
+            <div>{{creation}}</div>
+        </div>
+        <br>
+        {{#canEdit}}        
+        <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/edit">Edit Details</a><br>
+        {{/canEdit}}    
+        <div id="members" style="display: none">
+            <h3>Members</h3>
+            <ul>
+                {{#members}}
+                <li>
+                    UID: {{uid}}<br>
+                    {{#canEdit}}
+                    <a href="/configurations/{{_id}}/removeMember/{{uid}}">Remove</a>
+                    {{/canEdit}}
+                </li>
+                {{/members}}
+            </ul>
+            {{#canEdit}}
+            <a href="/configurations/{{_id}}/addMember">Add New Member</a>
+            {{/canEdit}} 
+        </div>
+        <h3>Sensors</h3>
+        <ul class="list-group">
             {{#sensors}}
-            <li><a href="/sensors/{{_id}}">{{name}}</a></li>
+            <li class="list-group-item"><a href="/sensors/{{_id}}">{{name}}</a></li>
             {{/sensors}}
         </ul>
         {{#canEdit}}
-        <a href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
-        <a href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
+        <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
+        &nbsp;
+        <a role="button" class="btn btn-primary" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
         {{/canEdit}} 
-        <h2>Edits</h2>
-        <ul>
+        <h3>Edits</h3>
+        <ul class="list-group">
             {{#edits}}
-            <li>{{time}}</li>
+            <li class="list-group-item">{{time}}</li>
             {{/edits}}
         </ul>
         {{/configuration}}

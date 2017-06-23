@@ -1,3 +1,5 @@
+const ObjectId = require('mongodb').ObjectId;
+
 let months = [
     'January',
     'February',
@@ -24,4 +26,26 @@ exports.prettyTime = function(timeStr, timezone) {
         ("0" + time.getUTCDate()).slice(-2) + ', ' +
         time.getUTCFullYear()
     );
+};
+
+exports.testOid = function(oid, failure, success) {
+    if (oid) {
+        try {
+            return ObjectId(oid);
+        } catch(e) {
+            if (failure)
+                failure({ "type": "Utils.testOid", "exception": e, "oid": oid });
+        }
+    }
+    return false;
+};
+
+exports.reqsToObj = function(fields) {
+    if (fields) {
+        let obj = {};
+        fields.forEach((key) => {
+            obj[key] = 1;
+        });
+        return obj;
+    } else return undefined;
 };

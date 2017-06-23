@@ -1,37 +1,21 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - Dashboard</title>
     <!--head-->
+    <title><!--title--> - Dashboard</title>
 </head>
 <body>
     <!--nav-->
-
-    <h1>Dashboard</h1>
-    Welcome, {{username}}!<br>
-    <img src="{{picture}}" alt="Profile Picture"><br>
-    <h1>Profile</h1>
-    Username: {{username}}<br>
-    First Name: {{first}}<br>
-    Last Name: {{last}}<br>
-    E-mail: {{email}}<br>
-    Short Description: {{descShort}}<br>
-    Long Description: {{descLong}}<br>
-    Account created at: {{creation}}<br>
-    Is account verified?: {{verified}}<br>
-    Timezone: {{timezone}}<br>
-    Phones:<br>
-    {{#phone}}
-        Number: {{number}}<br>
-        Location: {{Location}}<br>
-        ------------------<br>
-    {{/phone}}
-    Organizations:<br>
-    {{#organizations}}
-        {{.}}<br>
-    {{/organizations}}
-    <br>
-    <a href="/configurations">Configurations</a>
-    <a href="/logout">Logout</a>
+    <div class="container text-center">
+        {{#user}}
+        <h2>Welcome, {{username}}!</h2>
+        <h3>What would you like to do?</h3>
+        <a role="button" class="btn btn-primary btn-lg" href="/configurations/reading">Take a Reading</a><br>
+        <br>
+        <a role="button" class="btn btn-secondary btn-lg" href="/configurations">View Configurations</a><br>
+        <br>
+        <a role="button" class="btn btn-secondary btn-lg" href="/visualize">Visualize Data</a><br>
+        {{/user}}
+    </div>
 
     <!--footer-->
     <!--scripts-->

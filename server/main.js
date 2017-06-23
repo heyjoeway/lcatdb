@@ -111,6 +111,7 @@ app.use(bodyParser.urlencoded());
 app.engine('mustache', mustache());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views/');
+app.use(Express.static(STATIC));
 
 // ============================================================================
 // ROUTING
@@ -123,10 +124,10 @@ app.set('views', __dirname + '/views/');
 // If user is logged in, show them their dashboard.
 // Otherwise, just show the homepage.
 app.get('/', (req, res) => {
-    if (req.session && req.session.username) {
+    if (req.session && req.session.oid) {
         res.redirect('/dashboard');
     } else {
-        res.sendFile(STATIC + 'home.html');
+        res.redirect('/home.html');
     }
 });
 
@@ -221,7 +222,9 @@ app.all('/logout', (req, res) => {
 // ----------------------------------------------------------------------------
 
 sessionGet('/dashboard', (req, res, user) => {
-    res.render('dashboard', user);
+    res.render('dashboard', {
+        "user": user
+    });
 });
 
 // ----------------------------------------------------------------------------
@@ -255,7 +258,7 @@ let configPattern = '([0-9a-f]{24})';
 
 configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'edits.time']);
 configurationRender(`/configurations/${configPattern}/edit`, 'configurationEdit');
-configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor');
+configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor', ['user.sensors']);
 
 // ----------------------------------------------------------------------------
 // Configuration edit (action)
@@ -425,6 +428,24 @@ sessionGet('/configurations/new', (req, res, user) => {
     Configurations.new(user, (id) => {
         res.redirect(`/configurations/${id}/edit`);
     });
+});
+
+// ----------------------------------------------------------------------------
+// Sensors (page)
+// ----------------------------------------------------------------------------
+
+sessionGet('/sensors', (req, res, user) => {
+    Sensor.getList(user, 
+        (docs) => { // Success
+            res.render('sensorList', {
+                "sensors": docs
+            });
+        },
+        (error) => { // Failure
+            res.send(`Unknown error. (${error.type})`);
+        },
+        ['name'] // Requirements
+    );
 });
 
 // ----------------------------------------------------------------------------
@@ -710,7 +731,7 @@ function configurationRender(url, template, needs) {
 
     configurationGet(url, (req, res, user, configuration) => {
         Configurations.mustachify(user, configuration,
-            (configuration) => {
+            () => {
                 let canEdit = Configurations.canEdit(user, configuration);
 
                 Winston.debug('Rendering configuration page.', {

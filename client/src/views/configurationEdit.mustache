@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - Edit Configuration</title>
     <!--head-->
+    <title><!--title--> - Edit Configuration</title>
 </head>
 <body>
     <!--nav-->
 
-    <h1>Edit Configuration</h1>
-    {{#canEdit}}
-    <form action="./editDo" method="post">
-        Name: <input type="text" name="name" value="{{configuration.name}}">
-        <input type="submit" value="Submit">
-    </form>
-    {{/canEdit}}
-    {{^canEdit}}
-    <p>Sorry, you do not have permission to edit this configuration.
-    {{/canEdit}}
+    <div class="container">
+        <h2>Edit Configuration</h2>
+        {{#canEdit}}
+        <form action="./editDo" method="post" class="form-horizontal"><fieldset class="container">
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="name">Name</label>
+                <div class="col-xs-10"><input class="form-control" type="text" name="name" value="{{configuration.name}}"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-10 col-xs-offset-2">
+                    <a href="./" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </fieldset></form>
+        {{/canEdit}}
+        {{^canEdit}}
+        <p>Sorry, you do not have permission to edit this configuration.</p>
+        {{/canEdit}}
+    </div>
 
     <!--footer-->
     <!--scripts-->

@@ -1,25 +1,42 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - Edit Sensor</title>
     <!--head-->
+    <title><!--title--> - Edit Sensor</title>
 </head>
 <body>
     <!--nav-->
 
-    <div>
+    <div class="container">
+        
         <h1>Edit Sensor</h1>
         {{#canEdit}}
-        <form action="./editDo{{#configuration}}?configuration={{.}}{{/configuration}}" method="post">
-            Name: <input type="text" name="name" value="{{sensor.name}}"><br>
-            Description: <input type="text" name="description" value="{{sensor.description}}"><br>
-            Model: <input type="text" name="model" value="{{sensor.model}}" list="models"><br>
-            <datalist id="models">
-                {{#models}}
-                <option>{{name}}</option>
-                {{/models}}
-            </datalist>
-            <input type="submit" value="Submit"><br>
-        </form>
+        <form action="./editDo" method="post" class="form-horizontal"><fieldset class="container">
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="name">Name</label>
+                <div class="col-xs-10"><input class="form-control" type="text" name="name" value="{{sensor.name}}"></div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="description">Description</label>
+                <div class="col-xs-10"><input class="form-control" type="text" name="description" value="{{sensor.description}}"></div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="model">Model</label>
+                <div class="col-xs-10">
+                    <input class="form-control" type="text" name="model" value="{{sensor.model}}" list="models">
+                    <datalist id="models">
+                        {{#models}}
+                        <option>{{name}}</option>
+                        {{/models}}
+                    </datalist>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-10 col-xs-offset-2">
+                    <a href="./" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </fieldset></form>
         {{/canEdit}}
         {{^canEdit}}
         <p>Sorry, you do not have permission to edit this sensor.

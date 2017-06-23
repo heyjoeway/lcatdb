@@ -1,18 +1,47 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - Add Existing Sensor</title>
     <!--head-->
+    <title><!--title--> - Add Existing Sensor</title>
 </head>
 <body>
     <!--nav-->
 
-    <div>
-        <h1>Add New Sensor</h1>
-        <a href="/configuration/{{configuration._id}}">&larr; Back to Configuration ({{configuration._id}}</a><br>
-        <form action="/configurations/{{configuration._id}}/addSensorDo" method="post">
-            Sensor ID: <input type="text" name="sid">
-            <input type="submit" value="Submit">
-        </form>
+    <div class="container">
+        <h2>Add Existing Sensor</h2>
+        {{#canEdit}}
+        <h4>Input the ID in the box below.</h4>
+        <form action="./addSensorDo" method="post" class="form-horizontal"><fieldset class="container">
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="sid">Sensor ID</label>
+                <div class="col-xs-10"><input class="form-control" type="text" name="sid"></div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-10 col-xs-offset-2">
+                    <a href="./" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </fieldset></form>
+        <h3>OR</h3><br>
+        <h4>Choose a sensor from the list.</h4>
+        <div class="js">
+            <ul class="list-group">
+                {{#user.sensors}}
+                <li class="list-group-item"><a href="#" class="sensors.{{_id}}">{{name}} ({{_id}})</a></li>
+                {{/user.sensors}}
+            </ul>
+            {{^user.sensors.length}}
+                No sensors found.
+            {{/user.sensors.length}}
+        </div>
+        <div class="no-js">
+            Please enable Javascript to use this feature.
+        </div>
+
+        {{/canEdit}}
+        {{^canEdit}}
+        <p>Sorry, you do not have permission to add a sensor.</p>
+        {{/canEdit}}
     </div>
 
     <!--footer-->

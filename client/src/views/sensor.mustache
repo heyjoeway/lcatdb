@@ -1,24 +1,41 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - Sensor</title>
     <!--head-->
+    <title><!--title--> - Sensor</title>
 </head>
 <body>
     <!--nav-->
 
-    <div>
-        <h1>Sensor</h1>
-        Name: {{sensor.name}}<br>
-        Description: {{sensor.description}}<br>
-        Model: {{sensor.model}}<br>
-        Type: {{typeName}}
-        <h2>Edits</h2>
-        <ul>
-            {{#sensor.edits}}
-            <li>{{time}}</li>
-            {{/sensor.edits}}
+    <div class="container">
+        <h2>Sensor</h2>
+        {{#sensor}}
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Name</div>
+            <div>{{name}}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">ID</div>
+            <div>{{_id}}</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Owner</div>
+            <div>
+                <a href="/profile/{{owner}}">{{owner}}</a>
+            </div>
+        </div>
+        <!--<div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Creation Time</div>
+            <div>{{creation}}</div>
+        </div>-->
+        <br>
+        {{#canEdit}}<a role="button" class="btn btn-secondary" href="/sensors/{{_id}}/edit">Edit Details</a><br>{{/canEdit}}
+        <h3>Edits</h3>
+        <ul class="list-group">
+            {{#edits}}
+            <li class="list-group-item">{{time}}</li>
+            {{/edits}}
         </ul>
-        {{#canEdit}}<a href="/sensors/{{sensor._id}}/edit">Edit Sensor</a>{{/canEdit}}
+        {{/sensor}}
     </div>
 
     <!--footer-->

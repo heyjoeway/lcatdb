@@ -6,6 +6,8 @@ const Winston = require('winston');
 const ObjectId = require('mongodb').ObjectId;
 const deepmerge = require('deepmerge');
 
+const Utils = require('./utils.js');
+
 // ----------------------------------------------------------------------------
 // Champy-DB specific modules
 // ----------------------------------------------------------------------------
@@ -14,6 +16,38 @@ const Schema = require('./schema.js');
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
 const SensorTypes = require('./sensorTypes.js');
+
+exports.getList = function(user, success, failure, reqs) {
+    function fail(error) {
+        Winston.debug('Could not retrieve sensor list.', {
+            "error": error
+        });
+        failure(error)
+    }
+
+    let oid = Utils.testOid(user['_id'], fail);
+    if (!oid) return;
+
+    let sensors = Db.collection('sensors');
+
+    let query = { "owner": ObjectId(user["_id"]) };
+    let fields = Utils.reqsToObj(reqs);
+    let cursor = sensors.find(query);
+    cursor.toArray(function(error, list) {
+        if (error)
+            return fail({
+                "type": "cursor",
+                "error": error
+            });
+
+        Winston.debug('Finished searching for sensors.', {
+            "username": user.username,
+            // "list": list
+        });
+        success(list);
+    });
+};
+
 
 /** 
  * Tests if a user can edit a certain sensor.
@@ -63,9 +97,8 @@ exports.find = function(oid, success, failure) {
         return error;
     }
     
-    try { oid = ObjectId(oid); }
-    catch(e) { return fail({ "type": "badId", "exception": e }); }
-
+    oid = Utils.testOid(oid, fail);
+    if (!oid) return;
 
     let sensors = Db.collection('sensors');
 

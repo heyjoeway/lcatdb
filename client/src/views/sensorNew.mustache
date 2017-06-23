@@ -1,21 +1,38 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - New Sensor</title>
     <!--head-->
+    <title><!--title--> - New Sensor</title>
 </head>
 <body>
     <!--nav-->
 
-    <h1>New Sensor</h1>
-    <form action="/sensors/newDo{{#configuration}}?configuration={{.}}{{/configuration}}" method="post">
-        Type: <select name="type" value="{{typeFirst}}">
-        {{#types}}
-            <option value="{{key}}">{{type.data.name}}</option>
-        {{/types}}
-        </select><br>
-        Add to Configuration: <input type="text" name="configuration" value="{{configuration}}"><br>
-        <input type="submit" value="Submit">
-    </form>
+    <div class="container">
+        <h2>New Sensor</h2>
+        <form action="/sensors/newDo{{#configuration}}?configuration={{.}}{{/configuration}}" method="post" class="form-horizontal"><fieldset class="container">
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="sid">Type</label>
+                <div class="col-xs-10">
+                    <select class="form-control" name="type" value="{{typeFirst}}">
+                        {{#types}}
+                        <option value="{{key}}">{{type.data.name}}</option>
+                        {{/types}}
+                    </select><br>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="sid">Add to Configuration (Optional)</label>
+                <div class="col-xs-10">
+                    <input class="form-control" type="text" name="configuration" value="{{configuration}}">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-10 col-xs-offset-2">
+                    <a href="{{#configuration}}/configurations/{{.}}/{{/configuration}}{{^configuration}}./{{/configuration}}" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </fieldset></form>
+    </div>
 
     <!--footer-->
     <!--scripts-->

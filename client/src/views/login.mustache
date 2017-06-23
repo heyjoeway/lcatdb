@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <head>
-    <title><!--title--> - Login</title>
     <!--head-->
+    <title><!--title--> - Login</title>
 </head>
 <body>
-    <!--nav-->
+    <!--nav_nouser-->
 
-    <div>
-        <h1>Login</h1>
+    <div class="container" class="text-center">
+        <h2>Login</h2>
         {{#invalid}}
-        <p>Invaild username or password.</p>
+        <div class="alert alert-warning">
+            <p>Invaild username or password.</p>
+        </div>
         {{/invalid}}
         <form action="/logindo" method="post">
-            Username: <input type="text" name="username" value=""><br>
-            Password: <input type="password" name="password" value=""><br>
-            <input type="submit" value="Submit">
+            <input class="form-control" type="text" name="username" value="" placeholder="Username"><br>
+            <input class="form-control" type="password" name="password" value="" placeholder="Password"><br>
+            <input class="btn btn-primary" type="submit" value="Submit">
         </form>
     </div>
 

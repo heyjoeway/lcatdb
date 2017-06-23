@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Sensors</title>
+</head>
+<body>
+    <!--nav-->
+
+    <div class="container">
+        <h2 style="display: inline-block;vertical-align: middle">Sensors</h2>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a role="button" class="btn btn-primary btn-lg" href="/sensors/new">Add New</a><br>
+        <br>
+        <ul class="list-group">
+            {{#sensors}}
+            <li class="list-group-item"><a href="/sensors/{{_id}}">{{name}}</a></li>
+            {{/sensors}}
+        </ul>
+        {{^sensors.length}}
+            No sensors found.
+        {{/sensors.length}}
+    </div>
+
+    <!--footer-->
+    <!--scripts-->
+</body>

@@ -54,6 +54,9 @@ let replacements = [{
     from: "<!--nav-->",
     to: fs.readFileSync(TEMPLATES_DIR + "nav.html", "utf8")
 }, {
+    from: "<!--nav_nouser-->",
+    to: fs.readFileSync(TEMPLATES_DIR + "nav_nouser.html", "utf8")
+}, {
     from: "<!--footer-->",
     to: fs.readFileSync(TEMPLATES_DIR + "footer.html", "utf8")
 }, {
@@ -122,9 +125,9 @@ config.babel = {
 config.babel.www = {
     files: [{
         "expand": true,
-        "cwd": WWW_SRC + "js/",
+        "cwd": WWW_SRC + "js_es2015/",
         "src": ["**/*.es2015"],
-        "dest": WWW_BUILD + "js/",
+        "dest": WWW_TMP + "js/",
         "ext": ".js"
     }]
 };
@@ -140,7 +143,7 @@ config.uglify.www = {
     // dest: WWW_BUILD + "js/script.min.js"
     files: [{
         expand: true,
-        cwd: WWW_SRC + 'js/',
+        cwd: WWW_TMP + 'js/',
         src: '**/*.js',
         dest: WWW_BUILD + "js/"
     }]

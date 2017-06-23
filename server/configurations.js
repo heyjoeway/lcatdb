@@ -78,7 +78,7 @@ exports.find = function(oid, success, failure) {
 // TODO: Retrieve only necessary information
 exports.getSensorList = function(configuration, success, failure) {
     function fail(error) {
-        Winston.debug("Could not retrieve sensor list.", {
+        Winston.debug("Could not retrieve sensor list for configuration.", {
             "error": error
         });
         failure(error);
@@ -384,8 +384,12 @@ exports.mustachify = function(user, configuration, success, failure, needs = [])
     let tasks = needs.length + 1;
 
     function progress() {
+        Winston.debug('Progress made on Configurations.mustachify.');
         tasks--;
-        if (tasks == 0) success(configuration);
+        if (tasks == 0) {
+            Winston.debug('Configurations.mustachify succeeded.');
+            success();
+        }
     }
 
     // ----
@@ -401,7 +405,6 @@ exports.mustachify = function(user, configuration, success, failure, needs = [])
     if (needs.includes('sensors')) {
         exports.getSensorList(configuration,
             (sensors) => {
-                console.log(sensors);
                 configuration.sensors = sensors;
                 progress();
             },
@@ -423,5 +426,20 @@ exports.mustachify = function(user, configuration, success, failure, needs = [])
             );
         });
         progress();
+    }
+
+    // ---
+
+    if (needs.includes('user.sensors')) {
+        Sensor.getList(user, 
+            (docs) => { // Success
+                user.sensors = docs;
+                progress();
+            },
+            (error) => { // Failure
+                fail({ "type": "userSensorList", "error": error });
+            },
+            ['name'] // Requirements
+        );
     }
 }
