@@ -7,13 +7,18 @@
     <!--nav-->
 
     <div class="container">
-        <h2 style="display: inline-block;vertical-align: middle">Configurations</h2>
+        <h2 class="h-inline">Configurations</h2>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a role="button" class="btn btn-primary btn-lg" href="/configurations/new">Add New</a><br>
         <br>
         <ul class="list-group">
             {{#configurations}}
+            {{#reading}}
+            <li class="list-group-item"><a href="/configurations/{{_id}}/reading">{{name}}</a></li>
+            {{/reading}}
+            {{^reading}}
             <li class="list-group-item"><a href="/configurations/{{_id}}">{{name}}</a></li>
+            {{/reading}}
             {{/configurations}}
         </ul>
         {{^configurations.length}}

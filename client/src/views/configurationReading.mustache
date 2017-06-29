@@ -6,32 +6,122 @@
 <body>
     <!--nav-->
 
-    <h1>New Reading</h1>
-    Configuration Name: {{configuration.name}}<br>
-    Configuration Id: {{configuration._id}}<br>
-    <br>
-    {{#canEdit}}
-    <form action="./readingDo" method="post">
-        Latitude: <input type="number" name="location.lat" min="-90" max="90"><br>
-        Longitude: <input type="number" name="location.long" min="-180" max="180"><br>
-        Range (Optional): <input type="number" name="location.range" min="0"><br>
-        Altitude (Optional): <input type="number" name="location.alt"><br>
-        Altitude Range (Optional): <input type="number" name="location.altRange" min="0"><br>
-        Time Created: <input type="number" name="timeCreated" value="{{timeCurrent}}"><br>
-        <h2>Values</h2>
-        {{#sensors}}
-            Sensor Name: {{name}}<br>
-            Sensor Id: {{_id}}<br>
-            {{{html}}}
+    <div class="container">
+        <h2>New Reading</h2>
+        <div class="row">
+            &nbsp;&nbsp;&nbsp;Configuration <a href="./">{{configuration.name}} ({{configuration._id}})</a>
+        </div>
+        <br>
+        {{#canEdit}}
+        <div class="js">
+            <button id="locationget" type="button" class="btn btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label class="custom-control custom-checkbox">
+                <input type="checkbox" id="locationalways" class="custom-control-input">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">Get Location Automatically</span>
+            </label>
+            <br><br>
+            <div class="map" id="map"></div>
+        </div>
+        <br>
+        <form action="./readingDo" method="post"><fieldset class="container">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="control-label" for="location.lat">
+                        Latitude
+                    </label>
+                    <div class="input-group">
+                        <input class="form-control" type="number" step="any" name="location.lat"
+                        aria-describedby="addon-location_lat" id="location_lat" min="-90" max="90"><br>
+                        <span class="input-group-addon" id="addon-location_lat">Degrees</span>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <label class="control-label" for="location.long">
+                        Longitude
+                    </label>
+                    <div class="input-group">
+                        <input class="form-control" type="number" step="any" name="location.long" 
+                        aria-describedby="addon-location_long" id="location_long" min="-180" max="180">
+                        <span class="input-group-addon" id="addon-location_long">Degrees</span>
+                    </div>
+                </div>
+            </div>
+
             <br>
-        {{/sensors}}
-        <input type="submit" name="publish" value="Save and Publish">
-    </form>
-    {{/canEdit}}
-    {{^canEdit}}
-    <p>Sorry, you do not have permission to create a reading.
-    {{/canEdit}}
+
+            <div class="row form-expand">
+                <div class="col-sm-4 col-xs-12">
+                    <label class="control-label" for="location.range">
+                        Range (Optional)
+                    </label>
+                    <div class="input-group">
+                        <input class="form-control" type="number" step="any" name="location.range"
+                        aria-describedby="addon-location_range" id="location_range" min="0"><br>
+                        <span class="input-group-addon" id="addon-location_range">Meters</span>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 col-xs-12">
+                    <label class="control-label" for="location.alt">
+                        Altitude (Optional)
+                    </label>
+                    <div class="input-group">
+                        <input class="form-control" type="number" step="any" name="location.alt"
+                        aria-describedby="addon-location_alt" id="location_alt"><br>
+                        <span class="input-group-addon" id="addon-location_alt">Meters</span>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 col-xs-12">
+                    <label class="control-label" for="location.altRange">
+                        Altitude Range (Optional)
+                    </label>
+                    <div class="input-group">
+                        <input class="form-control" type="number" step="any" name="location.altRange"
+                        aria-describedby="addon-location_altRange" id="location_altRange" min="0"><br>
+                        <span class="input-group-addon" id="addon-location_altRange">Meters</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <br>
+            
+            <div class="form-group">
+                <label class="control-label">
+                    Time Created
+                </label>
+                <input class="form-control" type="number" name="timeCreated" value="{{timeCurrent}}">
+            </div>
+
+            <h3>Values</h3>
+            {{#sensors}}
+                <h4 class="h-inline">{{name}}</h4>&nbsp;&nbsp;<a href="/sensors/{{_id}}">({{_id}})</a><br>
+                {{{html}}}
+                <br>
+            {{/sensors}}
+
+            <div class="form-group">
+                <div>
+                    <a href="./" class="btn btn-default">Cancel</a>
+                    <button type="submit" name="publish" class="btn btn-primary">Save and Publish</button>
+                </div>
+            </div>
+        </fieldset></form>
+
+        {{/canEdit}}
+        {{^canEdit}}
+        <p>Sorry, you do not have permission to create a reading.
+        {{/canEdit}}
+    </div>
 
     <!--footer-->
     <!--scripts-->
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAsPFPL4ttV7hbmVIF-BELdB9WD_c5SjJA&callback=initMap">
+    </script>
+    <script src="/js/reading.js"></script>
+
 </body>

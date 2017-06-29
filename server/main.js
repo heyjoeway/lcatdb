@@ -170,11 +170,12 @@ app.post('/logindo', (req, res) => {
 app.get('/register', (req, res) => {
     req.session.reset();
 
-    let data = { "anyErrors": false };
+    // let data = { "anyErrors": false };
+    let data = {};
 
     for (var key in req.query) {
         data[key] = true;
-        data.anyErrors = true;
+        // data.anyErrors = true;
     }
 
     Winston.debug("Registration page accessed.", { "data": data });
@@ -232,9 +233,11 @@ sessionGet('/dashboard', (req, res, user) => {
 // ----------------------------------------------------------------------------
 
 sessionGet('/configurations', (req, res, user) => {
+    console.log(req.query.reading);
     Configurations.getList(user, (docs) => {
         res.render('configurationList', {
-            "configurations": docs
+            "configurations": docs,
+            "reading": typeof req.query.reading != 'undefined'
         });
     })
 });

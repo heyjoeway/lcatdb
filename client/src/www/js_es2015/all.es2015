@@ -1,4 +1,4 @@
-$(document).ready(() => {
+$(() => {
     $('.js').removeClass('js');
     $('.no-js').hide();
 });

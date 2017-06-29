@@ -84,7 +84,7 @@ exports.new = function(user, configuration, data, success, failure, publish) {
     });
     
     if (!valueValidity)
-        fail({ "type": "valueValidity", "errors": Schema.errors() });
+        return fail({ "type": "valueValidity", "errors": Schema.errors() });
     
     let readings = Db.collection('readings');
 

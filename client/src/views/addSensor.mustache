@@ -10,10 +10,10 @@
         <h2>Add Existing Sensor</h2>
         {{#canEdit}}
         <h4>Input the ID in the box below.</h4>
-        <form action="./addSensorDo" method="post" class="form-horizontal"><fieldset class="container">
+        <form id="form" action="./addSensorDo" method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
                 <label class="col-xs-2 control-label" for="sid">Sensor ID</label>
-                <div class="col-xs-10"><input class="form-control" type="text" name="sid"></div>
+                <div class="col-xs-10"><input class="form-control" type="text" id="sid" name="sid"></div>
             </div>
             <div class="form-group">
                 <div class="col-xs-10 col-xs-offset-2">
@@ -27,7 +27,7 @@
         <div class="js">
             <ul class="list-group">
                 {{#user.sensors}}
-                <li class="list-group-item"><a href="#" class="sensors.{{_id}}">{{name}} ({{_id}})</a></li>
+                <li class="list-group-item"><a href="#" class="sensor" id="{{_id}}">{{name}} ({{_id}})</a></li>
                 {{/user.sensors}}
             </ul>
             {{^user.sensors.length}}
@@ -46,4 +46,6 @@
 
     <!--footer-->
     <!--scripts-->
+
+    <script src="/js/configurationAddSensor.js"></script>
 </body>

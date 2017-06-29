@@ -1,0 +1,104 @@
+let configurationId, map, marker;
+
+function prefValue(key, val) {
+    if (val) localStorage[`configurations.${configurationId}.${key}`] = val;
+    return localStorage[`configurations.${configurationId}.${key}`];
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => { // Success
+                $('#location_lat').val(pos.coords.latitude);
+                $('#location_long').val(pos.coords.longitude);
+                $('#location_range').val(pos.coords.accuracy);
+                $('#location_alt').val(pos.coords.altitude);
+                $('#location_altRange').val(pos.coords.altitudeAccuracy);
+                updateMap();
+            },
+            (error) => { // Failure
+                $.notify({
+                    "message": 'Could not retrieve location. Please allow location on your device.'
+                }, {
+                    "type": 'warning'
+                });
+            },
+            { // Options
+                "enableHighAccuracy": true,
+                "maximumAge": 3 * 60 * 1000, // 3 minutes
+                "timeout": 15 * 1000 // 15 sec (may increase)
+            }
+        );
+    } else {
+        $.notify({
+            "message": 'Could not retrieve location. Geolocation is not supported by this browser.'
+        }, {
+            "type": 'warning'
+        });
+    }
+}
+
+let prefHandlers = [
+    {
+        "name": 'locationalways',
+        "load": function() {
+            let isSet = prefValue(this.name) == 'true';
+            $('#' + this.name).prop('checked', isSet);
+            if (isSet) getLocation();
+        },
+        "save": function() {
+            prefValue(this.name, $('#' + this.name).prop('checked').toString());
+        },
+        "listen": function() {
+            $('#' + this.name).change(() => { this.save() });
+        }
+    }
+];
+
+function loadPrefs() {
+    prefHandlers.forEach((handler) => {
+        handler.load();
+    });
+}
+
+function savePrefs() {
+    prefHandlers.forEach((handler) => {
+        handler.save();
+    });
+}
+
+function listenPrefs() {
+    prefHandlers.forEach((handler) => {
+        handler.listen();
+    });
+}
+
+function init() {
+    configurationId = location.pathname.split('/')[2];
+
+    loadPrefs();
+    listenPrefs();
+}
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12
+    });
+    
+    marker = new google.maps.Marker({
+        map: map
+    });
+    updateMap();
+}
+
+function updateMap() {
+    let pos = new google.maps.LatLng(
+        $('#location_lat').val(),
+        $('#location_long').val()
+    );
+
+    marker.setPosition(pos);
+    map.setCenter(pos);
+}
+
+$(window).ready(init);

@@ -1,0 +1,6 @@
+$(() => {
+    $('.sensor').click(function() {
+        $('#sid').val($(this).attr('id'));
+        $('#form').submit();
+    });
+});

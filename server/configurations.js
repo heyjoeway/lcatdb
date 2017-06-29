@@ -39,8 +39,8 @@ exports.getList = function(user, callback) {
             return;
         }
         Winston.debug('Finished searching for configurations.', {
-            "username": user.username,
-            "list": list
+            "username": user.username
+            // "list": list
         });
         callback(list);
     });
