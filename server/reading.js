@@ -1,13 +1,23 @@
+// ============================================================================
+// IMPORTS
+// ============================================================================
+
 const deepmerge = require('deepmerge');
 const Winston = require('winston');
 const ObjectId = require('mongodb').ObjectId;
+
+// ----------------------------------------------------------------------------
+// Champy-DB specific modules
+// ----------------------------------------------------------------------------
 
 const Schema = require('./schema.js');
 const SensorTypes = require('./sensorTypes.js')
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
 
-exports.find = function(oid, success, failure) {
+// ----------------------------------------------------------------------------
+
+exports.find = function(oid, success, failure, reqs) {
     function fail(error) {
         Winston.debug('Error finding reading.', {
             "error": error,
@@ -17,14 +27,20 @@ exports.find = function(oid, success, failure) {
         return error;
     }
     
-    try { oid = ObjectId(oid); }
-    catch(e) { return fail({ "type": "badId", "exception": e }); }
+    // ----
 
+    oid = Utils.testOid(oid, fail);
+    if (!oid) return;
+
+    // ----
 
     let readings = Db.collection('readings');
 
+    let fields = Utils.reqsToObj(reqs);
+
     readings.findOne(
         { "_id": oid },
+        fields,
         (error, reading) => {
             if (error || reading == null)
                 return fail({ "type": "notFound", "error": error });
@@ -38,13 +54,14 @@ exports.find = function(oid, success, failure) {
     );
 }
 
+// ----------------------------------------------------------------------------
+
 exports.new = function(user, configuration, data, success, failure, publish) {
     function fail(error) {
         Winston.debug("Could not create new reading.", {
             "error": error
         });
         failure(error);
-        console.log(newData);
     }
 
     let canEdit = Configurations.canEdit(user, configuration);

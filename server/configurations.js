@@ -29,11 +29,14 @@ const Utils = require('./utils.js');
  *      - list: Array of configuration objects associated with user.
  */
 
-exports.getList = function(user, callback) {
+exports.getList = function(user, callback, reqs) {
     let configurations = Db.collection('configurations');
 
     let query = { "owner": ObjectId(user["_id"]) };
-    let cursor = configurations.find(query);
+    let fields = Utils.reqsToObj(reqs);
+
+    let cursor = configurations.find(query, fields);
+
     cursor.toArray(function(err, list) {
         if (err) {
             return;
@@ -56,11 +59,14 @@ exports.getList = function(user, callback) {
  *      - err: mongoDB error object.
  */
 
-exports.find = function(oid, success, failure) {
+exports.find = function(oid, success, failure, reqs) {
     let configurations = Db.collection('configurations');
+
+    let fields = Utils.reqsToObj(reqs);
 
     configurations.findOne(
         { "_id": ObjectId(oid) },
+        fields,
         (err, configuration) => {
             if (err || configuration == null) {
                 Winston.warn('Error finding configuration.', {
@@ -75,7 +81,6 @@ exports.find = function(oid, success, failure) {
     );
 }
 
-// TODO: Retrieve only necessary information
 exports.getSensorList = function(configuration, success, failure) {
     function fail(error) {
         Winston.debug("Could not retrieve sensor list for configuration.", {
@@ -95,7 +100,7 @@ exports.getSensorList = function(configuration, success, failure) {
 
     sensors.forEach((id) => {
         Sensor.find(ObjectId(id),
-            (sensor) => {
+            (sensor) => { // Success
                 if (hasFailed) return;
 
                 result.push(sensor)
@@ -103,12 +108,13 @@ exports.getSensorList = function(configuration, success, failure) {
                 if (sensorsLeft == 0)
                     success(result);
             },
-            (error) => {
+            (error) => { // Failure
                 if (hasFailed) return;
 
                 fail(error);
                 hasFailed = true;                
-            }
+            },
+            ['name'] // Requirements
         );
     });
 };
@@ -184,8 +190,12 @@ exports.edit = function(user, cid, edit, success, failure) {
         failure(error);
     }
 
-    try { cid = ObjectId(cid); }
-    catch(e) { return fail({ "type": "badId", "exception": e }); }
+    // ----
+
+    cid = Utils.testOid(cid, fail);
+    if (!cid) return;
+
+    // ----
 
     exports.find(cid,
         (configuration) => {

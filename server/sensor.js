@@ -25,14 +25,19 @@ exports.getList = function(user, success, failure, reqs) {
         failure(error)
     }
 
+    // ---
+
     let oid = Utils.testOid(user['_id'], fail);
     if (!oid) return;
+
+    // ---
 
     let sensors = Db.collection('sensors');
 
     let query = { "owner": ObjectId(user["_id"]) };
     let fields = Utils.reqsToObj(reqs);
-    let cursor = sensors.find(query);
+
+    let cursor = sensors.find(query, fields);
     cursor.toArray(function(error, list) {
         if (error)
             return fail({
@@ -87,7 +92,7 @@ exports.canEdit = function(user, sensor) {
  *      - err: mongoDB error object.
  */
 
-exports.find = function(oid, success, failure) {
+exports.find = function(oid, success, failure, reqs) {
     function fail(error) {
         Winston.debug('Error finding sensor.', {
             "error": error,
@@ -97,13 +102,20 @@ exports.find = function(oid, success, failure) {
         return error;
     }
     
+    // ----
+
     oid = Utils.testOid(oid, fail);
     if (!oid) return;
 
+    // ----
+
     let sensors = Db.collection('sensors');
+
+    let fields = Utils.reqsToObj(reqs);
 
     sensors.findOne(
         { "_id": oid },
+        fields,
         (error, sensor) => {
             if (error || sensor == null)
                 return fail({ "type": "notFound", "error": error });
@@ -196,13 +208,13 @@ exports.new = function(user, data, cid, success, failure) {
 };
 
 /**
- * Edits a Configuration in the collection.
+ * Edits a Sensor in the collection.
  * TODO: Push edit history using a mongoDB push and not pulling the whole log
  * each time.
  * 
  * @param {object} user - User object.
- * @param {(object|string)} oid - ObjectId object or string of the configuration to edit.
- * @param {object} edit - Data to edit the Configuration with..
+ * @param {(object|string)} oid - ObjectId object or string of the Sensor to edit.
+ * @param {object} edit - Data to edit the Sensor with.
  * @param {function} success - Callback to be run upon successful edit.
  * @param {function} failure - Callback to be run upon failure.
  */
@@ -219,8 +231,12 @@ exports.edit = function(user, oid, edit, success, failure) {
         failure(error);
     }
 
-    try { oid = ObjectId(oid); }
-    catch(e) { return fail({ "type": "badId", "exception": e }); }
+    // ----
+
+    oid = Utils.testOid(oid, fail);
+    if (!oid) return;
+
+    // ----
 
     let sensors = Db.collection('sensors');
 

@@ -31,7 +31,9 @@ exports.prettyTime = function(timeStr, timezone) {
 exports.testOid = function(oid, failure, success) {
     if (oid) {
         try {
-            return ObjectId(oid);
+            let newOid = ObjectId(oid);
+            if (success) success(newOid);
+            return newOid;
         } catch(e) {
             if (failure)
                 failure({ "type": "Utils.testOid", "exception": e, "oid": oid });
