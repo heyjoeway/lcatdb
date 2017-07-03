@@ -81,7 +81,7 @@ exports.find = function(oid, success, failure, reqs) {
     );
 }
 
-exports.getSensorList = function(configuration, success, failure) {
+exports.getSensorList = function(configuration, success, failure, reqs) {
     function fail(error) {
         Winston.debug("Could not retrieve sensor list for configuration.", {
             "error": error
@@ -114,7 +114,7 @@ exports.getSensorList = function(configuration, success, failure) {
                 fail(error);
                 hasFailed = true;                
             },
-            ['name'] // Requirements
+            reqs
         );
     });
 };

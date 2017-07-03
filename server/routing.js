@@ -277,32 +277,34 @@ function sensorGet(url, success) {
  * template 'sensorNF'.
  */
 
-function sensorRender(url, template, needsModels) {
+function sensorRender(url, template, needs) {
+    function fail(error) {
+        Winston.debug('Error preparing sensor for mustache.', {
+            "error": error
+        });
+        failure(error);
+    }
+    
     sensorGet(url, (req, res, user, sensor) => {
-        let canEdit = Sensor.canEdit(user, sensor);
-        let type = sensor.type;
-        let typeName = SensorTypes.getTypeName(type);
+        Sensor.mustachify(user, sensor,
+            (data) => {
+                let canEdit = Sensor.canEdit(user, sensor);
+        
+                Winston.debug('Rendering sensor page.', {
+                    "canEdit": canEdit,
+                    "configuration": req.query.configuration            
+                });
 
-        let models;
-        if (needsModels) models = SensorTypes.getModelsList(type);
-
-        Winston.debug('Rendering sensor page.', {
-            "user": user,
-            "typeName": typeName,
-            "sensor": sensor,
-            "models": models,
-            "canEdit": canEdit,
-            "configuration": req.query.configuration            
-        });
-
-        res.render(template, {
-            "user": user,
-            "typeName": typeName,
-            "sensor": sensor,
-            "models": models,
-            "canEdit": canEdit,
-            "configuration": req.query.configuration
-        });
+                res.render(template, {
+                    "user": user,
+                    "sensor": sensor,
+                    "data": data,
+                    "canEdit": canEdit,
+                    "configuration": req.query.configuration
+                });
+            },
+            fail, needs
+        );
     });
 }
 
@@ -352,8 +354,8 @@ sessionGet('/sensors', (req, res, user) => {
 
 let sensorPattern = '([0-9a-f]{24})';
 
-sensorRender(`/sensors/${sensorPattern}`, 'sensor');
-sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit', true);
+sensorRender(`/sensors/${sensorPattern}`, 'sensor', ['edits.time', 'type']);
+sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit', ['models']);
 
 // ------------------------------------
 // New Sensor (Page)
@@ -511,7 +513,7 @@ function configurationRender(url, template, needs) {
                 });
             },
             fail, needs
-        )
+        );
 
     });
 }
@@ -526,9 +528,14 @@ function configurationRender(url, template, needs) {
 
 sessionGet('/configurations', (req, res, user) => {
     Configurations.getList(user, (docs) => {
+        let reading = typeof req.query.reading != 'undefined';
+
+        if (reading && docs.length == 1)
+            return res.redirect(`/configurations/${docs[0]['_id']}/reading`);
+        
         res.render('configurationList', {
             "configurations": docs,
-            "reading": typeof req.query.reading != 'undefined'
+            "reading": reading
         });
     })
 });

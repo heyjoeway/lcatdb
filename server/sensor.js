@@ -120,6 +120,7 @@ exports.find = function(oid, success, failure, reqs) {
             if (error || sensor == null)
                 return fail({ "type": "notFound", "error": error });
 
+
             Winston.debug("Sensor found successfully.", {
                 "oidString": oid.toString()
             });
@@ -158,10 +159,12 @@ exports.new = function(user, data, cid, success, failure) {
 
     [
         newSensor.owner,
-        newSensor.type
+        newSensor.type,
+        newSensor.creation
     ] = [
         ObjectId(user["_id"]),
-        type
+        type,
+        Date.now()
     ];
 
     let validity = Schema.validate('/Sensor', newSensor);
@@ -199,10 +202,14 @@ exports.new = function(user, data, cid, success, failure) {
             "oidString": oid.toString()
         });
 
-        if (typeof cid == "undefined") return success(oid);
+        if (!Utils.exists(cid)) return success(oid);
 
+        console.log("1");
         Configurations.edit(user, cid, { "sensors": [ oid ] },
-            () => { success(oid); }, failure
+            () => {
+                console.log("2");
+                success(oid);
+            }, failure
         );
     });
 };
@@ -296,4 +303,61 @@ exports.edit = function(user, oid, edit, success, failure) {
         },
         (error) => { fail({ "type": "find", "error": error }) }
     );
+}
+
+exports.mustachify = function(user, sensor, success, failure, needs = []) {
+    function fail(error) {
+        Winston.debug('Error preparing sensor for mustache.', {
+            "error": error
+        });
+        failure(error);
+    }
+ 
+    // ----
+
+    let hasFailed = false;
+    let tasks = needs.length + 1;
+    let data = {};
+
+    function progress() {
+        Winston.debug('Progress made on Sensor.mustachify.');
+        tasks--;
+        if (tasks == 0) {
+            Winston.debug('Sensor.mustachify succeeded.');
+            success(data);
+        }
+    }
+
+    // ----
+
+    sensor.creation = Utils.prettyTime(
+        sensor.creation, user.timezone
+    );
+
+    progress();
+    
+    // ----
+
+    if (needs.includes('edits.time')) {
+        sensor.edits.forEach((edit) => {
+            edit.time = Utils.prettyTime(
+                edit.time, user.timezone
+            );
+        });
+        progress();
+    }
+
+    // ----
+
+    if (needs.includes('models')) {
+        data.models = SensorTypes.getModelsList(sensor.type);
+        progress();
+    }
+
+    // ----
+
+    if (needs.includes('type')) {
+        sensor.type = SensorTypes.getTypeName(sensor.type);
+        progress();
+    }
 }

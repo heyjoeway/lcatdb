@@ -19,6 +19,7 @@
             "$ref": "/Definitions#/definitions/textShort",
             "default": ""
         },
+        "creation": { "$ref": "/Definitions#/definitions/time" },
         "edits": {
             "type": "array",
             "items": {
@@ -38,6 +39,7 @@
         "owner",
         "type",
         "name",
+        "creation",
         "description",
         "model"
     ]

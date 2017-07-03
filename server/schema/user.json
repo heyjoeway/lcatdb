@@ -104,7 +104,6 @@
     "additionalProperties": false,
     "required": [
         "username",
-        "email",
         "password",
         "first",
         "last",
