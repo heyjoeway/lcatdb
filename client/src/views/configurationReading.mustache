@@ -26,7 +26,7 @@
         <br>
         <form action="./readingDo" method="post"><fieldset class="container">
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-xs-6 col-xxs-12">
                     <label class="control-label" for="location.lat">
                         Latitude
                     </label>
@@ -36,7 +36,7 @@
                         <span class="input-group-addon" id="addon-location_lat">Degrees</span>
                     </div>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-6 col-xxs-12">
                     <label class="control-label" for="location.long">
                         Longitude
                     </label>
@@ -95,16 +95,25 @@
                 <input class="form-control" type="number" name="timeCreated" value="{{timeCurrent}}">
             </div>
 
-            <h3>Values</h3>
+            <h3 class="h-inline">Sensors</h3>
+            &nbsp;&nbsp;
+            <a href="/sensors/new?configuration={{configuration._id}}" class="btn btn-primary">Add New</a>
+            &nbsp;&nbsp;
+            <a href="./addSensor" class="btn btn-secondary">Add Existing</a>
+            <br>
             {{#sensors}}
                 <h4 class="h-inline">{{name}}</h4>&nbsp;&nbsp;<a href="/sensors/{{_id}}">({{_id}})</a><br>
                 {{{html}}}
                 <br>
             {{/sensors}}
+            {{^sensors}}
+                <p>No sensors found for this configuration.</p>
+            {{/sensors}}
 
             <div class="form-group">
                 <div>
                     <a href="./" class="btn btn-default">Cancel</a>
+                    &nbsp;&nbsp;
                     <button type="submit" name="publish" class="btn btn-primary">Save and Publish</button>
                 </div>
             </div>

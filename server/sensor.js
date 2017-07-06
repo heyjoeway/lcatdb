@@ -6,16 +6,17 @@ const Winston = require('winston');
 const ObjectId = require('mongodb').ObjectId;
 const deepmerge = require('deepmerge');
 
-const Utils = require('./utils.js');
 
 // ----------------------------------------------------------------------------
 // Champy-DB specific modules
 // ----------------------------------------------------------------------------
 
+const Utils = require('./utils.js');
 const Schema = require('./schema.js');
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
 const SensorTypes = require('./sensorTypes.js');
+const Auth = require('./auth.js');
 
 exports.getList = function(user, success, failure, reqs) {
     function fail(error) {
@@ -202,12 +203,12 @@ exports.new = function(user, data, cid, success, failure) {
             "oidString": oid.toString()
         });
 
+        console.log(cid);
+
         if (!Utils.exists(cid)) return success(oid);
 
-        console.log("1");
         Configurations.edit(user, cid, { "sensors": [ oid ] },
             () => {
-                console.log("2");
                 success(oid);
             }, failure
         );
@@ -359,5 +360,20 @@ exports.mustachify = function(user, sensor, success, failure, needs = []) {
     if (needs.includes('type')) {
         sensor.type = SensorTypes.getTypeName(sensor.type);
         progress();
+    }
+
+    // ----
+
+    if (needs.includes('owner')) {
+        Auth.findOid(sensor.owner,
+            (owner) => {
+                sensor.owner = owner;
+                progress();
+            },
+            (error) => {
+                fail({ "type": "sensorOwner", "error": error });
+            },
+            ['username']
+        );
     }
 }

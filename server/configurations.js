@@ -14,6 +14,8 @@ const Schema = require('./schema.js');
 const Db = require('./db.js');
 const Sensor = require('./sensor.js');
 const Utils = require('./utils.js');
+const Auth = require('./auth.js');
+const Reading = require('./reading.js');
 
 // ============================================================================
 // FINDING/LISTING
@@ -118,6 +120,7 @@ exports.getSensorList = function(configuration, success, failure, reqs) {
         );
     });
 };
+
 
 // ============================================================================
 // CREATION/EDITING
@@ -380,7 +383,7 @@ exports.addSensor = function(user, cid, sid, success, failure) {
 /**
  * @param {array} reqs
  */
-exports.mustachify = function(user, configuration, success, failure, needs = []) {
+exports.mustachify = function(user, configuration, success, failure, needs = [], query) {
     function fail(error) {
         Winston.debug('Error preparing configuration for mustache.', {
             "error": error
@@ -450,6 +453,47 @@ exports.mustachify = function(user, configuration, success, failure, needs = [])
                 fail({ "type": "userSensorList", "error": error });
             },
             ['name'] // Requirements
+        );
+    }
+
+    // ----
+
+    if (needs.includes('owner')) {
+        Auth.findOid(configuration.owner,
+            (owner) => {
+                configuration.owner = owner;
+                progress();
+            },
+            (error) => {
+                fail({ "type": "configurationOwner", "error": error });
+            },
+            ['username']
+        );
+    }
+
+    // ----
+
+    if (needs.includes('readings')) {
+        Reading.findConfiguration(configuration['_id'],
+            (list) => {
+                list.sort((a, b) => {
+                    let timeA = parseInt(a.timeCreated);
+                    let timeB = parseInt(b.timeCreated);
+                    if (timeA < timeB) return -1;
+                    if (timeA > timeB) return 1;
+                    return 0;
+                });
+                list.forEach((obj, i) => {
+                    console.log(obj);
+                    list[i].timeCreated = Utils.prettyTime(obj.timeCreated, user.timezone);
+                });
+                configuration.readings = list;
+                progress();
+            },
+            (error) => {
+                fail({ "type": "configurationOwner", "error": error });
+            },
+            ['timeCreated']
         );
     }
 }

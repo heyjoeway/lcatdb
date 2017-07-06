@@ -14,6 +14,7 @@ const Schema = require('./schema.js');
 const SensorTypes = require('./sensorTypes.js')
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
+const Utils = require('./utils.js');
 
 // ----------------------------------------------------------------------------
 
@@ -53,6 +54,41 @@ exports.find = function(oid, success, failure, reqs) {
         }
     );
 }
+
+exports.findConfiguration = function(cid, success, failure, reqs) {
+    function fail(error) {
+        Winston.debug('Error finding reading.', {
+            "error": error,
+            "oidString": oid.toString()
+        });
+        failure(error);
+        return error;
+    }
+    
+    // ----
+
+    cid = Utils.testOid(cid, fail);
+    if (!cid) return;
+
+    // ----
+
+    let readings = Db.collection('readings');
+
+    let query = { "configuration": cid };
+    let fields = Utils.reqsToObj(reqs);
+
+    let cursor = readings.find(query, fields);
+
+    cursor.toArray(function(error, list) {
+        if (error)
+            return fail({ "type": "toArray", "error": error });
+
+        Winston.debug('Finished searching for configurations.', {
+            // "list": list
+        });
+        success(list);
+    });
+};
 
 // ----------------------------------------------------------------------------
 

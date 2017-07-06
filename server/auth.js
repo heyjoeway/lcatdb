@@ -13,6 +13,7 @@ const Bcrypt = require('bcrypt');
 const Schema = require('./schema.js');
 const Config = require('./config.json');
 const Db = require('./db.js');
+const Utils = require('./utils.js');
 
 // ============================================================================
 // FIND
@@ -28,13 +29,13 @@ const Db = require('./db.js');
  *      - err: mongoDB error object.
  */
 
-exports.find = function(username, email, success, failure) {
+exports.find = function(username, email, success, failure, reqs) {
     let query = { "$or": [] }; 
 
     if (username) query["$or"].push({ "username": username });
     if (email) query["$or"].push({ "email": email });
 
-    return exports.findQuery(query, success, failure);
+    return exports.findQuery(query, success, failure, reqs);
 }
 
 /* Finds a user by object ID.
@@ -46,8 +47,8 @@ exports.find = function(username, email, success, failure) {
  *      - err: mongoDB error object.
  */
 
-exports.findOid = function(oid, success, failure) {
-    return exports.findQuery({ "_id": ObjectId(oid) }, success, failure);
+exports.findOid = function(oid, success, failure, reqs) {
+    return exports.findQuery({ "_id": ObjectId(oid) }, success, failure, reqs);
 }
 
 /* Finds a user by query.
@@ -59,10 +60,12 @@ exports.findOid = function(oid, success, failure) {
  *      - err: mongoDB error object.
  */
 
-exports.findQuery = function(query, success, failure) {
+exports.findQuery = function(query, success, failure, reqs) {
     let users = Db.collection('users');
 
-    users.findOne(query, (error, user) => {
+    let fields = Utils.reqsToObj(reqs);
+
+    users.findOne(query, fields, (error, user) => {
         if (user == null || error != null) {
             Winston.debug("Could not find user.", {
                 "query": query,
@@ -71,9 +74,7 @@ exports.findQuery = function(query, success, failure) {
             failure(error);
         } else {
             Winston.debug("Found user.", {
-                "query": query,
-                "oid": ObjectId(user['_id']).toString()
-                // "user": user
+                "query": query
             });
             success(user);
         }

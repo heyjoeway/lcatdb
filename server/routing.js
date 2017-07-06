@@ -286,9 +286,9 @@ function sensorRender(url, template, needs) {
     }
     
     sensorGet(url, (req, res, user, sensor) => {
+        let canEdit = Sensor.canEdit(user, sensor);
         Sensor.mustachify(user, sensor,
             (data) => {
-                let canEdit = Sensor.canEdit(user, sensor);
         
                 Winston.debug('Rendering sensor page.', {
                     "canEdit": canEdit,
@@ -354,7 +354,7 @@ sessionGet('/sensors', (req, res, user) => {
 
 let sensorPattern = '([0-9a-f]{24})';
 
-sensorRender(`/sensors/${sensorPattern}`, 'sensor', ['edits.time', 'type']);
+sensorRender(`/sensors/${sensorPattern}`, 'sensor', ['edits.time', 'type', 'owner']);
 sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit', ['models']);
 
 // ------------------------------------
@@ -498,9 +498,9 @@ function configurationRender(url, template, needs) {
     }
 
     configurationGet(url, (req, res, user, configuration) => {
+        let canEdit = Configurations.canEdit(user, configuration);
         Configurations.mustachify(user, configuration,
             () => {
-                let canEdit = Configurations.canEdit(user, configuration);
 
                 Winston.debug('Rendering configuration page.', {
                     "canEdit": canEdit
@@ -512,7 +512,7 @@ function configurationRender(url, template, needs) {
                     "canEdit": canEdit
                 });
             },
-            fail, needs
+            fail, needs, req.query
         );
 
     });
@@ -557,9 +557,10 @@ sessionGet('/configurations', (req, res, user) => {
 
 let configPattern = '([0-9a-f]{24})';
 
-configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'edits.time']);
+configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'edits.time', 'owner']);
 configurationRender(`/configurations/${configPattern}/edit`, 'configurationEdit');
 configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor', ['user.sensors']);
+configurationRender(`/configurations/${configPattern}/readings`, 'configurationReadingList', ['readings']);
 
 // ------------------------------------
 // New configuration (action)
@@ -719,6 +720,42 @@ configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user,
             }
         );
     });
+});
+
+// ------------------------------
+// Reading Export
+// ------------------------------
+
+configurationGet(`/configurations/${configPattern}/readingsExport`, (req, res, user, configuration) => {
+    function fail(error) {
+        Winston.debug('Error exporting data.', {
+            "error": error
+        });
+        res.send(`Error exporting data. (${error.type})`);
+    }
+
+    let format = req.query.format.toLowerCase();
+
+    if (!(['json', 'csv']).includes(format))
+        fail({ "type": "unknownFormat" });
+
+    Reading.findConfiguration(configuration['_id'],
+        (list) => {
+            list.sort((a, b) => {
+                let timeA = parseInt(a.timeCreated);
+                let timeB = parseInt(b.timeCreated);
+                if (timeA < timeB) return -1;
+                if (timeA > timeB) return 1;
+                return 0;
+            });
+
+
+            if (format == 'json') res.send(JSON.stringify(list));
+        },
+        (error) => {
+            fail({ "type": "findConfiguration", "error": error });
+        }
+    ); 
 });
 
 // ============================================================================

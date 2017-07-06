@@ -60,9 +60,9 @@ exports.reqsToObj = function(fields) {
 
 exports.exists = function(val) {
     let exists = true;
-    exists &= typeof val == 'undefined';
-    exists &= val == '';
-    exists &= isNaN(val);
-    exists &= val == 0;
+    exists &= typeof val != 'undefined';
+    exists &= val != '';
+    exists &= !((typeof val == 'array') && (val.length == 0));
+    exists &= val != 0;
     return exists;
 }

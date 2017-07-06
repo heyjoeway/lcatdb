@@ -27,7 +27,7 @@
         <div class="row">
             <div class="col-xs-4 col-sm-2 text-right">Owner</div>
             <div>
-                <a href="/profile/{{owner}}">{{owner}}</a>
+                <a href="/profile/{{owner._id}}">{{owner.username}}</a>
             </div>
         </div>
         <div class="row">
@@ -35,9 +35,12 @@
             <div>{{creation}}</div>
         </div>
         <br>
+        <a role="button" class="btn btn-primary" href="/configurations/{{_id}}/readings">View Readings</a>
+        &nbsp;
         {{#canEdit}}        
-        <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/edit">Edit Details</a><br>
-        {{/canEdit}}    
+        <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/edit">Edit Details</a>
+        {{/canEdit}}
+        <br>
         <div id="members" style="display: none">
             <h3>Members</h3>
             <ul>
@@ -59,11 +62,14 @@
             {{#sensors}}
             <li class="list-group-item"><a href="/sensors/{{_id}}">{{name}}</a></li>
             {{/sensors}}
+            {{^sensors}}
+            <p>No sensors found for this configuration.</p>
+            {{/sensors}}
         </ul>
         {{#canEdit}}
-        <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
-        &nbsp;
         <a role="button" class="btn btn-primary" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
+        &nbsp;
+        <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
         {{/canEdit}} 
         <h3>Edits</h3>
         <ul class="list-group">

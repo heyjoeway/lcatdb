@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Readings</title>
+</head>
+<body>
+    <!--nav-->
+
+    {{#configuration}}
+    <div class="container">
+        <h2 class="h-inline">Readings</h2>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <div style="display:inline" class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Export All...
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li><a href="./readingsExport?format=json">JSON</a></li>
+                <!--<li><a href="./readingsExport?format=csv">CSV</a></li>-->
+            </ul>
+        </div>
+        {{#canEdit}}
+        &nbsp;&nbsp;
+        <a role="button" class="btn btn-secondary" href="./reading">Take Reading</a>
+        {{/canEdit}}
+        <br>
+        <ul class="list-group">
+            {{#readings}}
+            <li class="list-group-item"><a href="/readings/{{_id}}">{{timeCreated}}</a></li>
+            {{/readings}}
+            {{^readings.length}}
+            <p>No readings found.</p>
+            {{/readings.length}}
+        </ul>
+    </div>
+    {{/configuration}}
+
+    <!--footer-->
+    <!--scripts-->
+</body>
