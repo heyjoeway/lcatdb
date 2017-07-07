@@ -1,0 +1,8 @@
+$(() => {
+    $('#home-slideshow').backstretch([
+        '/img/home/bg1.jpg',
+        '/img/home/bg2.jpg',
+        '/img/home/bg3.jpg',
+        '/img/home/bg4.jpg'
+    ], {duration: 5000, fade: 750});
+});

@@ -1,7 +1,9 @@
 @import "./lib/bootstrap/bootstrap";
 @import "./lib/bootstrap/bootstrap-xxs";
 
-body {
+@import "home";
+
+body:not(.no-nav) {
     padding-top: 54px;
 }
 
@@ -17,4 +19,8 @@ body {
 .h-inline {
     display: inline-block;
     vertical-align: middle;
+}
+
+.btn-img {
+    padding: 0;
 }

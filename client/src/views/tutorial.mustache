@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Dashboard</title>
+</head>
+<body>
+    <!--nav-->
+    <div class="container text-center">
+        {{#user}}
+        <h2>Welcome, {{username}}!</h2>
+        <h3>What would you like to do?</h3>
+        <a role="button" class="btn btn-primary btn-lg" href="/configurations?reading">Take a Reading</a><br>
+        <br>
+        <a role="button" class="btn btn-secondary btn-lg" href="/configurations">View Configurations</a><br>
+        <!--<br>
+        <a role="button" class="btn btn-secondary btn-lg" href="/visualize">Visualize Data</a><br>-->
+        {{/user}}
+    </div>
+
+    <!--footer-->
+    <!--scripts-->
+</body>
+m
