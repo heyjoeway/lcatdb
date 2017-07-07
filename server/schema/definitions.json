@@ -36,6 +36,41 @@
                 "depth",
                 "temperature"
             ]
+        },
+        "location": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "type": "number",
+                    "minimum": -90,
+                    "maximum": 90
+                },
+                "long": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                },
+                "range": {
+                    "type": ["number", "null"],
+                    "minimum": 0,
+                    "description": "Max error from lat/long in meters."
+                },
+                "alt": {
+                    "type": ["number", "null"],
+                    "description": "Distance from sea level in meters."
+                },
+                "altRange": {
+                    "type": ["number", "null"],
+                    "minimum": 0,
+                    "description": "Max error from alt in meters."
+                }
+            },
+            "required": ["lat", "long"],
+            "dependencies": {
+                "range": ["lat", "long"],
+                "altRange": ["alt"]
+            },
+            "additionalProperties": false
         }
     }
 }
