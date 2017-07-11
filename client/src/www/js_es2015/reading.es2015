@@ -42,13 +42,16 @@ let prefHandlers = [
     {
         "name": 'locationalways',
         "load": function() {
+            let query = location.href.split('?')[1];
+
+            let quick;
+            if (query)
+                quick = query.split(',').includes('quick');
+
+            if (quick) prefValue(this.name, true)
+
             let isSet = prefValue(this.name) == 'true';
-            isSet = isSet || (
-                location.href
-                    .split('?')[1]
-                    .split(',')
-                    .includes('quick')
-            );
+
             $('#' + this.name).prop('checked', isSet);
             if (isSet) getLocation();
         },
