@@ -9,9 +9,15 @@
         {{#user}}
         <h2>Welcome, {{username}}!</h2>
         <h3>What would you like to do?</h3>
-        <a role="button" class="btn btn-primary btn-lg" href="/quickreading">Take a Reading</a><br>
+        <a href="/quickreading"><div class="btn btn-image">
+            <img src="/img/dashboard/reading.png">
+            <div class="btn-image-short">Take a Reading</div>
+        </div></a>
         <br>
-        <a role="button" class="btn btn-secondary btn-lg" href="/configurations">View Configurations</a><br>
+        <a href="/configurations"><div class="btn btn-image">
+            <img src="/img/dashboard/configurations.png">
+            <div class="btn-image-short">View Configurations</div>
+        </div></a>
         <!--<br>
         <a role="button" class="btn btn-secondary btn-lg" href="/visualize">Visualize Data</a><br>-->
         {{/user}}
