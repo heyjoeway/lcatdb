@@ -92,7 +92,11 @@ app.post('/registerdo', (req, res) => {
     Auth.register(req.body,
         (oid) => { // Success
             req.session.oid = oid.toString();
-            res.redirect('/dashboard');
+
+            if (typeof req.query.quick != 'undefined')
+                res.redirect('/quickreading');
+            else
+                res.redirect('/tutorial');
         },
         (errors) => {
             let errorString = '/register?'; 
@@ -121,18 +125,36 @@ app.all('/logout', (req, res) => {
     res.redirect('/');
 });
 
+function sessionRender(url, template) {
+    Winston.debug('Rendering session page.', {
+        "template": template
+    });
+
+    sessionGet(url, (req, res, user) => {
+        res.render(template, {
+            "user": user
+        });
+    });
+}
+
 // ------------------------------------
 // Dashboard (page)
 // ------------------------------------
 
-sessionGet('/dashboard', (req, res, user) => {
-    res.render('dashboard', {
-        "user": user
+sessionRender('/dashboard', 'dashboard');
+sessionRender('/tutorial', 'tutorial');
+
+sessionGet('/quickreading', (req, res, user) => {
+    Configurations.getList(user, (list) => {
+        if (!Utils.exists(list)) {
+            Configurations.new(user, (cid) => {
+                res.redirect(`/configurations/${cid}/reading?quick`);
+            });
+        } else {
+            res.redirect('/configurations?reading')
+        }
     });
 });
-
-
-
 
 // ============================================================================
 // SESSIONS

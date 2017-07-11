@@ -7,9 +7,9 @@
     <!--nav_nouser-->
 
     <div class="container">
-        <h1>Quick Join</h1>
+        <h1>Quick Submit</h1>
 
-        <p>Quick Join allows you to join <!--title--> with an automatically generated user ID and password. This identity will be saved in your browser until:</p>
+        <p>Quick Submit allows you to join <!--title--> with an automatically generated user ID and password. This identity will be saved in your browser until:</p>
 
         <ul>
             <li>Your browser's cache is cleared.</li>
@@ -24,7 +24,7 @@
             <div id="notExists" style="display:none">
                 <p>Your anonymous identity is as follows:</p>
 
-                <form id="form" class="container" action="/registerdo" method="post">
+                <form id="form" class="container" action="/registerdo?quick" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
@@ -116,7 +116,6 @@
 
     </div>
 
-    <!--footer-->
     <!--scripts-->
 
     <script src="/js/quickJoin.js"></script>

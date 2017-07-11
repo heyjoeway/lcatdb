@@ -1,0 +1,41 @@
+$tut-btn-img-size: 72px;
+
+.tutorial-btn {
+    position: relative;
+
+    &, & * {
+        color: white;
+    }
+
+    & > img {
+        position: absolute;
+        left: 16px;
+        top: 16px;
+        width: $tut-btn-img-size;
+    }
+
+    & > h4 {
+        font-weight: bold;
+        margin: 8px 0;
+    }
+
+    & > p {
+        text-transform: none;
+    }
+
+    height: (16px * 2) + $tut-btn-img-size;
+    text-align: left;
+
+    padding: 16px;
+    padding-left: $tut-btn-img-size + 32px;
+
+    margin: 8px;
+}
+
+#tut-standard {
+    background: #1565C0;
+}
+
+#tut-expert {
+    background: #F57C00;
+}
