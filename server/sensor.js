@@ -156,7 +156,12 @@ exports.new = function(user, data, cid, success, failure) {
 
     // ---
 
+    let errors = [];
+
     let newSensor = Schema.defaults('/Sensor');
+
+    if (!Utils.exists(data.model))
+        data.model = '';
 
     [
         newSensor.owner,
