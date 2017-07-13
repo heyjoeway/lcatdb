@@ -69,6 +69,7 @@ const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js');
 const Reading = require('./reading.js');
 const Routing = require('./routing.js');
+const Api = require('./api.js');
 
 // ============================================================================
 // SCHEMA INIT
@@ -118,3 +119,4 @@ app.use(Express.static(STATIC));
 // ============================================================================
 
 Routing.init(app);
+Api.init(app);

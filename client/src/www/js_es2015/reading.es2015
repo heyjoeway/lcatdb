@@ -87,6 +87,121 @@ function init() {
 
     loadPrefs();
     listenPrefs();
+    modalSensorNew.init();
+}
+
+function updateSensors(success) {
+    $.get('./reading', (data, status) => {
+        // if (['success', 'notmodified'].includes(status)) {
+        console.log(data);
+        window.test = data;
+        // } else failure('get');
+        let sensorsNew = $(data).find(".sensor").toArray();
+        let sensorsCurrent = $('body').find('.sensor').toArray();
+
+        let sensorsCurrentIds = sensorsCurrent.map((x) => { return x.id; });
+
+        sensorsNew.forEach((sensor) => {
+            if (!sensorsCurrentIds.includes(sensor.id)) {
+                $("#sensors").append(sensor);
+                $("#sensors-none").hide();
+            }
+        });
+
+        success();
+    
+    });
+
+}
+
+let modalSensorNew = {
+
+    fail: function(error) {
+        $('#modal-sensor-new .modal-step-error').show();
+    },
+
+    createSensor: function(typeKey, model) {
+        $('#modal-sensor-new .modal-step').hide();
+        $('#modal-sensor-new .modal-step-loading').show();
+
+        let cid = window.location.pathname.split('/')[2];
+
+        $.post(`/sensors/newDo`,
+            {
+                "type": typeKey,
+                "model": model,
+                "configuration": cid
+            },
+            (data, success) => {
+                console.log(data);
+                updateSensors(() => {
+                    $('#modal-sensor-new').modal('hide');
+                });
+            }
+        );
+    },
+
+    showModels: function(typeKey) {
+        $('#modal-sensor-new .modal-step').hide();
+        $('#modal-sensor-models').html('');
+
+        this.types[typeKey].models.forEach((model) => {
+            $("#modal-sensor-models").append(`<a href="#">
+                <li class="list-group-item sensor-model">
+                    ${model.name}
+                </li>
+            </a>`);
+        });
+        
+        $('.sensor-model').click((e) => {
+            e.preventDefault();
+            this.createSensor(typeKey, e.target.innerText);
+        });
+
+        $('#modal-sensor-new .modal-step-2').show();
+    },
+
+    showTypes: function() {
+        Object.keys(this.types).forEach((key) => {
+            let type = this.types[key];
+            $("#modal-sensor-types").append(`<a href="#">
+                <li class="list-group-item sensor-type" id="sensor-type_${key}">
+                    ${type.name}
+                </li>
+            </a>`);
+        });
+
+        $('.sensor-type').click((e) => {
+            e.preventDefault();
+            let id = e.target.id.split('_')[1];
+            this.showModels(id);
+        });
+        
+        $('#modal-sensor-new .modal-step').hide();
+        $('#modal-sensor-new .modal-step-1').show();
+    },
+
+    init: function() {
+        $('#modal-sensor-new .modal-step').hide();
+        $('#modal-sensor-new .modal-step-loading').show();
+
+        $.getJSON('/api/sensorTypes', (data, status) => {
+            if (['success', 'notmodified'].includes(status)) {
+                this.types = data;
+                this.showTypes();
+
+            } else this.fail('types');
+        });
+
+        $('#sensor-new').click((e) => {
+            e.preventDefault();
+            $('#modal-sensor-new').modal('show');
+            if (this.types) {
+                $('#modal-sensor-new .modal-step').hide();
+                $('#modal-sensor-new .modal-step-1').show();
+            }
+        });
+    }
 }
 
 function initMap() {

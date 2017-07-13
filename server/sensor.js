@@ -161,10 +161,12 @@ exports.new = function(user, data, cid, success, failure) {
     [
         newSensor.owner,
         newSensor.type,
+        newSensor.model,
         newSensor.creation
     ] = [
         ObjectId(user["_id"]),
         type,
+        data.model,
         Date.now()
     ];
 
@@ -351,7 +353,7 @@ exports.mustachify = function(user, sensor, success, failure, needs = []) {
     // ----
 
     if (needs.includes('models')) {
-        data.models = SensorTypes.getModelsList(sensor.type);
+        data.models = SensorTypes.getTypeData(sensor.type).models;
         progress();
     }
 

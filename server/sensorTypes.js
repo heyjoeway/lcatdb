@@ -35,12 +35,23 @@ exports.getTypesMustache = function() {
     return result;
 }
 
+exports.getTypes = function() {
+    let typesFinal = {};
+
+    Object.keys(types).forEach((key) => {
+        typesFinal[key] = types[key].data;
+    });
+
+    return typesFinal;
+}
+
 exports.getTypeName = function(type) {
     return types[type].data.name;
 }
 
-exports.getModelsList = function(type) {
-    return types[type].data.models;
+exports.getTypeData = function(type) {
+    if (types[type]) return types[type].data;
+    return undefined;
 }
 
 exports.getInputTemplate = function(type, user, configuration, sensor) {
