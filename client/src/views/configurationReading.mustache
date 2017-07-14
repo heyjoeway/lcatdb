@@ -99,7 +99,7 @@
             &nbsp;&nbsp;
             <a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-primary">Add New</a>
             &nbsp;&nbsp;
-            <a href="./addSensor" class="btn btn-secondary">Add Existing</a>
+            <a id="sensor-existing" href="./addSensor" class="btn btn-secondary">Add Existing</a>
             <br>
             <div id="sensors">
                 {{#sensors}}
@@ -148,7 +148,31 @@
                     <p>Loading...</p>
                 </div>
                 <div class="modal-step modal-body modal-step-error">
+                    <p>An error has occurred. (<span class="modal-error"></span>)</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-sensor-existing" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add an Existing Sensor</h4>
+                </div>
+                <div class="modal-step modal-body modal-step-1">
+                    <h5>Select a sensor.</h5>
+                    <ul id="sensors-existing" class="list-group"></ul>
+                </div>
+                <div class="modal-step modal-body modal-step-loading">
                     <p>Loading...</p>
+                </div>
+                <div class="modal-step modal-body modal-step-error">
+                    <p>An error has occurred. (<span class="modal-error"></span>)</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

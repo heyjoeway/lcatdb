@@ -25,14 +25,14 @@
         <h3>OR</h3><br>
         <h4>Choose a sensor from the list.</h4>
         <div class="js">
-            <ul class="list-group">
+            <ul id="sensors" class="list-group">
                 {{#user.sensors}}
-                <li class="list-group-item"><a href="#" class="sensor" id="{{_id}}">{{name}} ({{_id}})</a></li>
+                <a href="#" class="sensor" id="{{_id}}"><li class="list-group-item">{{name}} ({{_id}})</li></a>
                 {{/user.sensors}}
+                {{^user.sensors.length}}
+                <p>No sensors found.</p>
+                {{/user.sensors.length}}
             </ul>
-            {{^user.sensors.length}}
-                No sensors found.
-            {{/user.sensors.length}}
         </div>
         <div class="no-js">
             Please enable Javascript to use this feature.

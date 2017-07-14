@@ -88,14 +88,11 @@ function init() {
     loadPrefs();
     listenPrefs();
     modalSensorNew.init();
+    modalSensorExisting.init();
 }
 
 function updateSensors(success) {
     $.get('./reading', (data, status) => {
-        // if (['success', 'notmodified'].includes(status)) {
-        console.log(data);
-        window.test = data;
-        // } else failure('get');
         let sensorsNew = $(data).find(".sensor").toArray();
         let sensorsCurrent = $('body').find('.sensor').toArray();
 
@@ -112,6 +109,59 @@ function updateSensors(success) {
     
     });
 
+}
+
+let modalSensorExisting = {
+    fail: function(error) {
+ 
+    },
+
+    addSensor: function(sid) {
+        $('#modal-sensor-existing .modal-step').hide();
+        $('#modal-sensor-existing .modal-step-loading').show();
+
+        $.post(`./addSensorDo`,
+            {
+                "sid": sid
+            },
+            (data, success) => {
+                console.log(data);
+                console.log(success);
+                updateSensors(() => {
+                    $('#modal-sensor-existing').modal('hide');
+                });
+            }
+        );
+    },
+
+    showSensors: function() {
+        $.get('./addSensor', (data, status) => {
+            let sensors = $(data).find('#sensors');
+
+            $('#sensors-existing').html(sensors);
+
+            $('#sensors-existing .sensor').click((e) => {
+                e.preventDefault();
+                this.addSensor(e.currentTarget.id);
+            });
+
+            $('#modal-sensor-existing .modal-step').hide();
+            $('#modal-sensor-existing .modal-step-1').show();
+        });
+    },
+
+    init: function() {
+        $('#sensor-existing').click((e) => {
+            e.preventDefault();
+            
+            $('#modal-sensor-existing .modal-step').hide();
+            $('#modal-sensor-existing .modal-step-loading').show();
+
+            $('#modal-sensor-existing').modal('show');
+
+            this.showSensors();
+        });
+    }
 }
 
 let modalSensorNew = {
@@ -133,7 +183,6 @@ let modalSensorNew = {
                 "configuration": cid
             },
             (data, success) => {
-                console.log(data);
                 updateSensors(() => {
                     $('#modal-sensor-new').modal('hide');
                 });
@@ -153,9 +202,9 @@ let modalSensorNew = {
             </a>`);
         });
         
-        $('.sensor-model').click((e) => {
+        $('#modal-sensor-models .sensor-model').click((e) => {
             e.preventDefault();
-            this.createSensor(typeKey, e.target.innerText);
+            this.createSensor(typeKey, e.currentTarget.innerText);
         });
 
         $('#modal-sensor-new .modal-step-2').show();
@@ -171,7 +220,7 @@ let modalSensorNew = {
             </a>`);
         });
 
-        $('.sensor-type').click((e) => {
+        $('#modal-sensor-types .sensor-type').click((e) => {
             e.preventDefault();
             let id = e.target.id.split('_')[1];
             this.showModels(id);

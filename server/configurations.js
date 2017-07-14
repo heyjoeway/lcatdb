@@ -215,7 +215,7 @@ exports.edit = function(user, cid, edit, success, failure) {
 
             // -----
 
-            exports.canAddSensorMulti(user, edit.sensors, () => {
+            exports.canAddSensorMulti(user, configuration, edit.sensors, () => {
                 // Custom array merge function ensures all arrays are concatenated.
                 // e.g:
                 // >> let test1 = { "test": [ 1, 2, 3 ]}
@@ -266,7 +266,7 @@ exports.edit = function(user, cid, edit, success, failure) {
     );
 }
 
-exports.canAddSensor = function(user, sid, success, failure) {
+exports.canAddSensor = function(user, configuration, sid, success, failure) {
     function fail(error) {
         Winston.debug("Cannot add sensor.", {
             "error": error
@@ -275,6 +275,16 @@ exports.canAddSensor = function(user, sid, success, failure) {
         return error;
     }
     
+    sid = Utils.testOid(sid, fail);
+    if (!sid) return;
+
+    configuration.sensors.forEach((sensor) => {
+        sensor = ObjectId(sensor);
+        if (sid.equals(sensor)) return fail({
+            "type": "duplicateSensor",
+        });
+    });
+
     Sensor.find(sid,
         (sensor) => {
             let ownerId = ObjectId(sensor.owner);
@@ -289,7 +299,7 @@ exports.canAddSensor = function(user, sid, success, failure) {
     );
 }
 
-exports.canAddSensorMulti = function(user, sidArray, success, failure) {
+exports.canAddSensorMulti = function(user, configuration, sidArray, success, failure) {
     function fail(error) {
         Winston.debug('Could not add one or more sensors.', {
             "error": error,
@@ -306,7 +316,7 @@ exports.canAddSensorMulti = function(user, sidArray, success, failure) {
     let hasFailed = false;
 
     sidArray.forEach((sid) => {
-        exports.canAddSensor(user, sid,
+        exports.canAddSensor(user, configuration, sid,
             () => {
                 if (hasFailed) return;
                 responsesLeft--;
@@ -337,10 +347,10 @@ exports.canEdit = function(user, configuration) {
     let userId = ObjectId(user["_id"]);
     let result = ownerId.equals(userId);
 
-    if (!result) configuration.members.some((member) => {
-        result = userId.equals(ObjectId(member.uid));
-        return result;
-    });
+    // if (!result) configuration.members.some((member) => {
+    //     result = userId.equals(ObjectId(member.uid));
+    //     return result;
+    // });
 
     Winston.debug("Testing if user can edit this configuration.", {
         "username": user.username,
@@ -373,11 +383,12 @@ exports.addSensor = function(user, cid, sid, success, failure) {
         failure(error);
     }
 
-    let data = {
-        "sensors": [sid.toString()]
-    };
+    sid = Utils.testOid(sid, fail);
+    if (!sid) return;
 
-    exports.edit(user, cid, data, success, failure);
+    let data = { "sensors": [ sid ] };
+
+    exports.edit(user, cid, data, success, fail);
 };
 
 /**

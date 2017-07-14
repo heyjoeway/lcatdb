@@ -619,15 +619,11 @@ sessionPost(`/configurations/${configPattern}/addSensorDo`, (req, res, user) => 
     }
 
     let cid = req.originalUrl.split('/')[2];
+    let sid = req.body.sid;
 
-    let sid;
-
-    sid = Utils.testOid(req.body.sid, fail);
-    if (!sid) return;
-
-    Configurations.edit(user, cid, { "sensors": [ sid ] },
-        () => { res.redirect(`/configurations/${cid}`); },
-        fail
+    Configurations.addSensor(user, cid, sid,
+         () => { res.redirect(`/configurations/${cid}`); },
+         fail
     );
 });
 
@@ -640,10 +636,12 @@ configurationGet(`/configurations/${configPattern}/reading`, (req, res, user, co
         (sensors) => {
             let canEdit = Configurations.canEdit(user, configuration);
 
-            sensors.forEach((sensor) => {
+            sensors.forEach((sensor, i) => {
                 sensor.html = SensorTypes.getInputTemplate(
                     sensor.type, user, configuration, sensor
                 );
+
+                sensor.index = i;
             });
 
             Winston.debug('Rendering configuration reading page.', {
@@ -689,59 +687,65 @@ configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user,
 
     // Reorganize Sensor data
 
-    function setPath(obj, path, val) {
-        let pathArray = path.split('.');
-        let lastCrumb = pathArray.pop();
-        pathArray.forEach((crumb) => {
-            if (typeof obj[crumb] == 'undefined')
-                obj[crumb] = {};
-            obj = obj[crumb];
-        });
-        obj[lastCrumb] = val;
-    }
-
     let rawData = req.body;
-    let newData = {};
+    console.log(rawData);
+    
 
-    Object.keys(rawData).forEach((key) => {
-        setPath(newData, key, rawData[key]);
-    });
+    // function setPath(obj, path, val) {
+    //     let pathArray = path.split('.');
+    //     let lastCrumb = pathArray.pop();
+    //     pathArray.forEach((crumb) => {
+    //         if (typeof obj[crumb] == 'undefined')
+    //             obj[crumb] = {};
+    //         obj = obj[crumb];
+    //     });
+    //     obj[lastCrumb] = val;
+    // }
+
+    // let rawData = req.body;
+    // let newData = {};
+
+    // Object.keys(rawData).forEach((key) => {
+    //     setPath(newData, key, rawData[key]);
+    // });
 
 
-    let oldValues = newData.values;
-    newData.values = [];
+    // let oldValues = newData.values;
+    // newData.values = [];
 
-    let valueKeys = Object.keys(oldValues);
-    let valuesLeft = valueKeys.length; 
-    let hasFailed = false;
+    // let valueKeys = Object.keys(oldValues);
+    // let valuesLeft = valueKeys.length; 
+    // let hasFailed = false;
 
-    valueKeys.forEach((key) => {
-        let sid = ObjectId(key);
-        Sensor.find(sid,
-            (sensor) => {
-                if (hasFailed) return;
-                newData.values.push({
-                    "sensor": sid,
-                    "type": sensor.type,
-                    "data": oldValues[key]
-                });
+    // valueKeys.forEach((key) => {
+    //     let sid = ObjectId(key);
+    //     Sensor.find(sid,
+    //         (sensor) => {
+    //             if (hasFailed) return;
+    //             newData.values.push({
+    //                 "sensor": sid,
+    //                 "type": sensor.type,
+    //                 "data": oldValues[key]
+    //             });
 
-                if (--valuesLeft == 0)
-                    Reading.new(
-                        user,
-                        configuration,
-                        newData,
-                        success,
-                        fail
-                    );
-            },
-            (error) => {
-                if (hasFailed) return;
-                fail({ "type": "sensorFind", "error": error });
-                hasFailed = true;
-            }
-        );
-    });
+
+    //             if (--valuesLeft == 0) {
+    //                 Reading.new(
+    //                     user,
+    //                     configuration,
+    //                     newData,
+    //                     success,
+    //                     fail
+    //                 );
+    //             }
+    //         },
+    //         (error) => {
+    //             if (hasFailed) return;
+    //             fail({ "type": "sensorFind", "error": error });
+    //             hasFailed = true;
+    //         }
+    //     );
+    // });
 });
 
 // ------------------------------
