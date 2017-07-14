@@ -66,3 +66,23 @@ exports.exists = function(val) {
     exists &= val != 0;
     return exists;
 }
+
+exports.chain = function() {
+    let index = -1;
+    let links = arguments;
+    let pauseAmt = 0;
+
+    this.next = function() {
+        if (pauseAmt) return --pauseAmt;
+
+        index++;
+        links[index].apply(this, arguments);
+        return 0;
+    };
+
+    this.pause = function(amt) {
+        pauseAmt = amt;
+    };
+
+    this.next.apply(this);
+}

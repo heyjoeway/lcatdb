@@ -31,7 +31,13 @@ const Reading = require('./reading.js');
  *      - list: Array of configuration objects associated with user.
  */
 
-exports.getList = function(user, callback, reqs) {
+exports.getList = function(user, success, reqs) {
+    function fail(error) {
+        Winston.debug('Could not find configuration list for user.', {
+            "error": error
+        });
+    }
+
     let configurations = Db.collection('configurations');
 
     let query = { "owner": ObjectId(user["_id"]) };
@@ -39,15 +45,16 @@ exports.getList = function(user, callback, reqs) {
 
     let cursor = configurations.find(query, fields);
 
-    cursor.toArray(function(err, list) {
-        if (err) {
-            return;
-        }
+    cursor.toArray(function(error, list) {
+        if (error) return fail({
+            "type": "cursor",
+            "error": error
+        });
+
         Winston.debug('Finished searching for configurations.', {
-            "username": user.username
             // "list": list
         });
-        callback(list);
+        success(list);
     });
 };
 
@@ -62,25 +69,35 @@ exports.getList = function(user, callback, reqs) {
  */
 
 exports.find = function(oid, success, failure, reqs) {
+    function fail(error) {
+        Winston.warn('Error finding configuration.', {
+            "configuration": configuration,
+            "errInternal": error,
+            "oid": oid.toString()
+        });
+        failure(error);
+    }
+
     let configurations = Db.collection('configurations');
 
     let fields = Utils.reqsToObj(reqs);
 
-    configurations.findOne(
-        { "_id": ObjectId(oid) },
-        fields,
-        (err, configuration) => {
-            if (err || configuration == null) {
-                Winston.warn('Error finding configuration.', {
-                    "configuration": configuration,
-                    "errInternal": err,
-                    "oid": oid.toString()
-                });
-                failure(err);
-                return;
-            } else success(configuration);
+    Utils.chain(function() {
+        configurations.findOne(
+            { "_id": ObjectId(oid) },
+            fields,
+            this.next
+        );
+    }, function(error, configuration) {
+        if (error || configuration == null) {
+            fail({
+                "type": 'find',
+                "error": error
+            });
         }
-    );
+
+        success(configuration);
+    });
 }
 
 exports.getSensorList = function(configuration, success, failure, reqs) {
@@ -93,32 +110,31 @@ exports.getSensorList = function(configuration, success, failure, reqs) {
 
     let sensors = configuration.sensors;
 
-    if (typeof sensors == 'undefined' || sensors.length == 0)
+    if (!Utils.exists(sensors))
         success([]);
 
     let result = [];
-    let sensorsLeft = sensors.length;
     let hasFailed = false;
 
-    sensors.forEach((id) => {
-        Sensor.find(ObjectId(id),
-            (sensor) => { // Success
-                if (hasFailed) return;
-
-                result.push(sensor)
-                sensorsLeft--;
-                if (sensorsLeft == 0)
-                    success(result);
-            },
-            (error) => { // Failure
-                if (hasFailed) return;
-
-                fail(error);
-                hasFailed = true;                
-            },
-            reqs
-        );
-    });
+    Utils.chain(function() {
+        this.pause(sensors.length - 1);
+   
+        sensors.forEach((id) => {
+            Sensor.find(ObjectId(id),
+                (sensor) => { // Success
+                    if (hasFailed) return;
+                    result.push(sensor)
+                    this.next(result);
+                },
+                (error) => { // Failure
+                    if (hasFailed) return;
+                    fail(error);
+                    hasFailed = true;                
+                },
+                reqs
+            );
+        });
+    }, success);
 };
 
 
@@ -135,7 +151,11 @@ exports.getSensorList = function(configuration, success, failure, reqs) {
  *      - oid: ObjectId of the new configuration.
  */
 
-exports.new = function(user, callback) {
+exports.new = function(user, success, failure) {
+    function fail(error) {
+
+    }
+
     let configurations = Db.collection('configurations');
 
     let newConfiguration = Schema.defaults('/Configuration');
@@ -161,9 +181,9 @@ exports.new = function(user, callback) {
             "username": user.username,
             "newConfiguration": newConfiguration
         });
-        // Run callback with the oid of the new configuration
+        // Run success with the oid of the new configuration
         // as the parameter
-        callback(ObjectId(result.ops[0]["_id"]));
+        success(ObjectId(result.ops[0]["_id"]));
     })
 };
 
@@ -199,6 +219,73 @@ exports.edit = function(user, cid, edit, success, failure) {
     if (!cid) return;
 
     // ----
+
+    // Utils.chain(function() {
+    //     exports.find(cid,
+    //         (configuration) => { this.next(configuration) },
+    //         (error) => {
+    //             fail({ "type": "find", "error": error });
+    //         }
+    //     );
+    // }, function(configuration) {
+    //     let canEdit = exports.canEdit(user, configuration);
+    //     if (!canEdit)
+    //         return fail({ "type": "canEdit" });
+
+    //     let editValidity = Schema.validate('/ConfigurationEdit', edit);
+
+    //     if (!editValidity)
+    //         return fail({ "type": "editValidity", "errors": Schema.errors() });
+
+    //     exports.canAddSensorMulti(user, configuration, edit.sensors,
+    //         this.next.bind(this, configuration),
+    //         fail
+    //     );
+    // }, function(configuration) {
+    //     // Custom array merge function ensures all arrays are concatenated.
+    //     // e.g:
+    //     // >> let test1 = { "test": [ 1, 2, 3 ]}
+    //     // >> let test2 = { "test": [ 4, 5, 6 ]}
+    //     // >> deepmerge(test1, test2, { ... })
+    //     // { "test": [ 1, 2, 3, 4, 5, 6 ] }
+        
+    //     let newData = deepmerge(configuration, edit, {
+    //         arrayMerge: (dest, src) => { return dest.concat(src) }
+    //     });
+
+    //     configuration.edits.push({
+    //         "uid": ObjectId(user['_id']),
+    //         "time": Date.now(),
+    //         "changes": edit
+    //     });
+
+    //     let completeValidity = Schema.validate('/Configuration', configuration);
+        
+    //     if (!completeValidity) {
+    //         fail({ "type": "completeValidity", "errors": Schema.errors() });
+    //         return;
+    //     }
+        
+    //     // -----
+
+    //     let configurations = Db.collection('configurations');
+
+    //     configurations.updateOne(
+    //         {'_id': ObjectId(cid) },
+    //         newData,
+    //         this.next
+    //     );
+
+    // }, function(errUpdate, writeResult) {
+    //     if (errUpdate || writeResult.result.ok != 1)
+    //         return fail({
+    //             "type": "write",
+    //             "result": (writeResult || "").toString(),
+    //             "error": errUpdate
+    //         });
+        
+    //     success();
+    // });
 
     exports.find(cid,
         (configuration) => {

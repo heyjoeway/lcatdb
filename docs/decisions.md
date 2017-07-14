@@ -102,3 +102,64 @@ Data needed:
 exports.inputTemplate = function(user, configuration, sensor) { return htmlString };
 exports.outputTemplate = function(user, value) { return htmlString };
 ```
+
+
+## Internal Practices
+
+7/14/17 - Since I've been feature pushing for a little while, I feel it would be nice to take a step back and revise some messy code that's been thrown about.
+
+### Things I Want to Fix
+
+#### Nesting
+
+So this is something that's become a bit of an unreadable mess:
+
+```
+this(param1, param2, (param3, param4) => {
+    is(param3, param4, (param5, param6) => {
+        not(param5, param6, (param7, param8) => {
+            good(param7, param8, ...); // Continue until column 80+
+        });
+    });
+});
+```
+
+Yeah. So, this is what I propose:
+
+```
+steps(() => {
+    next("much", "better");
+}, (param1, param2) => {
+    next(param1, param2);
+}, (param3, param4) => {
+    next(param3, param4);
+}, (param5, param6) => {
+    next(param5, param6);
+}, (param7, param8) => {
+    next(param7, param8)
+}, ...);
+```
+
+Much better. Much more readable.
+
+This probably already exists somewhere, but I think I'm probably better off writing a lightweight implementation. I'll throw it in Utils.
+
+OOH, ALSO, LET'S DO THIS
+
+```
+thing({
+    "user": user,
+    "configuration": configuration,
+    "etc": ...
+})
+```
+
+Instead of this:
+
+```
+thing(way, too, many, effing, arguments, asdf);
+```
+
+Yeah. Do that. K.
+
+When using a context in a chain, modify the context in place.

@@ -687,65 +687,65 @@ configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user,
 
     // Reorganize Sensor data
 
-    let rawData = req.body;
-    console.log(rawData);
+    // let rawData = req.body;
+    // console.log(rawData);
     
 
-    // function setPath(obj, path, val) {
-    //     let pathArray = path.split('.');
-    //     let lastCrumb = pathArray.pop();
-    //     pathArray.forEach((crumb) => {
-    //         if (typeof obj[crumb] == 'undefined')
-    //             obj[crumb] = {};
-    //         obj = obj[crumb];
-    //     });
-    //     obj[lastCrumb] = val;
-    // }
+    function setPath(obj, path, val) {
+        let pathArray = path.split('.');
+        let lastCrumb = pathArray.pop();
+        pathArray.forEach((crumb) => {
+            if (typeof obj[crumb] == 'undefined')
+                obj[crumb] = {};
+            obj = obj[crumb];
+        });
+        obj[lastCrumb] = val;
+    }
 
-    // let rawData = req.body;
-    // let newData = {};
+    let rawData = req.body;
+    let newData = {};
 
-    // Object.keys(rawData).forEach((key) => {
-    //     setPath(newData, key, rawData[key]);
-    // });
-
-
-    // let oldValues = newData.values;
-    // newData.values = [];
-
-    // let valueKeys = Object.keys(oldValues);
-    // let valuesLeft = valueKeys.length; 
-    // let hasFailed = false;
-
-    // valueKeys.forEach((key) => {
-    //     let sid = ObjectId(key);
-    //     Sensor.find(sid,
-    //         (sensor) => {
-    //             if (hasFailed) return;
-    //             newData.values.push({
-    //                 "sensor": sid,
-    //                 "type": sensor.type,
-    //                 "data": oldValues[key]
-    //             });
+    Object.keys(rawData).forEach((key) => {
+        setPath(newData, key, rawData[key]);
+    });
 
 
-    //             if (--valuesLeft == 0) {
-    //                 Reading.new(
-    //                     user,
-    //                     configuration,
-    //                     newData,
-    //                     success,
-    //                     fail
-    //                 );
-    //             }
-    //         },
-    //         (error) => {
-    //             if (hasFailed) return;
-    //             fail({ "type": "sensorFind", "error": error });
-    //             hasFailed = true;
-    //         }
-    //     );
-    // });
+    let oldValues = newData.values;
+    newData.values = [];
+
+    let valueKeys = Object.keys(oldValues);
+    let valuesLeft = valueKeys.length; 
+    let hasFailed = false;
+
+    valueKeys.forEach((key) => {
+        let sid = ObjectId(key);
+        Sensor.find(sid,
+            (sensor) => {
+                if (hasFailed) return;
+                newData.values.push({
+                    "sensor": sid,
+                    "type": sensor.type,
+                    "data": oldValues[key]
+                });
+
+
+                if (--valuesLeft == 0) {
+                    Reading.new(
+                        user,
+                        configuration,
+                        newData,
+                        success,
+                        fail
+                    );
+                }
+            },
+            (error) => {
+                if (hasFailed) return;
+                fail({ "type": "sensorFind", "error": error });
+                hasFailed = true;
+            }
+        );
+    });
 });
 
 // ------------------------------
