@@ -451,6 +451,7 @@ function configurationTest(req, res, user, success) {
 
     Configurations.find(id,
         (configuration) => { // Success
+            console.log(configuration);
             success(req, res, user, configuration);
         },
         () => { // Failure
