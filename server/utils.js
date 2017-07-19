@@ -67,9 +67,9 @@ exports.exists = function(val) {
     return exists;
 }
 
-exports.chain = function() {
+// exports.chain = function() {
 
-}
+// }
 
 class Chain {
     constructor() {
