@@ -1,0 +1,31 @@
+{
+    "id": "/ApiQuery",
+    "type": "object",
+    "properties": {
+        "filter": {
+            "type": "object"
+        },
+        "projection": {
+            "type": "object"
+        },
+        "sort": {
+            "type": "array",
+            "items": {
+                "type": "array"
+            }
+        },
+        "pageSize": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "page": {
+            "type": "integer",
+            "minimum": 1
+        }
+    },
+    "dependencies": {
+        "pageSize": ["page"],
+        "page": ["pageSize"]
+    },
+    "additionalProperties": true
+}

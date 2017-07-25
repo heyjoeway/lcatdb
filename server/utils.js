@@ -67,10 +67,6 @@ exports.exists = function(val) {
     return exists;
 }
 
-// exports.chain = function() {
-
-// }
-
 class Chain {
     constructor() {
         this.index = -1;

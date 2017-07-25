@@ -17,6 +17,8 @@ const Utils = require('./utils.js');
 const Auth = require('./auth.js');
 const Reading = require('./reading.js');
 
+const Chain = Utils.Chain;
+
 // ============================================================================
 // FINDING/LISTING
 // ============================================================================
@@ -40,7 +42,7 @@ exports.getList = function(user, success, reqs) {
 
     let configurations = Db.collection('configurations');
 
-    let query = { "owner": ObjectId(user["_id"]) };
+    let query = { "owner": ObjectId(user["_id"]).toString() };
     let fields = Utils.reqsToObj(reqs);
 
     let cursor = configurations.find(query, fields);
@@ -82,22 +84,19 @@ exports.find = function(cid, success, failure, reqs) {
 
     let fields = Utils.reqsToObj(reqs);
 
-    new Utils.Chain(function() {
-        configurations.findOne(
-            { "_id": ObjectId(cid) },
-            fields,
-            this.next.bind(this)
-        );
-    }, function(error, configuration) {
-        if (Utils.exists(error) || !Utils.exists(configuration)) {
-            return fail({
-                "type": 'find',
-                "error": error
-            });
+    configurations.findOne(
+        { "_id": ObjectId(cid) },
+        fields,
+        function(error, configuration) {
+            if ((error != null) || !Utils.exists(configuration)) {
+                return fail({
+                    "type": 'find',
+                    "error": error
+                });
+            }
+            success(configuration);
         }
-
-        success(configuration);
-    });
+    );
 }
 
 exports.getSensorList = function(configuration, success, failure, reqs) {
@@ -116,7 +115,7 @@ exports.getSensorList = function(configuration, success, failure, reqs) {
     let result = [];
     let hasFailed = false;
 
-    new Utils.Chain(function() {
+    new Chain(function() {
         this.pause(sensors.length - 1);
    
         sensors.forEach((id) => {
@@ -164,7 +163,7 @@ exports.new = function(user, success, failure) {
         newConfiguration.owner,
         newConfiguration.creation
     ] = [
-        ObjectId(user["_id"]),
+        ObjectId(user["_id"]).toString(),
         Date.now()
     ];
 
@@ -220,7 +219,7 @@ exports.edit = function(user, cid, edit, success, failure) {
 
     // ----
 
-    new Utils.Chain(function() {
+    new Chain(function() {
         exports.find(cid,
             this.next.bind(this),
             (error) => {
@@ -261,10 +260,10 @@ exports.edit = function(user, cid, edit, success, failure) {
 
         let completeValidity = Schema.validate('/Configuration', configuration);
         
-        if (!completeValidity) {
-            fail({ "type": "completeValidity", "errors": Schema.errors() });
-            return;
-        }
+        if (!completeValidity) return fail({
+            "type": "completeValidity",
+            "errors": Schema.errors()
+        });
         
         // -----
 
@@ -582,7 +581,6 @@ exports.mustachify = function(user, configuration, success, failure, needs = [],
                     return 0;
                 });
                 list.forEach((obj, i) => {
-                    console.log(obj);
                     list[i].timeCreated = Utils.prettyTime(obj.timeCreated, user.timezone);
                 });
                 configuration.readings = list;

@@ -35,7 +35,7 @@ exports.getList = function(user, success, failure, reqs) {
 
     let sensors = Db.collection('sensors');
 
-    let query = { "owner": ObjectId(user["_id"]) };
+    let query = { "owner": ObjectId(user["_id"]).toString() };
     let fields = Utils.reqsToObj(reqs);
 
     let cursor = sensors.find(query, fields);
@@ -169,7 +169,7 @@ exports.new = function(user, data, cid, success, failure) {
         newSensor.model,
         newSensor.creation
     ] = [
-        ObjectId(user["_id"]),
+        ObjectId(user["_id"]).toString(),
         type,
         data.model,
         Date.now()
@@ -209,8 +209,6 @@ exports.new = function(user, data, cid, success, failure) {
         Winston.debug('Successfully registered new sensor.', {
             "oidString": oid.toString()
         });
-
-        console.log(cid);
 
         if (!Utils.exists(cid)) return success(oid);
 

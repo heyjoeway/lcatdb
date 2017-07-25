@@ -31,8 +31,17 @@
                     "data": { "type": "object" }
                 },
                 "additionalProperties": false
-            }
+            },
+            "default": []
         }
     },
+    "required": [
+        "configuration",
+        "creator",
+        "published",
+        "location",
+        "timeCreated",
+        "values"
+    ],
     "additionalProperties": false
 }

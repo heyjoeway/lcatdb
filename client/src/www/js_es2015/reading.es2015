@@ -125,8 +125,6 @@ let modalSensorExisting = {
                 "sid": sid
             },
             (data, success) => {
-                console.log(data);
-                console.log(success);
                 updateSensors(() => {
                     $('#modal-sensor-existing').modal('hide');
                 });

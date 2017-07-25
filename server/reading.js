@@ -55,40 +55,112 @@ exports.find = function(oid, success, failure, reqs) {
     );
 }
 
-exports.findConfiguration = function(cid, success, failure, reqs) {
+exports.findQuery = function(query, success, failure) {
     function fail(error) {
-        Winston.debug('Error finding reading.', {
-            "error": error,
-            "oidString": oid.toString()
+        Winston.debug('Could not process query.', {
+            "error": error
         });
         failure(error);
-        return error;
     }
+
+    let queryValidity = Schema.validate('/ApiQuery', query);
     
-    // ----
+    if (!queryValidity) return fail({
+        "errorName": "queryValidity",
+        "errorData": {
+            "schemaErrors": Schema.errors()
+        }
+    });
 
-    cid = Utils.testOid(cid, fail);
-    if (!cid) return;
+    let [
+        filter,
+        fields,
+        page,
+        pageSize,
+        sort
+    ] = [
+        query.filter,
+        query.fields,
+        query.page || 1,
+        query.pageSize || 0,
+        query.sort
+    ];
 
-    // ----
+    sort.forEach((val, i) => {
+        sort[i][1] = parseInt(val[1]);
+    });
 
-    let readings = Db.collection('readings');
-
-    let query = { "configuration": cid };
-    let fields = Utils.reqsToObj(reqs);
-
-    let cursor = readings.find(query, fields);
+    let cursor = (
+        Db.collection('readings')
+            .find(filter, fields)
+            .sort(sort)
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+    );
 
     cursor.toArray(function(error, list) {
-        if (error)
-            return fail({ "type": "toArray", "error": error });
+        if (error) return fail({
+            "errorName": "toArray",
+            "error": error
+        });
 
-        Winston.debug('Finished searching for configurations.', {
+        Winston.debug('Finished searching for readings.', {
             // "list": list
         });
         success(list);
     });
 };
+
+exports.findConfiguration = function(cid, success, failure, reqs) {
+    function fail(error) {
+        Winston.debug('Could not find reading by configuration.', {
+            "error": error
+        });
+        failure(error);
+    }
+
+    cid = Utils.testOid(cid, fail);
+    if (!cid) return;
+
+    return exports.findQuery({
+        "filter": { "configuration": cid.toString() },
+        "fields": Utils.reqsToObj(reqs)
+    }, success, failure);
+};
+
+// exports.findConfiguration = function(cid, success, failure, reqs) {
+//     function fail(error) {
+//         Winston.debug('Error finding reading.', {
+//             "error": error,
+//             "oidString": oid.toString()
+//         });
+//         failure(error);
+//         return error;
+//     }
+    
+//     // ----
+
+
+
+//     // ----
+
+//     let readings = Db.collection('readings');
+
+//     let query = { "configuration": cid };
+//     let fields = Utils.reqsToObj(reqs);
+
+//     let cursor = readings.find(query, fields);
+
+//     cursor.toArray(function(error, list) {
+//         if (error)
+//             return fail({ "type": "toArray", "error": error });
+
+//         Winston.debug('Finished searching for configurations.', {
+//             // "list": list
+//         });
+//         success(list);
+//     });
+// };
 
 // ----------------------------------------------------------------------------
 
@@ -115,9 +187,9 @@ exports.new = function(user, configuration, data, success, failure, publish) {
         newData.published,
         newData.timePublished
     ] = [
-        ObjectId(configuration["_id"]),
-        ObjectId(user["_id"]),
-        ObjectId(user["_id"]),
+        ObjectId(configuration["_id"]).toString(),
+        ObjectId(user["_id"]).toString(),
+        ObjectId(user["_id"]).toString(),
         true,
         Date.now()
     ];
@@ -126,19 +198,21 @@ exports.new = function(user, configuration, data, success, failure, publish) {
     if (!readingValidity)
         return fail({ "type": "readingValidity", "errors": Schema.errors() });
     
-    let valueValidity;
-    data.values.some((val) => {
-        valueValidity = Schema.validate(
-            SensorTypes.getSchemaId(val.type),
-            val.data            
-        );
+    if (Utils.exists(data.values)) {
+        let valueValidity;
+        data.values.some((val) => {
+            valueValidity = Schema.validate(
+                SensorTypes.getSchemaId(val.type),
+                val.data            
+            );
 
-        return valueValidity;
-    });
-    
-    if (!valueValidity)
-        return fail({ "type": "valueValidity", "errors": Schema.errors() });
-    
+            return valueValidity;
+        });
+        
+        if (!valueValidity)
+            return fail({ "type": "valueValidity", "errors": Schema.errors() });
+    }
+
     let readings = Db.collection('readings');
 
     readings.save(newData, (error, result) => {

@@ -451,7 +451,6 @@ function configurationTest(req, res, user, success) {
 
     Configurations.find(id,
         (configuration) => { // Success
-            console.log(configuration);
             success(req, res, user, configuration);
         },
         () => { // Failure
@@ -710,9 +709,19 @@ configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user,
         setPath(newData, key, rawData[key]);
     });
 
-
     let oldValues = newData.values;
+
     newData.values = [];
+
+    if (!Utils.exists(oldValues)) {
+        return Reading.new(
+            user,
+            configuration,
+            newData,
+            success,
+            fail
+        );
+    }
 
     let valueKeys = Object.keys(oldValues);
     let valuesLeft = valueKeys.length; 
@@ -747,6 +756,7 @@ configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user,
             }
         );
     });
+
 });
 
 // ------------------------------
@@ -852,9 +862,13 @@ function readingGet(url, success) {
 function readingRender(url, template) {
     readingGet(url, (req, res, user, reading) => {
         reading.values.forEach((value) => {
-            value.html = SensorTypes.getOutputTemplate(
-                value.type, user, value.data
-            );
+            try {
+                value.html = SensorTypes.getOutputTemplate(
+                    value.type, user, value.data
+                );
+            } catch(e) {
+                value.html = '<span class="error">ERROR: Could not retrieve template for value.</span>';
+            }
         });
 
         Winston.debug('Rendering reading page.', {

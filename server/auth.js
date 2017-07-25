@@ -35,8 +35,11 @@ exports.find = function(username, email, success, failure, reqs) {
     if (username) query["$or"].push({ "username": username });
     if (email) query["$or"].push({ "email": email });
 
-    return exports.findQuery(query, success, failure, reqs);
-}
+    return exports.findQuery({
+       "filter": query,
+       "fields": Utils.reqsToObj(reqs)
+    }, success, failure);
+};
 
 /* Finds a user by object ID.
  *
@@ -48,8 +51,11 @@ exports.find = function(username, email, success, failure, reqs) {
  */
 
 exports.findOid = function(oid, success, failure, reqs) {
-    return exports.findQuery({ "_id": ObjectId(oid) }, success, failure, reqs);
-}
+    return exports.findQuery({
+       "filter": { "_id": ObjectId(oid) },
+       "fields": Utils.reqsToObj(reqs)
+    }, success, failure);
+};
 
 /* Finds a user by query.
  *
@@ -60,25 +66,49 @@ exports.findOid = function(oid, success, failure, reqs) {
  *      - err: mongoDB error object.
  */
 
-exports.findQuery = function(query, success, failure, reqs) {
-    let users = Db.collection('users');
+exports.findQuery = function(query, success, failure) {
+    function fail(error) {
+        Winston.debug('Could not process query.', {
+            "error": error
+        });
+        failure(error);
+    }
 
-    let fields = Utils.reqsToObj(reqs);
-
-    users.findOne(query, fields, (error, user) => {
-        if (user == null || error != null) {
-            Winston.debug("Could not find user.", {
-                "query": query,
-                "error": error
-            });
-            failure(error);
-        } else {
-            Winston.debug("Found user.", {
-                "query": query
-            });
-            success(user);
+    let queryValidity = Schema.validate('/ApiQuery', query);
+    
+    if (!queryValidity) return fail({
+        "errorName": "queryValidity",
+        "errorData": {
+            "schemaErrors": Schema.errors()
         }
     });
+
+    let [
+        filter,
+        fields
+    ] = [
+        query.filter,
+        query.fields
+    ];
+
+    try {
+        Db.collection('users').findOne(filter, fields, (error, user) => {
+            if (user == null || error != null) return fail({
+                "errorName": "notFound",
+                "error": error                 
+            });
+            
+            Winston.debug("Found user.", {
+                "fields": fields,
+                "filter": filter
+            });
+            success(user);
+        });
+    } catch(e) {
+        fail({
+            "errorName": "exception"
+        });
+    }
 }
 
 // ============================================================================

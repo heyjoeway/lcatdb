@@ -10,7 +10,7 @@
             "pattern": "^[^<>]*$"
         },
         "oid": {
-            "type": "object"
+            "type": "string"
         },
         "time": {
             "type": "integer",
