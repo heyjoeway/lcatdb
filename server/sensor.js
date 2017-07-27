@@ -212,7 +212,7 @@ exports.new = function(user, data, cid, success, failure) {
 
         if (!Utils.exists(cid)) return success(oid);
 
-        Configurations.edit(user, cid, { "sensors": [ oid ] },
+        Configurations.edit(user, cid, { "sensors": [ oid.toString() ] },
             () => {
                 success(oid);
             }, failure

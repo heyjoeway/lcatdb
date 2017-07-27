@@ -253,7 +253,7 @@ exports.edit = function(user, cid, edit, success, failure) {
         });
 
         configuration.edits.push({
-            "uid": ObjectId(user['_id']),
+            "uid": ObjectId(user['_id']).toString(),
             "time": Date.now(),
             "changes": edit
         });
@@ -285,71 +285,6 @@ exports.edit = function(user, cid, edit, success, failure) {
         
         success();
     });
-
-    // exports.find(cid,
-    //     (configuration) => {
-    //         let canEdit = exports.canEdit(user, configuration);
-    //         if (!canEdit)
-    //             return fail({ "type": "canEdit" });
-
-    //         // -----
-
-    //         let editValidity = Schema.validate('/ConfigurationEdit', edit);
-            
-    //         if (!editValidity)
-    //             return fail({ "type": "editValidity", "errors": Schema.errors() });
-
-    //         // -----
-
-    //         exports.canAddSensorMulti(user, configuration, edit.sensors, () => {
-    //             // Custom array merge function ensures all arrays are concatenated.
-    //             // e.g:
-    //             // >> let test1 = { "test": [ 1, 2, 3 ]}
-    //             // >> let test2 = { "test": [ 4, 5, 6 ]}
-    //             // >> deepmerge(test1, test2, { ... })
-    //             // { "test": [ 1, 2, 3, 4, 5, 6 ] }
-                
-    //             let newData = deepmerge(configuration, edit, {
-    //                 arrayMerge: (dest, src) => { return dest.concat(src) }
-    //             });
-
-    //             configuration.edits.push({
-    //                 "uid": ObjectId(user['_id']),
-    //                 "time": Date.now(),
-    //                 "changes": edit
-    //             });
-
-    //             let completeValidity = Schema.validate('/Configuration', configuration);
-                
-    //             if (!completeValidity) {
-    //                 fail({ "type": "completeValidity", "errors": Schema.errors() });
-    //                 return;
-    //             }
-                
-    //             // -----
-
-    //             let configurations = Db.collection('configurations');
-
-    //             configurations.updateOne({'_id': ObjectId(cid) }, newData,
-    //                 (errUpdate, writeResult) => {
-    //                     if (errUpdate || writeResult.result.ok != 1)
-    //                         return fail({
-    //                             "type": "write",
-    //                             "result": (writeResult || "").toString(),
-    //                             "error": errUpdate
-    //                         });
-                        
-    //                     success();
-    //                 }
-    //             );
-
-    //         }, fail);
-
-    //         // -----
-
-    //     },
-    //     (error) => { fail({ "type": "find", "error": error }) }
-    // );
 }
 
 exports.canAddSensor = function(user, configuration, sid, success, failure) {

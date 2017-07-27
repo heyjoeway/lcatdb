@@ -12,7 +12,7 @@ function fail(req, res, error) {
 
 exports.init = function(app) {
 
-app.get('/api/sensorTypes', (req, res) => {
+app.all('/api/sensorTypes', (req, res) => {
     res.send(SensorTypes.getTypes());
 });
 

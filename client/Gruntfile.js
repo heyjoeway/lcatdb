@@ -47,6 +47,8 @@ config.sass.www = {
     }]
 };
 
+// <!--nav--> must come before <!--nav_nouser-->!!!!!
+
 let replacements = [{
     from: "<!--head-->",
     to: fs.readFileSync(TEMPLATES_DIR + "head.html", "utf8")

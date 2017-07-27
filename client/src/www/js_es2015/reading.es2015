@@ -89,6 +89,9 @@ function init() {
     listenPrefs();
     modalSensorNew.init();
     modalSensorExisting.init();
+
+    $("#location_lat").change(updateMap);
+    $("#location_long").change(updateMap);
 }
 
 function updateSensors(success) {
@@ -106,9 +109,7 @@ function updateSensors(success) {
         });
 
         success();
-    
     });
-
 }
 
 let modalSensorExisting = {
@@ -253,7 +254,8 @@ let modalSensorNew = {
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12
+        zoom: 12,
+        "scrollwheel": false
     });
     
     marker = new google.maps.Marker({

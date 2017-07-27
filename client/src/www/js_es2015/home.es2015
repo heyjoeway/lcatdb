@@ -5,4 +5,63 @@ $(() => {
         '/img/home/bg3.jpg',
         '/img/home/bg4.jpg'
     ], {duration: 5000, fade: 750});
+
+    $.post('/api/readings', {
+        "fields": {
+            "location.lat": 1,
+            "location.long": 1
+        },
+        "sort": [
+            ["_id", -1]
+        ],
+        "page": 1,
+        "pageSize": 50
+    }, function(data, textStatus) {
+        if (textStatus == 'success') {
+            dataLocation = data;
+            addMarkers();
+        }
+    });
 });
+
+let map;
+let markers = [];
+let mapLoaded = false;
+let dataLocation;
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        "scrollwheel": false
+    });
+
+    mapLoaded = true;
+    addMarkers();
+}
+
+function addMarkers() {
+    if (!dataLocation || !mapLoaded) return;
+
+    let bounds = new google.maps.LatLngBounds();
+
+    dataLocation.forEach((val) => {
+        let marker = new google.maps.Marker({
+            map: map
+        });
+
+        let location = new google.maps.LatLng(
+            val.location.lat,
+            val.location.long
+        );
+
+        marker.setPosition(location);
+        bounds.extend(location);
+
+        markers.push(marker);
+    });
+
+    map.fitBounds(bounds);
+    let zoomInterval = setTimeout(() => {
+        if (map.getZoom() > 12) map.setZoom(12);
+        else clearInterval(zoomInterval);
+    }, 100);
+}

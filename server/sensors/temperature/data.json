@@ -1,10 +1,20 @@
 {
     "name": "Temperature",
-    "models": [
-        {
-            "name": "Generic Temperature Sensor",
-            "description": "A generic temperature sensor.",
-            "img": "/sensors/Temperature/generic.png"
-        }
-    ]
+    "models": [{
+        "name": "Generic Temperature Sensor",
+        "description": "A generic temperature sensor.",
+        "img": "/sensors/temperature/generic.png"
+    }, {
+        "name": "Fish Hawk X4D",
+        "description": "Temperature measurements from the Fish Hawk X4D.",
+        "img": "/sensors/temperature/fishhawk/x4d.png"
+    }, {
+        "name": "Fish Hawk TD",
+        "description": "Temperature measurements from the Fish Hawk TD.",
+        "img": "/sensors/temperature/fishhawk/td.png"
+    }, {
+        "name": "Fish Hawk X4",
+        "description": "Temperature measurements from the Fish Hawk X4.",
+        "img": "/sensors/temperature/fishhawk/x4.png"
+    }]
 }

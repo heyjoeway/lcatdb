@@ -2,7 +2,6 @@
     "id": "/Sensor",
     "type": "object",
     "properties": {
-        "_id": { "$ref": "/Definitions#/definitions/oid" },
         "owner": { "$ref": "/Definitions#/definitions/oid" },
         "type": {
             "$ref": "/Definitions#/definitions/sensorType"

@@ -27,7 +27,8 @@
         <div class="row">
             <div class="col-xs-4 col-sm-2 text-right">Owner</div>
             <div>
-                <a href="/profile/{{owner._id}}">{{owner.username}}</a>
+                <!--<a href="/profile/{{owner._id}}">{{owner.username}}</a>-->
+                <span>{{owner.username}}</span>
             </div>
         </div>
         <div class="row">
@@ -75,6 +76,9 @@
         <ul class="list-group">
             {{#edits}}
             <li class="list-group-item">{{time}}</li>
+            {{/edits}}
+            {{^edits}}
+            <p>No edits found for this configuration.</p>
             {{/edits}}
         </ul>
         {{/configuration}}

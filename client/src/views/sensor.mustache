@@ -18,29 +18,33 @@
             <div>{{_id}}</div>
         </div>
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Type</div>
-            <div>{{type}}</div>
+            <div class="col-xs-4 col-sm-2 text-right">Owner</div>
+            <div>
+                <!--<a href="/profile/{{owner._id}}">{{owner.username}}</a>-->
+                <span>{{owner.username}}</span>
+            </div>
         </div>
         <div class="row">
             <div class="col-xs-4 col-sm-2 text-right">Creation Time</div>
             <div>{{creation}}</div>
         </div>
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Owner</div>
-            <div>
-                <a href="/profile/{{owner._id}}">{{owner.username}}</a>
-            </div>
+            <div class="col-xs-4 col-sm-2 text-right">Type</div>
+            <div>{{type}}</div>
         </div>
         <!--<div class="row">
             <div class="col-xs-4 col-sm-2 text-right">Creation Time</div>
             <div>{{creation}}</div>
         </div>-->
         <br>
-        {{#canEdit}}<a role="button" class="btn btn-secondary" href="/sensors/{{_id}}/edit">Edit Details</a><br>{{/canEdit}}
+        {{#canEdit}}<a role="button" class="btn btn-primary" href="/sensors/{{_id}}/edit">Edit Details</a><br>{{/canEdit}}
         <h3>Edits</h3>
         <ul class="list-group">
             {{#edits}}
             <li class="list-group-item">{{time}}</li>
+            {{/edits}}
+            {{^edits}}
+            <p>No edits found for this sensor.</p>
             {{/edits}}
         </ul>
         {{/sensor}}

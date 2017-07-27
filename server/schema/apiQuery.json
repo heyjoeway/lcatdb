@@ -6,12 +6,22 @@
             "type": "object"
         },
         "projection": {
-            "type": "object"
+            "type": "object",
+            "additionalProperties": {
+                "type": "integer",
+                "enum": [0, 1]
+            }
         },
         "sort": {
             "type": "array",
             "items": {
-                "type": "array"
+                "type": "array",
+                "items": [{
+                    "type": "string"
+                }, {
+                    "type": "integer",
+                    "enum": [1, -1]
+                }] 
             }
         },
         "pageSize": {

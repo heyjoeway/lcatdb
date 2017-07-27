@@ -2,9 +2,6 @@
     "id": "/Configuration",
     "type": "object",
     "properties": {
-        "_id": {
-            "$ref": "/Definitions#/definitions/oid"
-        },
         "owner": {
             "$ref": "/Definitions#/definitions/oid",
             "description": "OID of the user who owns this configuration."

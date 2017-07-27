@@ -72,28 +72,15 @@ exports.findQuery = function(query, success, failure) {
         }
     });
 
-    let [
-        filter,
-        fields,
-        page,
-        pageSize,
-        sort
-    ] = [
-        query.filter,
-        query.fields,
+    let [page, pageSize] = [
         query.page || 1,
         query.pageSize || 0,
-        query.sort
     ];
-
-    sort.forEach((val, i) => {
-        sort[i][1] = parseInt(val[1]);
-    });
 
     let cursor = (
         Db.collection('readings')
-            .find(filter, fields)
-            .sort(sort)
+            .find(query.filter, query.fields)
+            .sort(query.sort)
             .skip((page - 1) * pageSize)
             .limit(pageSize)
     );
@@ -124,43 +111,10 @@ exports.findConfiguration = function(cid, success, failure, reqs) {
 
     return exports.findQuery({
         "filter": { "configuration": cid.toString() },
-        "fields": Utils.reqsToObj(reqs)
+        "fields": Utils.reqsToObj(reqs),
+        "sort": [['_id', -1]]
     }, success, failure);
 };
-
-// exports.findConfiguration = function(cid, success, failure, reqs) {
-//     function fail(error) {
-//         Winston.debug('Error finding reading.', {
-//             "error": error,
-//             "oidString": oid.toString()
-//         });
-//         failure(error);
-//         return error;
-//     }
-    
-//     // ----
-
-
-
-//     // ----
-
-//     let readings = Db.collection('readings');
-
-//     let query = { "configuration": cid };
-//     let fields = Utils.reqsToObj(reqs);
-
-//     let cursor = readings.find(query, fields);
-
-//     cursor.toArray(function(error, list) {
-//         if (error)
-//             return fail({ "type": "toArray", "error": error });
-
-//         Winston.debug('Finished searching for configurations.', {
-//             // "list": list
-//         });
-//         success(list);
-//     });
-// };
 
 // ----------------------------------------------------------------------------
 

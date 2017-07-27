@@ -125,7 +125,7 @@ app.all('/logout', (req, res) => {
     res.redirect('/');
 });
 
-function sessionRender(url, template) {
+function sessionRender(url, template, allowAnon) {
     Winston.debug('Rendering session page.', {
         "template": template
     });
@@ -134,7 +134,7 @@ function sessionRender(url, template) {
         res.render(template, {
             "user": user
         });
-    });
+    }, allowAnon);
 }
 
 // ------------------------------------
@@ -143,6 +143,7 @@ function sessionRender(url, template) {
 
 sessionRender('/dashboard', 'dashboard');
 sessionRender('/tutorial', 'tutorial');
+sessionRender('/visualize', 'visualize', true);
 
 sessionGet('/quickreading', (req, res, user) => {
     Configurations.getList(user, (list) => {
@@ -150,9 +151,7 @@ sessionGet('/quickreading', (req, res, user) => {
             Configurations.new(user, (cid) => {
                 res.redirect(`/configurations/${cid}/reading?quick`);
             });
-        } else {
-            res.redirect('/configurations?reading')
-        }
+        } else res.redirect('/configurations?reading');
     });
 });
 
@@ -170,7 +169,7 @@ sessionGet('/quickreading', (req, res, user) => {
  *      - user: User object.
  */
 
-function sessionTest(req, res, success) {
+function sessionTest(req, res, success, allowAnon) {
     function fail(error) {
         Winston.debug("Session not valid.", {
             "error": error 
@@ -178,10 +177,10 @@ function sessionTest(req, res, success) {
         res.redirect('/login');
     }
 
-    if (req.session && req.session.oid) {
-        let oid;
+    console.log(allowAnon);
 
-        oid = Utils.testOid(req.session.oid, fail);
+    if (req.session && req.session.oid) {
+        let oid = Utils.testOid(req.session.oid, fail);
         if (!oid) return;
         
         Auth.findOid(oid,
@@ -196,7 +195,8 @@ function sessionTest(req, res, success) {
                 });
             }
         );
-    } else fail({ "type": "noSession" });
+    } else if (allowAnon) return success(req, res);
+    else fail({ "type": "noSession" });
 }
 
 // ----------------------------------------------------------------------------
@@ -210,9 +210,9 @@ function sessionTest(req, res, success) {
  *      - user: User object.
  */
 
-function sessionPost(url, success) {
+function sessionPost(url, success, allowAnon) {
     app.post(url, (req, res) => {
-        sessionTest(req, res, success);
+        sessionTest(req, res, success, allowAnon);
     });
 }
 
@@ -227,9 +227,9 @@ function sessionPost(url, success) {
  *      - user: User object.
  */
 
-function sessionGet(url, success) {
+function sessionGet(url, success, allowAnon) {
     app.get(url, (req, res) => {
-        sessionTest(req, res, success);
+        sessionTest(req, res, success, allowAnon);
     });
 }
 
@@ -557,9 +557,10 @@ sessionGet('/configurations', (req, res, user) => {
         
         res.render('configurationList', {
             "configurations": docs,
-            "reading": reading
+            "reading": reading,
+            "user": user
         });
-    })
+    });
 });
 
 // ------------------------------------

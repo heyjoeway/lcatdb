@@ -1,10 +1,16 @@
 {
     "name": "Depth",
-    "models": [
-        {
-            "name": "Generic Depth Sensor",
-            "description": "A generic depth sensor.",
-            "img": "/sensors/depth/generic.png"
-        }
-    ]
+    "models": [{
+        "name": "Generic Depth Sensor",
+        "description": "A generic depth sensor.",
+        "img": "/sensors/depth/generic.png"
+    }, {
+        "name": "Fish Hawk X4D",
+        "description": "Depth measurements from the Fish Hawk X4D.",
+        "img": "/sensors/depth/fishhawk/x4d.png"
+    }, {
+        "name": "Fish Hawk TD",
+        "description": "Depth measurements from the Fish Hawk TD.",
+        "img": "/sensors/depth/fishhawk/td.png"
+    }]
 }
