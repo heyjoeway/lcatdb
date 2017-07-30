@@ -7,13 +7,14 @@
     <!--nav-->
     <div class="container">
         <h2>Visualize Data</h2>
-        <div id="view_data" class="row">
-            <div id="panel_sets" class="col-md-3 col-sm-12">
+        <div id="view_data" class="view row">
+
+            <div id="section_sets" class="section col-md-4 col-sm-12">
                 <h4 class="h-inline">Data Sets</h4>
                 &nbsp;&nbsp;
                 <a role="button" class="btn btn-primary" href="#">New</a>
                 &nbsp;&nbsp;
-                <a role="button" class="btn btn-primary" href="#">Delete</a>
+                <a role="button" class="btn btn-secondary" href="#">Delete</a>
                 <br>
                 <select id="list_sets" class="form-control">
                     <option>Test Set</option>
@@ -23,8 +24,10 @@
                 </ul>
             </div>
   
-            <div id="panel_properties" class="col-md-9 col-sm-12">
-                <h4>Properties</h4>                
+            <div id="section_properties" class="section col-md-8 col-sm-12">
+                <h4>Properties</h4>
+                
+                <!-- Tabs -->                   
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#property_time" data-toggle="tab">
                         Date & Time
@@ -42,23 +45,239 @@
                         Misc
                     </a></li>
                 </ul>
+                
                 <br>
+
                 <div class="tab-content">
+                    
+                    <!-- Time Limiting -->
                     <div class="tab-pane active" id="property_time">
+
+                        <!-- Time Range Enabled -->
                         <div class="form-check">
                             <label class="form-check-label">
-                                <input name="time.enabled" class="form-check-input set-control" type="checkbox" value="">
+                                <input  name="time.enabled" class="form-check-input set-control"
+                                        type="checkbox" value="">
                                 Limit Time Range
                             </label>
                         </div>
 
+                        <!-- Time Range Start -->
                         <div class="form-group">
                             <label class="control-label">
                                 Starting Time
                             </label>
                             <div class="input-group">
-                                <input name="time.start" disabled class="form-control" type="datetime-local">
+                                <input  name="time.min" class="form-control set-control"
+                                        type="datetime-local" disabled>
                             </div>
+                        </div>
+
+                        <!-- Time Range End -->
+                        <div class="form-group">
+                            <label class="control-label">
+                                Ending Time
+                            </label>
+                            <div class="input-group">
+                                <input  name="time.max" class="form-control set-control"
+                                        type="datetime-local" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Limiting -->
+                    <div class="tab-pane" id="property_location">
+
+                        <!-- Minimum Coordinates -->                        
+                        <div class="row">
+
+                            <!-- Minimum Latitude -->
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label">
+                                    Minimum Latitude
+                                </label>
+                                <div class="input-group">
+                                    <input  name="location.lat.min" class="form-control set-control"
+                                            type="number" step="any" min="-90" max="90"
+                                            aria-describedby="addon-location_lat">
+                                    <span class="input-group-addon" id="addon-location_lat">Degrees</span>
+                                </div>
+                            </div>
+
+                            <!-- Minimum Longitude -->
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label">
+                                    Minimum Longitude
+                                </label>
+                                <div class="input-group">
+                                    <input  name="location.long.min" class="form-control set-control"
+                                            type="number" step="any" min="-180" max="180" 
+                                            aria-describedby="addon-location_long">
+                                    <span class="input-group-addon" id="addon-location_long">
+                                        Degrees
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Maximum Coordinates -->
+                        <div class="row">
+
+                            <!-- Maximum Latitude -->
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label">
+                                    Maximum Latitude
+                                </label>
+                                <div class="input-group">
+                                    <input  name="location.lat.max" class="form-control set-control"
+                                            type="number" step="any" min="-90" max="90"
+                                            aria-describedby="addon-location_lat">
+                                    <span class="input-group-addon" id="addon-location_lat">Degrees</span>
+                                </div>
+                            </div>
+
+                            <!-- Maximum Longitude -->
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label" for="location.long">
+                                    Maximum Longitude
+                                </label>
+                                <div class="input-group">
+                                    <input  name="location.long.max" class="form-control set-control" 
+                                            type="number" step="any" min="-180" max="180"
+                                            aria-describedby="addon-location_long">
+                                    <span class="input-group-addon" id="addon-location_long">Degrees</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- User Limiting -->
+                    <div class="tab-pane" id="property_users">
+
+                        <!-- Allow all users -->
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input  name="users.limit" class="form-check-input set-control"
+                                        type="radio" value="all" checked>
+                                Allow entries from all users.
+                            </label>
+                        </div>
+
+                        <!-- Disallow anonymous users -->
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input  name="users.limit" class="form-check-input set-control"
+                                        type="radio" value="standard">
+                                Don't allow entries from anonymous users.
+                            </label>
+                        </div>
+                        
+                        <!-- Allow only verified users -->
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input  name="users.limit" class="form-check-input set-control"
+                                        type="radio" value="verified">
+                                Allow entries from verified users only.
+                            </label>
+                        </div>
+
+                        <!-- Whitelist users -->
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input  name="users.limit" class="form-check-input set-control"
+                                        type="radio" value="whitelist"
+                                        disabled>
+                                Allow entries from only the following users:
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <!-- Configuration Limiting -->
+                    <div class="tab-pane" id="property_configurations">
+
+                        <!-- Allow all configurations -->
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input  name="configurations.limit" class="form-check-input set-control"
+                                        type="radio" value="all" checked>
+                                Allow entries from all configurations.
+                            </label>
+                        </div>
+
+                        <!-- Whitelist configurations -->
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input  name="configurations.limit" class="form-check-input set-control"
+                                        type="radio" value="whitelist">
+                                Allow entries from only the following configurations:
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <!-- Miscellaneous Limits -->
+                    <div class="tab-pane" id="property_misc">
+
+                        <!-- Limit max number of entries -->
+                        <div class="form-group">
+                            <label class="control-label">
+                                Limit Number of Entries
+                            </label>
+                            <div class="input-group">
+                                <input  name="misc.entries" class="form-control"
+                                        type="number" step="1" min="0" value="0">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="view_graphs" class="view row hide">
+            <div id="panel_sets" class="col-md-4 col-sm-12">
+                <h4 class="h-inline">Graphs</h4>
+                &nbsp;&nbsp;
+                <a role="button" class="btn btn-primary" href="#">New</a>
+                &nbsp;&nbsp;
+                <a role="button" class="btn btn-secondary" href="#">Delete</a>
+                <br>
+                <select id="list_graphs" class="form-control">
+                    <option>Test Graph</option>
+                    <option>Test Graph</option>
+                    <option>Test Graph</option>
+                    <option>Test Graph</option>
+                </ul>
+            </div>
+  
+            <div id="panel_properties" class="col-md-8 col-sm-12">
+                <h4>Properties</h4>                
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#property_sets" data-toggle="tab">
+                        Data Sets
+                    </a></li>
+                    <li><a href="#property_type" data-toggle="tab">
+                        Graph Type
+                    </a></li>
+                    <li><a href="#property_typeprefs" data-toggle="tab">
+                        Type Settings
+                    </a></li>
+                </ul>
+                <br>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="property_sets">
+                        <div class="form-group">
+                            <select class="form-control">
+                                <option>Test Set</option>
+                                <option>Test Set</option>
+                                <option>Test Set</option>
+                                <option>Test Set</option>
+                            </ul>
                         </div>
 
                         <div class="form-group">
@@ -75,7 +294,7 @@
                         <div class="row">
                             <div class="col-xs-6 col-xxs-12">
                                 <label class="control-label" for="location.lat">
-                                    Latitude
+                                    Minimum Latitude
                                 </label>
                                 <div class="input-group">
                                     <input class="form-control" type="number" step="any" name="location.lat"
@@ -85,7 +304,30 @@
                             </div>
                             <div class="col-xs-6 col-xxs-12">
                                 <label class="control-label" for="location.long">
-                                    Longitude
+                                    Minimum Longitude
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" type="number" step="any" name="location.long" 
+                                    aria-describedby="addon-location_long" id="location_long" min="-180" max="180">
+                                    <span class="input-group-addon" id="addon-location_long">Degrees</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label" for="location.lat">
+                                    Maximum Latitude
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" type="number" step="any" name="location.lat"
+                                    aria-describedby="addon-location_lat" id="location_lat" min="-90" max="90"><br>
+                                    <span class="input-group-addon" id="addon-location_lat">Degrees</span>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label" for="location.long">
+                                    Maximum Longitude
                                 </label>
                                 <div class="input-group">
                                     <input class="form-control" type="number" step="any" name="location.long" 
@@ -111,19 +353,19 @@
                             </label>
                         </div>
                         
-                        <!--<div class="form-check">
+                        <div class="form-check">
                             <label class="form-check-label">
                                 <input name="users.limit" class="form-check-input set-control" type="radio" value="verified">
                                 Allow entries from verified users only.
                             </label>
-                        </div>-->
+                        </div>
 
-                        <!--<div class="form-check">
+                        <div class="form-check">
                             <label class="form-check-label">
                                 <input name="users.limit" class="form-check-input set-control" type="radio" value="whitelist">
                                 Allow entries from only the following users:
                             </label>
-                        </div>-->
+                        </div>
 
                     </div>
                     <div class="tab-pane" id="property_configurations">
@@ -155,6 +397,7 @@
             </div>
         </div>
     </div>
+
 
     <!--scripts-->
     <script src="/js/visualize.js"></script>

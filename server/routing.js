@@ -734,7 +734,7 @@ configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user,
             (sensor) => {
                 if (hasFailed) return;
                 newData.values.push({
-                    "sensor": sid,
+                    "sensor": sid.toString(),
                     "type": sensor.type,
                     "data": oldValues[key]
                 });

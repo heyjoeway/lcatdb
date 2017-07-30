@@ -407,7 +407,7 @@ exports.addSensor = function(user, cid, sid, success, failure) {
     sid = Utils.testOid(sid, fail);
     if (!sid) return;
 
-    let data = { "sensors": [ sid ] };
+    let data = { "sensors": [ sid.toString() ] };
 
     exports.edit(user, cid, data, success, fail);
 };
