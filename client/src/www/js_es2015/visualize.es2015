@@ -1,0 +1,392 @@
+class DataSet {
+    defaultProps() {
+        return {
+            "time": {
+                "enabled": false,
+                "min": 0,
+                "max": 0
+            },
+            "location": {
+                "enabled": false,
+                "lat": {
+                    "min": -90,
+                    "max": 90
+                },
+                "long": {
+                    "min": -180,
+                    "max": 180
+                }
+            },
+            "users": {
+                "limit": "all",
+                "whitelist": []
+            },
+            "configurations": {
+                "limit": "all",
+                "whitelist": []
+            },
+            "misc": {
+                "entries": 0
+            }
+        }
+    }
+
+    constructor(data) {
+        if (typeof data == 'string')
+            data = { "name": data };
+        
+        if (typeof data != 'undefined')
+            this.name = data.name;
+
+        if (data.props)
+            this.props = data.props;
+        else
+            this.props = this.defaultProps();
+    }
+
+    toJSON() {
+        return {
+            "name": this.name,
+            "props": this.props
+        };
+
+    }
+
+    toString() {
+        return JSON.stringify(this.toJSON());
+    }
+
+    controlsToProps() {
+        let newProps = {};
+
+        $(".set-control").each((i, element) => {
+            let $element = $(element);
+            let propType = $element.prop('type');
+            let propVal = $element.val();
+
+            // Why do checkboxes and radios have to act so weird
+            if (propType == 'radio') {
+                if (!$element.prop('checked'))
+                    return;
+            } else if (propType == 'checkbox')
+                propVal = $element.prop('checked');
+            else if (propType == 'number') {
+                if (($element.attr('step') % 1) == 0)
+                    propVal = parseInt(propVal);
+                else
+                    propVal = parseFloat(propVal);
+            }
+
+            let propName = $element.prop('name');
+            let propPath = newProps;
+
+            if (typeof propName == 'undefined') {
+                console.log("ERROR: name is undefined");
+                console.log($element);
+                return;
+            }
+
+            propName.split('.').forEach((key, i, arr) => {
+                if (i == arr.length - 1) {
+                    propPath[key] = propVal;
+                    return;
+                }
+
+                if (typeof propPath[key] == 'undefined')
+                    propPath[key] = {};
+
+                propPath = propPath[key];
+            });
+        });
+
+        // true indicates deep merge
+        $.extend(true, this.props, newProps);
+    }
+
+    propsToControls() {
+       $(".set-control").each((i, element) => {
+            let $element = $(element);
+
+            let propType = $element.prop('type');
+
+            let propVal = this.props;
+
+            let propName = $element.prop('name');
+
+            if (typeof propName == 'undefined') {
+                console.log("ERROR: name is undefined");
+                console.log($element);
+                return;
+            }
+
+            let error = propName.split('.').some((key, i, arr) => {
+                propVal = propVal[key];
+
+                if (typeof propVal == 'undefined') {
+                    console.log("ERROR: Couldn't find value.")
+                    console.log($element);
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (error) return;
+
+            // Why do checkboxes and radios have to act so weird
+            if (propType == 'radio') {
+                $element.prop(
+                    'checked',
+                    $element.val() == propVal
+                );
+            } else if (propType == 'checkbox') {
+                $element.prop('checked', propVal);
+            } else {
+                $element.val(propVal);
+            }
+        });
+
+        $('.set-control_time').attr(
+            'disabled',
+            !this.props.time.enabled
+        );
+
+        $('.set-control_location').attr(
+            'disabled',
+            !this.props.location.enabled
+        );
+    }
+
+    propsToQuery() {
+        let filter = [];
+        let query = {
+            "filter": {
+                "$and": filter
+            }
+        };
+        let props = this.props;
+
+        if (props.time.enabled) {
+            if (props.time.max < props.time.min) {
+                $.notify({
+                    "message": `Error in "${this.name}": Invalid time range.`
+                }, {
+                    "type": 'error'
+                });
+                return;
+            }
+            filter.push({ 
+                'timeCreated': {
+                    "$lte": props.time.max,
+                    "$gte": props.time.min
+                }
+            });
+        }
+
+        if (props.location.enabled) {
+            filter.push({
+                'location.lat': {
+                    "$lte": props.location.lat.max,
+                    "$gte": props.location.lat.min,
+                }
+            });
+
+            filter.push({
+                'location.long': {
+                    "$lte": props.location.long.max,
+                    "$gte": props.location.long.min,
+                }
+            });
+        }
+
+        if (props.users.limit != 'all') {
+            if (props.users.limit == 'whitelist') {
+                let or = [];
+                props.users.whitelist.forEach((user) => {
+                    or.push({
+                        'creator': user
+                    });
+                });
+
+                if (or.length > 0)
+                    filter.push({
+                        "$or": or
+                    });
+            } else {
+                query['users'] = props.users.limit;
+            }
+        }
+
+        if (props.configurations.limit != 'all') {
+            if (props.configurations.limit == 'whitelist') {
+                let or = [];                
+                props.configurations.whitelist.forEach((user) => {
+                    or.push({
+                        'configuration': user
+                    });
+                });
+
+                if (or.length > 0)
+                    filter.push({
+                        "$or": or
+                    });
+            }
+        }
+
+        if (props.misc.entries > 0) {
+            query['pageSize'] = props.misc.entries;
+            query['page'] = 1;
+        }
+
+        return query;
+    }
+}
+
+class DataSetManager {
+    constructor() {
+        this.sets = [];
+        this.setCurrent = -1;
+        this.nameCounter = 1;
+
+        $('.set-control').change(() => {
+            this.controlChange();
+        });
+
+        $('#new_set').click(() => {
+            this.newSet();
+        });
+
+        $('#delete_set').click(() => {
+            this.deleteSet();
+        });
+
+        $('#list_set').change(() => {
+            let setId = parseInt($('#list_set').val());
+            this.switchSet(setId);
+        });
+
+        this.load();
+    }
+
+    clear() {
+        while (this.sets.length) {
+            this.deleteSet();
+        }
+    }
+
+    store() {
+        let setData = [];
+        this.sets.forEach((set) => {
+            setData.push(set.toJSON());
+        });
+
+        localStorage["visualize.dataSets"] = JSON.stringify(setData);
+    }
+
+    load() {
+        this.clear();
+        let setData;
+        try {
+            setData = JSON.parse(localStorage["visualize.dataSets"]);
+        } catch(e) { 
+            return;
+        }
+    
+        setData.forEach((data) => {
+            this.sets.push(new DataSet(data));
+        });
+
+        this.switchSet(0);
+    }
+
+    populateMenu() {
+        let html = '';
+
+        this.sets.forEach((set, i) => {
+            let selected = (this.setCurrent == i) ? 'selected' : '';
+            html += `<option value="${i}" ${selected}>${set.name}</option>`;
+        });
+
+        $("#list_set").html(html);
+    }
+
+    newSet() {
+        this.sets.push(new DataSet(
+            "Set " + (this.nameCounter++)
+        ));
+        this.switchSet(this.sets.length - 1);
+    }
+
+    switchSet(i) {
+        if (typeof i != 'undefined')
+            this.setCurrent = i;
+        
+        this.setCurrent = Math.min(
+            this.setCurrent,
+            this.sets.length - 1
+        );
+
+        if (this.setCurrent == -1)
+            $('#section_properties').hide();
+        else {
+            $('#section_properties').show();
+            this.sets[this.setCurrent].propsToControls();
+        }
+
+        this.populateMenu();
+
+    }
+
+    deleteSet(i) {
+        if (this.sets.length == 0)
+            return;
+
+        if (typeof i == 'undefined')
+            i = this.setCurrent;
+        
+        delete this.sets[i];
+        this.sets.splice(i, 1);
+
+        if (this.setCurrent >= this.sets.length)
+            this.setCurrent = this.sets.length - 1;
+
+        this.switchSet();
+    }
+
+    controlChange(e) {
+        this.sets[this.setCurrent].controlsToProps();
+        this.store();
+    }
+
+
+}
+
+let manager;
+
+$(() => {
+    manager = new DataSetManager();
+    
+    $('.datetimepicker').datetimepicker({
+        "showMeridian": true,
+        "format": "m/dd/yyyy H:iip",
+        "startView": 2,
+        "minView": 0,
+        "todayBtn": true,
+        "todayHighlight": true
+    });
+
+    $('input[name="time.enabled"]').change(function() {
+        $('.set-control_time').attr(
+            'disabled',
+            !this.checked
+        );
+    });
+
+    $('input[name="location.enabled"]').change(function() {
+        $('.set-control_location').attr(
+            'disabled',
+            !this.checked
+        );
+    });
+
+});

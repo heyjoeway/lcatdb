@@ -12,19 +12,14 @@
             <div id="section_sets" class="section col-md-4 col-sm-12">
                 <h4 class="h-inline">Data Sets</h4>
                 &nbsp;&nbsp;
-                <a role="button" class="btn btn-primary" href="#">New</a>
+                <button id="new_set" class="btn btn-primary">New</button>
                 &nbsp;&nbsp;
-                <a role="button" class="btn btn-secondary" href="#">Delete</a>
+                <button id="delete_set" class="btn btn-secondary">Delete</button>
                 <br>
-                <select id="list_sets" class="form-control">
-                    <option>Test Set</option>
-                    <option>Test Set</option>
-                    <option>Test Set</option>
-                    <option>Test Set</option>
-                </ul>
+                <select id="list_set" class="form-control"></select>
             </div>
   
-            <div id="section_properties" class="section col-md-8 col-sm-12">
+            <div id="section_properties" class="section col-md-8 col-sm-12" style="display: none">
                 <h4>Properties</h4>
                 
                 <!-- Tabs -->                   
@@ -35,12 +30,12 @@
                     <li><a href="#property_location" data-toggle="tab">
                         Location
                     </a></li>
-                    <li><a href="#property_users" data-toggle="tab">
+                    <!--<li><a href="#property_users" data-toggle="tab">
                         Users
                     </a></li>
                     <li><a href="#property_configurations" data-toggle="tab">
                         Configurations
-                    </a></li>
+                    </a></li>-->
                     <li><a href="#property_misc" data-toggle="tab">
                         Misc
                     </a></li>
@@ -68,8 +63,8 @@
                                 Starting Time
                             </label>
                             <div class="input-group">
-                                <input  name="time.min" class="form-control set-control"
-                                        type="datetime-local" disabled>
+                                <input  name="time.min" class="form-control set-control datetimepicker set-control_time"
+                                        type="datetime-local">
                             </div>
                         </div>
 
@@ -79,14 +74,24 @@
                                 Ending Time
                             </label>
                             <div class="input-group">
-                                <input  name="time.max" class="form-control set-control"
-                                        type="datetime-local" disabled>
+                                <input  name="time.max" class="form-control set-control datetimepicker set-control_time"
+                                        type="datetime-local">
                             </div>
                         </div>
                     </div>
 
                     <!-- Location Limiting -->
                     <div class="tab-pane" id="property_location">
+
+
+                        <!-- Location Range Enabled -->
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input  name="location.enabled" class="form-check-input set-control"
+                                        type="checkbox" value="">
+                                Limit Location Range
+                            </label>
+                        </div>
 
                         <!-- Minimum Coordinates -->                        
                         <div class="row">
@@ -97,7 +102,7 @@
                                     Minimum Latitude
                                 </label>
                                 <div class="input-group">
-                                    <input  name="location.lat.min" class="form-control set-control"
+                                    <input  name="location.lat.min" class="form-control set-control set-control_location"
                                             type="number" step="any" min="-90" max="90"
                                             aria-describedby="addon-location_lat">
                                     <span class="input-group-addon" id="addon-location_lat">Degrees</span>
@@ -110,7 +115,7 @@
                                     Minimum Longitude
                                 </label>
                                 <div class="input-group">
-                                    <input  name="location.long.min" class="form-control set-control"
+                                    <input  name="location.long.min" class="form-control set-control set-control_location"
                                             type="number" step="any" min="-180" max="180" 
                                             aria-describedby="addon-location_long">
                                     <span class="input-group-addon" id="addon-location_long">
@@ -130,7 +135,7 @@
                                     Maximum Latitude
                                 </label>
                                 <div class="input-group">
-                                    <input  name="location.lat.max" class="form-control set-control"
+                                    <input  name="location.lat.max" class="form-control set-control set-control_location"
                                             type="number" step="any" min="-90" max="90"
                                             aria-describedby="addon-location_lat">
                                     <span class="input-group-addon" id="addon-location_lat">Degrees</span>
@@ -143,7 +148,7 @@
                                     Maximum Longitude
                                 </label>
                                 <div class="input-group">
-                                    <input  name="location.long.max" class="form-control set-control" 
+                                    <input  name="location.long.max" class="form-control set-control set-control_location"
                                             type="number" step="any" min="-180" max="180"
                                             aria-describedby="addon-location_long">
                                     <span class="input-group-addon" id="addon-location_long">Degrees</span>
@@ -224,10 +229,10 @@
                         <!-- Limit max number of entries -->
                         <div class="form-group">
                             <label class="control-label">
-                                Limit Number of Entries
+                                Limit Number of Entries (0 = Unlimited)
                             </label>
                             <div class="input-group">
-                                <input  name="misc.entries" class="form-control"
+                                <input  name="misc.entries" class="form-control set-control"
                                         type="number" step="1" min="0" value="0">
                             </div>
                         </div>
@@ -268,137 +273,12 @@
                         Type Settings
                     </a></li>
                 </ul>
-                <br>
-                <div class="tab-content">
-                    <div class="tab-pane active" id="property_sets">
-                        <div class="form-group">
-                            <select class="form-control">
-                                <option>Test Set</option>
-                                <option>Test Set</option>
-                                <option>Test Set</option>
-                                <option>Test Set</option>
-                            </ul>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label set-control">
-                                Ending Time
-                            </label>
-                            <div class="input-group set-control">
-                                <input name="time.end" disabled class="form-control" type="datetime-local">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane" id="property_location">
-                        <div class="row">
-                            <div class="col-xs-6 col-xxs-12">
-                                <label class="control-label" for="location.lat">
-                                    Minimum Latitude
-                                </label>
-                                <div class="input-group">
-                                    <input class="form-control" type="number" step="any" name="location.lat"
-                                    aria-describedby="addon-location_lat" id="location_lat" min="-90" max="90"><br>
-                                    <span class="input-group-addon" id="addon-location_lat">Degrees</span>
-                                </div>
-                            </div>
-                            <div class="col-xs-6 col-xxs-12">
-                                <label class="control-label" for="location.long">
-                                    Minimum Longitude
-                                </label>
-                                <div class="input-group">
-                                    <input class="form-control" type="number" step="any" name="location.long" 
-                                    aria-describedby="addon-location_long" id="location_long" min="-180" max="180">
-                                    <span class="input-group-addon" id="addon-location_long">Degrees</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-xs-6 col-xxs-12">
-                                <label class="control-label" for="location.lat">
-                                    Maximum Latitude
-                                </label>
-                                <div class="input-group">
-                                    <input class="form-control" type="number" step="any" name="location.lat"
-                                    aria-describedby="addon-location_lat" id="location_lat" min="-90" max="90"><br>
-                                    <span class="input-group-addon" id="addon-location_lat">Degrees</span>
-                                </div>
-                            </div>
-                            <div class="col-xs-6 col-xxs-12">
-                                <label class="control-label" for="location.long">
-                                    Maximum Longitude
-                                </label>
-                                <div class="input-group">
-                                    <input class="form-control" type="number" step="any" name="location.long" 
-                                    aria-describedby="addon-location_long" id="location_long" min="-180" max="180">
-                                    <span class="input-group-addon" id="addon-location_long">Degrees</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane" id="property_users">
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input name="users.limit" class="form-check-input set-control" type="radio" value="all" checked>
-                                Allow entries from all users.
-                            </label>
-                        </div>
-
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input name="users.limit" class="form-check-input set-control" type="radio" value="standard">
-                                Don't allow entries from anonymous users.
-                            </label>
-                        </div>
-                        
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input name="users.limit" class="form-check-input set-control" type="radio" value="verified">
-                                Allow entries from verified users only.
-                            </label>
-                        </div>
-
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input name="users.limit" class="form-check-input set-control" type="radio" value="whitelist">
-                                Allow entries from only the following users:
-                            </label>
-                        </div>
-
-                    </div>
-                    <div class="tab-pane" id="property_configurations">
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input name="configurations.limit" class="form-check-input set-control" type="radio" value="all" checked>
-                                Allow entries from all configurations.
-                            </label>
-                        </div>
-
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input name="users.limit" class="form-check-input set-control" type="radio" value="standard">
-                                Don't allow entries from anonymous users.
-                            </label>
-                        </div>
-                    </div>
-                    <div class="tab-pane" id="property_misc">
-                        <div class="form-group">
-                            <label class="control-label">
-                                Limit Number of Entries
-                            </label>
-                            <div class="input-group">
-                                <input name="misc.entries" class="form-control" type="number" step="1" value="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
 
     <!--scripts-->
+    <script src="/js/lib/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/visualize.js"></script>
 </body>
