@@ -3,7 +3,28 @@
     "type": "object",
     "properties": {
         "filter": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "$gt": { "type": "number" },
+                "$gte": { "type": "number" },
+                "$lt": { "type": "number" },
+                "$lte": { "type": "number" },
+                "$and": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "/ApiQuery#/properties/filter"
+                    }
+                },
+                "$or": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "/ApiQuery#/properties/filter"
+                    }
+                }
+            },
+            "additionalProperties": {
+                "$ref": "/ApiQuery#/properties/filter"   
+            }
         },
         "projection": {
             "type": "object",

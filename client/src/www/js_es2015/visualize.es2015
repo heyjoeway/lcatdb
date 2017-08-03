@@ -1,3 +1,122 @@
+let typeNames = {
+    "depth": "Depth",
+    "temperature": "Temperature"
+}
+
+Array.prototype.xor = function(other) {
+    let newArray = [];
+    this.forEach((val) => {
+        if (!other.includes(val))
+            newArray.push(val);
+    });
+    return newArray;
+}
+
+function isUndefined(val) {
+    return typeof val == 'undefined';
+}
+
+function jqValue($element, newVal) {
+    let propType = $element.prop('type');
+    if (isUndefined(newVal)) {
+        let propVal = $element.val();
+
+        if (propType == 'radio') {
+            if (!$element.prop('checked'))
+                return undefined;
+        } else if (propType == 'checkbox')
+            propVal = $element.prop('checked');
+        else if (propType == 'number') {
+            if (($element.attr('step') % 1) == 0)
+                propVal = parseInt(propVal);
+            else
+                propVal = parseFloat(propVal);
+        }
+
+        return propVal;
+    } else {
+        if (propType == 'radio') {
+            $element.prop(
+                'checked',
+                $element.val() == newVal
+            );
+        } else if (propType == 'checkbox')
+            $element.prop('checked', newVal);
+        else
+            $element.val(newVal);
+    }
+}
+
+function getProps(selector, props) {
+    let newProps = {};
+    $(selector).each((i, element) => {
+        let $element = $(element);
+        let propType = $element.prop('type');
+        let propVal = jqValue($element);
+
+        if (typeof propVal == 'undefined') return;
+
+        let propName = $element.prop('name');
+
+        if (typeof propName == 'undefined') {
+            console.log("ERROR: name is undefined");
+            console.log($element);
+            return;
+        }
+
+        let propPath = newProps;
+
+        propName.split('.').forEach((key, i, arr) => {
+            if (i == arr.length - 1) {
+                propPath[key] = propVal;
+                return;
+            }
+
+            if (typeof propPath[key] == 'undefined')
+                propPath[key] = {};
+
+            propPath = propPath[key];
+        });
+    });
+
+    $.extend(true, props, newProps);
+    return newProps;
+}
+
+function setProps(selector, props) {
+    $(selector).each((i, element) => {
+        let $element = $(element);
+
+        let propType = $element.prop('type');
+
+        let propVal = props;
+
+        let propName = $element.prop('name');
+
+        if (typeof propName == 'undefined') {
+            console.log("ERROR: name is undefined");
+            console.log($element);
+            return;
+        }
+
+        let error = propName.split('.').some((key, i, arr) => {
+            propVal = propVal[key];
+
+            if (typeof propVal == 'undefined') {
+                console.log("ERROR: Couldn't find value.")
+                console.log($element);
+                return true;
+            }
+
+            return false;
+        });
+
+        if (error) return;
+
+        jqValue($element, propVal);
+    });
+}
+
 class DataSet {
     defaultProps() {
         return {
@@ -38,10 +157,30 @@ class DataSet {
         if (typeof data != 'undefined')
             this.name = data.name;
 
-        if (data.props)
-            this.props = data.props;
-        else
-            this.props = this.defaultProps();
+        this.props = $.extend(
+            true, // deep
+            {}, //target
+            this.defaultProps(),
+            data.props
+        );
+
+        this.callbacks = {};
+        this.callbackCtr = 0;
+    }
+
+    addCallback(callback) {
+        this.callbacks[this.callbackCtr] = callback;
+        return this.callbackCtr++;
+    }
+
+    removeCallback(key) {
+        delete this.callbacks[key];
+    }
+
+    runCallbacks(status) {
+        Object.keys(this.callbacks).forEach((key) => {
+            this.callbacks[key](this, status);
+        });
     }
 
     toJSON() {
@@ -57,94 +196,12 @@ class DataSet {
     }
 
     controlsToProps() {
-        let newProps = {};
-
-        $(".set-control").each((i, element) => {
-            let $element = $(element);
-            let propType = $element.prop('type');
-            let propVal = $element.val();
-
-            // Why do checkboxes and radios have to act so weird
-            if (propType == 'radio') {
-                if (!$element.prop('checked'))
-                    return;
-            } else if (propType == 'checkbox')
-                propVal = $element.prop('checked');
-            else if (propType == 'number') {
-                if (($element.attr('step') % 1) == 0)
-                    propVal = parseInt(propVal);
-                else
-                    propVal = parseFloat(propVal);
-            }
-
-            let propName = $element.prop('name');
-            let propPath = newProps;
-
-            if (typeof propName == 'undefined') {
-                console.log("ERROR: name is undefined");
-                console.log($element);
-                return;
-            }
-
-            propName.split('.').forEach((key, i, arr) => {
-                if (i == arr.length - 1) {
-                    propPath[key] = propVal;
-                    return;
-                }
-
-                if (typeof propPath[key] == 'undefined')
-                    propPath[key] = {};
-
-                propPath = propPath[key];
-            });
-        });
-
-        // true indicates deep merge
-        $.extend(true, this.props, newProps);
+        let newProps = getProps('.set-control', this.props);
+        this.runCallbacks("props");
     }
 
     propsToControls() {
-       $(".set-control").each((i, element) => {
-            let $element = $(element);
-
-            let propType = $element.prop('type');
-
-            let propVal = this.props;
-
-            let propName = $element.prop('name');
-
-            if (typeof propName == 'undefined') {
-                console.log("ERROR: name is undefined");
-                console.log($element);
-                return;
-            }
-
-            let error = propName.split('.').some((key, i, arr) => {
-                propVal = propVal[key];
-
-                if (typeof propVal == 'undefined') {
-                    console.log("ERROR: Couldn't find value.")
-                    console.log($element);
-                    return true;
-                }
-
-                return false;
-            });
-
-            if (error) return;
-
-            // Why do checkboxes and radios have to act so weird
-            if (propType == 'radio') {
-                $element.prop(
-                    'checked',
-                    $element.val() == propVal
-                );
-            } else if (propType == 'checkbox') {
-                $element.prop('checked', propVal);
-            } else {
-                $element.val(propVal);
-            }
-        });
+        setProps('.set-control', this.props);
 
         $('.set-control_time').attr(
             'disabled',
@@ -167,7 +224,10 @@ class DataSet {
         let props = this.props;
 
         if (props.time.enabled) {
-            if (props.time.max < props.time.min) {
+            let timeMax = new Date(props.time.max);
+            let timeMin = new Date(props.time.min);
+
+            if (timeMax < timeMin) {
                 $.notify({
                     "message": `Error in "${this.name}": Invalid time range.`
                 }, {
@@ -177,8 +237,8 @@ class DataSet {
             }
             filter.push({ 
                 'timeCreated': {
-                    "$lte": props.time.max,
-                    "$gte": props.time.min
+                    "$lte": timeMax.getTime(),
+                    "$gte": timeMin.getTime()
                 }
             });
         }
@@ -186,15 +246,15 @@ class DataSet {
         if (props.location.enabled) {
             filter.push({
                 'location.lat': {
-                    "$lte": props.location.lat.max,
-                    "$gte": props.location.lat.min,
+                    "$lte": parseFloat(props.location.lat.max),
+                    "$gte": parseFloat(props.location.lat.min),
                 }
             });
 
             filter.push({
                 'location.long': {
-                    "$lte": props.location.long.max,
-                    "$gte": props.location.long.min,
+                    "$lte": parseFloat(props.location.long.max),
+                    "$gte": parseFloat(props.location.long.min),
                 }
             });
         }
@@ -238,7 +298,12 @@ class DataSet {
             query['page'] = 1;
         }
 
+        console.log(query);
         return query;
+    }
+
+    destroy() {
+        this.runCallbacks("destroy");
     }
 }
 
@@ -266,6 +331,24 @@ class DataSetManager {
         });
 
         this.load();
+
+        this.callbacks = {};
+        this.callbackCtr = 0;
+    }
+
+    addCallback(callback) {
+        this.callbacks[this.callbackCtr] = callback;
+        return this.callbackCtr++;
+    }
+
+    removeCallback(key) {
+        delete this.callbacks[key];
+    }
+
+    runCallbacks(status) {
+        Object.keys(this.callbacks).forEach((key) => {
+            this.callbacks[key](this, status);
+        });
     }
 
     clear() {
@@ -311,10 +394,16 @@ class DataSetManager {
     }
 
     newSet() {
-        this.sets.push(new DataSet(
+        let set = new DataSet(
             "Set " + (this.nameCounter++)
-        ));
+        );
+
+        set.addCallback(this.runCallbacks.bind(this));
+
+        this.sets.push(set);
         this.switchSet(this.sets.length - 1);
+
+        this.runCallbacks("new");
     }
 
     switchSet(i) {
@@ -344,7 +433,8 @@ class DataSetManager {
         if (typeof i == 'undefined')
             i = this.setCurrent;
         
-        delete this.sets[i];
+        this.sets[i].destroy();
+        // delete this.sets[i];
         this.sets.splice(i, 1);
 
         if (this.setCurrent >= this.sets.length)
@@ -357,18 +447,336 @@ class DataSetManager {
         this.sets[this.setCurrent].controlsToProps();
         this.store();
     }
+}
 
+class Graph {
+    defaultProps() {
+        return {};
+    }
+
+    constructor(data) {
+        if (typeof data == 'string')
+            data = { "name": data };
+        
+        if (typeof data != 'undefined')
+            this.name = data.name;
+
+        this.props = $.extend(
+            true, // deep
+            {}, //target
+            this.defaultProps(),
+            data.props
+        );
+
+        this.type = "None";
+        this.sets = [];
+    }
+
+    addSet(dataSet) {
+        dataSet.addCallback((set, status) => {
+            if (status == "destroy") this.removeSet(set);
+        });
+        this.sets.push(dataSet);
+    }
+
+    getSetID(dataSet) {
+        let id;
+        this.sets.some((dataSetIn, i) => {
+            if (dataSet === dataSetIn) {
+                id = i;
+                return true;
+            }
+            return false;
+        });
+        return id;
+    }
+
+    removeSet(dataSet) {
+        let i;
+        if (typeof dataSet == 'number') i = dataSet;
+        else i = this.getSetID(dataSet);
+
+        this.sets.splice(i, 1);
+    }
+
+    propsToControls() {
+        $('.graph_typeprefs').hide();
+    }
+    destroy() { }
+
+    getData() {
+
+    }
+
+    createGraph() {
+        let html;
+        return html;
+    }
 
 }
 
-let manager;
+class GraphRaw extends Graph {
+    defaultProps() {
+        return { };
+    }
+
+    constructor(data) {
+        super(data);
+        this.type = "raw";
+    }
+
+    propsToControls() {
+        super.propsToControls();
+        $('.graph_typeprefs#raw').show();
+    }
+
+    controlsToProps() {
+
+    }
+
+    getData(callback) {
+        this.data = [];
+        let setsLeft = this.sets.length + 1;
+
+        let gotData = (data) => {
+            if (data) this.data.push(data);
+            setsLeft--;
+            if (setsLeft == 0) callback(this.data);
+        }
+
+        gotData();
+
+        this.sets.forEach((set) => {
+            let query = set.propsToQuery();
+            // query.fields = {
+            //     "values": 1
+            // };
+
+            $.post('/api/readings', query, (data, status) => {
+                if (status == 'success') gotData(data);
+            });
+        });
+    }
+
+    createGraph() {
+        console.log(this.data);
+        let $element = $('<pre></pre>', {
+            "class": "graph_raw",
+            "html": "<code>" + JSON.stringify(this.data, null, '\t') + "</code>"
+        });
+        return $element;
+    }
+}
+
+class Graph2d extends Graph {
+    defaultProps() {
+        return {
+            "x": {
+                "var": "timeCreated"
+            },
+            "y": {
+                "var": "values.temperature"
+            }
+        };
+    }
+
+    constructor(data) {
+        super(data);
+        this.type = "2d";
+    }
+
+    controlsToProps() {
+        getProps('.graph-control-2d', this.props);
+    }
+
+    propsToControls() {
+        super.propsToControls();
+        $('.graph_typeprefs#2d').show();
+        setProps('.graph-control-2d', this.props);
+    }
+}
+
+const graphTypeDict = {
+    "2d": Graph2d,
+    "raw": GraphRaw
+}
+
+class GraphManager {
+    constructor(dataSetManager) {
+        this.graphs = [];
+        this.graphCurrent = -1;
+        this.nameCounter = 1;
+        this.dataSetManager = dataSetManager;
+        this.dataSetManager.addCallback(this.callback.bind(this));
+
+        this.setsAvailable = [];
+
+        $('.graph-control').change(() => {
+            this.controlChange();
+        });
+
+        $('#new_graph').click(() => {
+            this.newGraph();
+        });
+
+        $('#delete_graph').click(() => {
+            this.deleteGraph();
+        });
+
+        $('#list_graph').change(() => {
+            let setId = parseInt($('#list_graph').val());
+            this.switchGraph(setId);
+        });
+
+        $('#addset_graph').click(() => {
+            this.addSet();
+        });
+
+        $('#removeset_graph').click(() => {
+            this.removeSets();
+        });
+
+        $('#create_graph').click(() => {
+            this.createGraph();
+        });
+
+        // this.load();
+    }
+
+    callback(set, status) {
+        console.log(status);
+        this.updateSets();
+    }
+
+    clear() {
+        while (this.graphs.length) {
+            this.deleteGraph();
+        }
+    }
+
+    populateMenu() {
+        let html = '';
+
+        this.graphs.forEach((graph, i) => {
+            let selected = (this.graphCurrent == i) ? 'selected' : '';
+            html += `<option value="${i}" ${selected}>${graph.name}</option>`;
+        });
+
+        $("#list_graph").html(html);
+    }
+
+    newGraph() {
+        let graphType = graphTypeDict[
+            $("#list_graphtypes").val()
+        ];
+
+        this.graphs.push(new graphType(
+            "Graph " + (this.nameCounter++)
+        ));
+        this.switchGraph(this.graphs.length - 1);
+    }
+
+    switchGraph(i) {
+        if (typeof i != 'undefined')
+            this.graphCurrent = i;
+        
+        this.graphCurrent = Math.min(
+            this.graphCurrent,
+            this.graphs.length - 1
+        );
+
+        if (this.graphCurrent == -1)
+            $('#section_graph_properties').hide();
+        else {
+            $('#section_graph_properties').show();
+            this.graphs[this.graphCurrent].propsToControls();
+        }
+
+        this.populateMenu();
+        this.updateSets();
+    }
+
+    deleteGraph(i) {
+        if (this.graphs.length == 0)
+            return;
+
+        if (typeof i == 'undefined')
+            i = this.graphCurrent;
+        
+        this.graphs[i].destroy();
+        // delete this.graphs[i];
+        this.graphs.splice(i, 1);
+
+        if (this.graphCurrent >= this.graphs.length)
+            this.graphCurrent = this.graphs.length - 1;
+
+        this.switchGraph();
+    }
+
+    updateSets() {
+        if (this.graphCurrent == -1) return;
+
+        this.setsCurrent = this.graphs[this.graphCurrent].sets;
+        this.setsAvailable = dataSetManager.sets.xor(this.setsCurrent);
+
+        let availableHtml = '';
+
+        this.setsAvailable.forEach((set, i) => {
+            let selected = (0 == i) ? 'selected' : '';
+            availableHtml += `<option value="${i}" ${selected}>${set.name}</option>`;
+        });
+
+        $("#list_setsgraphavail").html(availableHtml);
+
+        let currentHtml = '';
+
+        this.setsCurrent.forEach((set, i) => {
+            currentHtml += `<option value="${i}">${set.name}</option>`;
+        });
+
+        $("#list_setsgraphcur").html(currentHtml);
+    }
+
+    addSet() {
+        let i = parseInt($("#list_setsgraphavail").val());
+        let set = this.setsAvailable[i];
+        this.graphs[this.graphCurrent].addSet(set);
+
+        this.updateSets();
+    }
+
+    removeSets() {
+        $("#list_setsgraphcur").val().forEach((val) => {
+            let i = parseInt(val);
+            let set = this.setsCurrent[i];
+            this.graphs[this.graphCurrent].removeSet(set);
+        });
+
+        this.updateSets();
+    }
+
+    createGraph() {
+        let graphCurrent = this.graphs[this.graphCurrent];
+        graphCurrent.getData(() => {
+            $('#output').html(graphCurrent.createGraph());
+        });
+    }
+
+    controlChange(e) {
+        this.graphs[this.graphCurrent].controlsToProps();
+        // this.store();
+    }
+}
+
+let dataSetManager, graphManager;
 
 $(() => {
-    manager = new DataSetManager();
-    
+    dataSetManager = new DataSetManager();
+    graphManager = new GraphManager(dataSetManager);
+
     $('.datetimepicker').datetimepicker({
         "showMeridian": true,
-        "format": "m/dd/yyyy H:iip",
+        "format": "m/dd/yyyy H:ii p Z",
         "startView": 2,
         "minView": 0,
         "todayBtn": true,

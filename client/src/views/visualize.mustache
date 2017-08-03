@@ -5,7 +5,10 @@
 </head>
 <body>
     <!--nav-->
-    <div class="container">
+    <div class="container no-js">
+        <p>The visualization tool requires Javascript to function. Please make sure it is enabled and that you are using a compatible browser.</p>
+    </div>
+    <div class="container js">
         <h2>Visualize Data</h2>
         <div id="view_data" class="view row">
 
@@ -243,38 +246,89 @@
             </div>
 
         </div>
-
-        <div id="view_graphs" class="view row hide">
-            <div id="panel_sets" class="col-md-4 col-sm-12">
-                <h4 class="h-inline">Graphs</h4>
-                &nbsp;&nbsp;
-                <a role="button" class="btn btn-primary" href="#">New</a>
-                &nbsp;&nbsp;
-                <a role="button" class="btn btn-secondary" href="#">Delete</a>
+        <hr>
+        <div id="view_graphs" class="view row">
+            <div id="section_graphs" class="col-md-4 col-sm-12">
+                <h4>Graphs</h4>
+                <select name="type" id="list_graphtypes" class="form-control" size="2">
+                    <!--<option value="map">Geographical Map</option>-->
+                    <option value="2d">2-D Plot</option>
+                    <!--<option value="3d">3-D Plot</option>-->
+                    <option value="raw">Raw Data</option>
+                </select>
                 <br>
-                <select id="list_graphs" class="form-control">
-                    <option>Test Graph</option>
-                    <option>Test Graph</option>
-                    <option>Test Graph</option>
-                    <option>Test Graph</option>
-                </ul>
+                <button id="new_graph" class="btn btn-primary">New</button>
+                <br><br>
+                <select id="list_graph" class="form-control"></select>
+                <br>
+                <button id="delete_graph" class="btn btn-secondary">Delete</button>
+                <button id="create_graph" class="btn btn-secondary">Create Graph</button>
             </div>
   
-            <div id="panel_properties" class="col-md-8 col-sm-12">
+            <div id="section_graph_properties" class="col-md-8 col-sm-12" style="display: none">
                 <h4>Properties</h4>                
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#property_sets" data-toggle="tab">
+                    <li class="active"><a href="#property_graph_sets" data-toggle="tab">
                         Data Sets
                     </a></li>
-                    <li><a href="#property_type" data-toggle="tab">
+                    <!--<li><a href="#property_graph_type" data-toggle="tab">
                         Graph Type
-                    </a></li>
-                    <li><a href="#property_typeprefs" data-toggle="tab">
+                    </a></li>-->
+                    <li><a href="#property_graph_typeprefs" data-toggle="tab">
                         Type Settings
                     </a></li>
                 </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="property_graph_sets">
+                        <h4>Associated Sets</h4>
+                        <select id="list_setsgraphavail" class="form-control"></select>
+                        <br>
+                        <button id="addset_graph" class="btn btn-primary">Add</button>
+                        <br><br>
+                        <select multiple id="list_setsgraphcur" class="form-control"></select>
+                        <br>
+                        <button id="removeset_graph" class="btn btn-secondary">Remove Selected</button>
+                    </div>
+
+                    <div class="tab-pane" id="property_graph_typeprefs">
+                        <!--<div class="graph_typeprefs" id="map"></div>-->
+                        <div class="graph_typeprefs" id="2d">
+                            <h5>X Axis</h5>
+                            <select name="x.var" class="graph-control graph-control-2d form-control">
+                                <option value="values.depth">Depth</option>
+                                <option value="values.temperature">Temperature</option>
+                                <option value="timeCreated">Time</option>
+                                <option value="location.lat">Latitude</option>
+                                <option value="location.long">Longitude</option>
+                                <option value="location.alt">Altitude</option>
+                            </select>
+                            <h5>Y Axis</h5>
+                            <select name="y.var" class="graph-control graph-control-2d form-control">
+                                <option value="values.depth">Depth</option>
+                                <option value="values.temperature">Temperature</option>
+                                <option value="timeCreated">Time</option>
+                                <option value="location.lat">Latitude</option>
+                                <option value="location.long">Longitude</option>
+                                <option value="location.alt">Altitude</option>
+
+                            </select>
+                        </div>
+                        <!--<div class="graph_typeprefs" id="3d"></div>-->
+                        <div class="graph_typeprefs" id="raw">
+                            <br>
+                            <p>No preferences are currently available for this type.</p>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
+        <hr>
+        <h4>Output</h4>
+        <br>
+        <div id="output"></div>
     </div>
 
 
