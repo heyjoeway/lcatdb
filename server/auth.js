@@ -74,7 +74,7 @@ exports.findQuery = function(query, success, failure) {
         failure(error);
     }
 
-    let queryValidity = Schema.validate('/ApiQuery', query);
+    let queryValidity = Schema.validate('/Query', query);
     
     if (!queryValidity) return fail({
         "errorName": "queryValidity",

@@ -47,6 +47,20 @@ function jqValue($element, newVal) {
     }
 }
 
+function setPropertyByPath(obj, path, val) {
+    path.split('.').forEach((key, i, arr) => {
+        if (i == arr.length - 1) {
+            obj[key] = val;
+            return;
+        }
+
+        if (typeof obj[key] == 'undefined')
+            obj[key] = {};
+
+        obj = obj[key];
+    });
+}
+
 function getProps(selector, props) {
     let newProps = {};
     $(selector).each((i, element) => {
@@ -66,21 +80,28 @@ function getProps(selector, props) {
 
         let propPath = newProps;
 
-        propName.split('.').forEach((key, i, arr) => {
-            if (i == arr.length - 1) {
-                propPath[key] = propVal;
-                return;
-            }
-
-            if (typeof propPath[key] == 'undefined')
-                propPath[key] = {};
-
-            propPath = propPath[key];
-        });
+        setPropertyByPath(newProps, propName, propVal);
     });
 
     $.extend(true, props, newProps);
     return newProps;
+}
+
+function getPropertyByPath(obj, path) {
+    let error = path.split('.').some((key, i, arr) => {
+        obj = obj[key];
+
+        if (typeof obj == 'undefined') {
+            console.log("ERROR: Couldn't find value.")
+            console.log($element);
+            return true;
+        }
+
+        return false;
+    });
+
+    if (!error) return obj;  
+    return;
 }
 
 function setProps(selector, props) {
@@ -88,8 +109,6 @@ function setProps(selector, props) {
         let $element = $(element);
 
         let propType = $element.prop('type');
-
-        let propVal = props;
 
         let propName = $element.prop('name');
 
@@ -99,19 +118,8 @@ function setProps(selector, props) {
             return;
         }
 
-        let error = propName.split('.').some((key, i, arr) => {
-            propVal = propVal[key];
-
-            if (typeof propVal == 'undefined') {
-                console.log("ERROR: Couldn't find value.")
-                console.log($element);
-                return true;
-            }
-
-            return false;
-        });
-
-        if (error) return;
+        let propVal = getPropertyByPath(props, propName)
+        if (!propVal) return;
 
         jqValue($element, propVal);
     });
@@ -502,10 +510,29 @@ class Graph {
     propsToControls() {
         $('.graph_typeprefs').hide();
     }
+  
     destroy() { }
 
-    getData() {
+    getData(callback, fields) {
+        this.data = [];
+        let setsLeft = this.sets.length + 1;
 
+        let gotData = (data) => {
+            if (data) this.data.push(data);
+            setsLeft--;
+            if (setsLeft == 0) callback(this.data);
+        }
+
+        gotData();
+
+        this.sets.forEach((set) => {
+            let query = set.propsToQuery();
+            query.fields = fields;
+
+            $.post('/api/readings', query, (data, status) => {
+                if (status == 'success') gotData(data);
+            });
+        });
     }
 
     createGraph() {
@@ -530,36 +557,7 @@ class GraphRaw extends Graph {
         $('.graph_typeprefs#raw').show();
     }
 
-    controlsToProps() {
-
-    }
-
-    getData(callback) {
-        this.data = [];
-        let setsLeft = this.sets.length + 1;
-
-        let gotData = (data) => {
-            if (data) this.data.push(data);
-            setsLeft--;
-            if (setsLeft == 0) callback(this.data);
-        }
-
-        gotData();
-
-        this.sets.forEach((set) => {
-            let query = set.propsToQuery();
-            // query.fields = {
-            //     "values": 1
-            // };
-
-            $.post('/api/readings', query, (data, status) => {
-                if (status == 'success') gotData(data);
-            });
-        });
-    }
-
     createGraph() {
-        console.log(this.data);
         let $element = $('<pre></pre>', {
             "class": "graph_raw",
             "html": "<code>" + JSON.stringify(this.data, null, '\t') + "</code>"
@@ -593,6 +591,108 @@ class Graph2d extends Graph {
         super.propsToControls();
         $('.graph_typeprefs#2d').show();
         setProps('.graph-control-2d', this.props);
+    }
+
+    organizeData(dataRaw) {
+        let dataOrganized = [];
+        let props = this.props;
+
+        dataRaw.forEach((setRaw, i) => {
+            let set = {
+                "label": "Set " + i,
+                "color": "#FF0000",
+                "borderColor": "#FF0000",
+                "fill": false,
+                "data": []
+            };
+
+            setRaw.forEach((reading) => {
+                let data = {};
+
+                ['x', 'y'].forEach((axis) => {
+                    let valueVar = props[axis].var;
+                    let isValue = valueVar.startsWith('values');
+                    if (!isValue)
+                        data[axis] = getPropertyByPath(reading, valueVar);
+                    else {
+                        let valueType = valueVar.split('.')[1];
+                        reading.values.some((value) => {
+                            if (valueType == value.type) {
+                                data[axis] = value.data[valueType];
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
+                });
+
+                let dataKeys = Object.keys(data);
+                if (dataKeys.includes('x') && dataKeys.includes('y'))
+                    set.data.push(data);
+            });
+            dataOrganized.push(set);
+        });
+        return dataOrganized;
+    }
+
+    getData(callback) {
+        let props = this.props;
+        let fields = {
+            "values": 1
+        };
+
+        let dataSets = [];
+
+        if (!props.x.var.startsWith('values'))
+            fields[props.x.var] = 1;
+
+        if (!props.y.var.startsWith('values'))
+            fields[props.y.var] = 1;
+
+        super.getData((dataRaw) => {
+            this.data = this.organizeData(dataRaw);
+            callback(this.data);
+        }, fields);
+    }
+
+    createGraph() {
+        let props = this.props;
+        let config = {
+            "type": "line",
+            "data": {
+                "datasets": this.data
+            },
+            "options": {
+                "responsive": true,
+                "scales": {
+                    "xAxes": [{
+                        "display": true,
+                        "scaleLabel": {
+                            "display": true,
+                            "labelString": props.x.var
+                        }
+                    }],
+                    "yAxes": [{
+                        "display": true,
+                        "scaleLabel": {
+                            "display": true,
+                            "labelString": props.y.var
+                        }
+                    }]
+                }
+            }
+        };
+
+        let $element = $('<canvas></canvas>', {
+            "width": 512,
+            "height": 512
+        });
+
+        $('#output').html($element)
+
+        this.chartCurrent = new Chart($element, config);
+
+        return;
     }
 }
 
