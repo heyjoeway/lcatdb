@@ -7,124 +7,156 @@
     <!--nav-->
 
     <div class="container">
-        <h2>New Reading</h2>
-        <div class="row">
-            &nbsp;&nbsp;&nbsp;Configuration <a href="./">{{configuration.name}} ({{configuration._id}})</a>
-        </div>
-        <br>
         {{#canEdit}}
-        <div class="js">
-            <button id="locationget" type="button" class="btn btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label class="custom-control custom-checkbox">
-                <input type="checkbox" id="locationalways" class="custom-control-input">
-                <span class="custom-control-indicator"></span>
-                <span class="custom-control-description">Get Location Automatically</span>
-            </label>
-            <br><br>
-            <div class="map" id="map"></div>
-        </div>
-        <br>
-        <form action="./readingDo" method="post"><fieldset class="container">
+        <form id="form" class="container" action="./readingDo" method="post">
             <div class="row">
-                <div class="col-xs-6 col-xxs-12">
-                    <label class="control-label" for="location.lat">
-                        Latitude
-                    </label>
-                    <div class="input-group">
-                        <input class="form-control" type="number" step="any" name="location.lat"
-                        aria-describedby="addon-location_lat" id="location_lat" min="-90" max="90"><br>
-                        <span class="input-group-addon" id="addon-location_lat">Degrees</span>
+
+                <div class="col-xs-12 col-md-7">
+
+                    <h2>New Reading</h2>
+                    &nbsp;&nbsp;&nbsp;Configuration <a href="./">{{configuration.name}} ({{configuration._id}})</a>
+                    <br><br>
+
+                    <!-- Location + Time -->
+                    <div class="js">
+                        <button id="locationget" type="button" class="btn btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <label class="custom-control custom-checkbox">
+                            <input type="checkbox" id="locationalways" class="custom-control-input">
+                            <span class="custom-control-indicator"></span>
+                            <span class="custom-control-description">Get Location Automatically</span>
+                        </label>
+                        <br><br>
+                        <div class="map" id="map"></div>
                     </div>
-                </div>
-                <div class="col-xs-6 col-xxs-12">
-                    <label class="control-label" for="location.long">
-                        Longitude
-                    </label>
-                    <div class="input-group">
-                        <input class="form-control" type="number" step="any" name="location.long" 
-                        aria-describedby="addon-location_long" id="location_long" min="-180" max="180">
-                        <span class="input-group-addon" id="addon-location_long">Degrees</span>
-                    </div>
-                </div>
-            </div>
 
-            <br>
-
-            <div class="row form-expand">
-                <div class="col-sm-4 col-xs-12">
-                    <label class="control-label" for="location.range">
-                        Range (Optional)
-                    </label>
-                    <div class="input-group">
-                        <input class="form-control" type="number" step="any" name="location.range"
-                        aria-describedby="addon-location_range" id="location_range" min="0"><br>
-                        <span class="input-group-addon" id="addon-location_range">Meters</span>
-                    </div>
-                </div>
-
-                <div class="col-sm-4 col-xs-12">
-                    <label class="control-label" for="location.alt">
-                        Altitude (Optional)
-                    </label>
-                    <div class="input-group">
-                        <input class="form-control" type="number" step="any" name="location.alt"
-                        aria-describedby="addon-location_alt" id="location_alt"><br>
-                        <span class="input-group-addon" id="addon-location_alt">Meters</span>
-                    </div>
-                </div>
-
-                <div class="col-sm-4 col-xs-12">
-                    <label class="control-label" for="location.altRange">
-                        Altitude Range (Optional)
-                    </label>
-                    <div class="input-group">
-                        <input class="form-control" type="number" step="any" name="location.altRange"
-                        aria-describedby="addon-location_altRange" id="location_altRange" min="0"><br>
-                        <span class="input-group-addon" id="addon-location_altRange">Meters</span>
-                    </div>
-                </div>
-
-            </div>
-
-            <br>
-            
-            <div class="form-group">
-                <label class="control-label">
-                    Time Created
-                </label>
-                <input class="form-control" type="number" name="timeCreated" value="{{timeCurrent}}">
-            </div>
-
-            <h3 class="h-inline">Sensors</h3>
-            &nbsp;&nbsp;
-            <a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-primary">Add New</a>
-            &nbsp;&nbsp;
-            <a id="sensor-existing" href="./addSensor" class="btn btn-secondary">Add Existing</a>
-            <br>
-            <div id="sensors">
-                {{#sensors}}
-                <div class="sensor" id="sensor_{{_id}}">
-                    <h4 class="h-inline">{{name}}</h4>&nbsp;&nbsp;<a href="/sensors/{{_id}}">({{_id}})</a><br>
-                    {{{html}}}
                     <br>
-                </div>
-                {{/sensors}}
-                {{^sensors}}
-                <p id="sensors-none">No sensors found for this configuration.</p>
-                {{/sensors}}
-            </div>
 
-            <div class="form-group">
-                <div>
-                    <a href="./" class="btn btn-default">Cancel</a>
+                    <!-- Lat/Long -->
+                    <div class="row">
+
+                        <!-- Latitude -->
+                        <div class="col-xs-6 col-xxs-12">
+                            <label class="control-label">Latitude</label>
+                            <div class="input-group">
+                                <input  name="location.lat" class="form-control"
+                                        type="number" step="any"
+                                        min="-90" max="90"
+                                        aria-describedby="addon-location_lat">
+                                <br>
+                                <span class="input-group-addon" id="addon-location_lat">Degrees</span>
+                            </div>
+                        </div>
+
+                        <!-- Longitude -->                    
+                        <div class="col-xs-6 col-xxs-12">
+                            <label class="control-label">Longitude</label>
+                            <div class="input-group">
+                                <input  name="location.long" class="form-control"
+                                        type="number" step="any" min="-180" max="180"
+                                        aria-describedby="addon-location_long">
+                                <span class="input-group-addon" id="addon-location_long">Degrees</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <br>
+
+                    <div class="spoiler reading-more" data-spoiler-link="location"></div>
+                    <div class="spoiler-content row" data-spoiler-link="location">
+
+                        <!-- Time Created -->
+                        <div class="col-xs-12">
+                            <label class="control-label">
+                                Time Created
+                            </label>
+                            <input  name="timeCreated" class="form-control normalize"
+                                    type="number" value="{{timeCurrent}}"
+                                    data-unittype="time" data-unit="unix" data-unitpref="iso">
+                            <br>
+                        </div>
+
+                        <!-- Range -->
+                        <div class="col-sm-4 col-xs-12">
+                            <label class="control-label">Range (Optional)</label>
+                            <div class="input-group">
+                                <input  name="location.range" class="form-control normalize"
+                                        type="number" step="any" min="0"
+                                        aria-describedby="addon-location_range"
+                                        data-unittype="length" data-unit="meters" data-unitpref="feet">
+                                <span class="input-group-addon" id="addon-location_range">Meters</span>
+                            </div>
+                            <br>
+                        </div>
+                    
+
+                        <!-- Altitude -->
+                        <div class="col-sm-4 col-xs-12">
+                            <label class="control-label">Altitude (Optional)</label>
+                            <div class="input-group">
+                                <input  name="location.alt" class="form-control normalize" id="location_alt"
+                                        type="number" step="any" 
+                                        aria-describedby="addon-location_alt"
+                                        data-unittype="length" data-unit="meters" data-unitpref="feet">
+                                <span class="input-group-addon" id="addon-location_alt">Meters</span>
+                            </div>
+                            <br>
+                        </div>
+                    
+                        <!-- Altitude Range -->
+                        <div class="col-sm-4 col-xs-12">
+                            <label class="control-label">Altitude Range (Optional)</label>
+                            <div class="input-group">
+                                <input  name="location.altRange" class="form-control normalize" id="location_altRange" 
+                                        type="number" step="any" min="0"
+                                        aria-describedby="addon-location_altRange"
+                                        data-unittype="length" data-unit="meters" data-unitpref="feet">
+                                <span class="input-group-addon" id="addon-location_altRange">Meters</span>
+                            </div>
+                            <br>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-md-5">
+                    <br>
+                    <h3 class="h-inline">Sensors</h3>
                     &nbsp;&nbsp;
-                    <button type="submit" name="publish" class="btn btn-primary">Save and Publish</button>
-                </div>
-            </div>
-        </fieldset></form>
+                    <a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-primary">Add New</a>
+                    &nbsp;&nbsp;
+                    <a id="sensor-existing" href="./addSensor" class="btn btn-secondary">Add Existing</a>
+                    <br>
+                    <div id="sensors">
+                        {{#sensors}}
+                        <div class="sensor" id="sensor_{{_id}}">
+                            <h4 class="h-inline">{{name}}</h4>&nbsp;&nbsp;<a href="/sensors/{{_id}}">({{_id}})</a><br>
+                            {{{html}}}
+                            <br>
+                        </div>
+                        {{/sensors}}
+                        {{^sensors}}
+                        <p id="sensors-none">No sensors found for this configuration.</p>
+                        {{/sensors}}
+                    </div>
 
+                    <div class="form-group">
+                        <div>
+                            <a href="./" class="btn btn-default">Cancel</a>
+                            &nbsp;&nbsp;
+                            <button type="submit" name="publish" class="btn btn-primary">Save and Publish</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </form>
         {{/canEdit}}
         {{^canEdit}}
+        <h2>New Reading</h2>
+        &nbsp;&nbsp;&nbsp;Configuration <a href="./">{{configuration.name}} ({{configuration._id}})</a>
+        <br><br>
         <p>Sorry, you do not have permission to create a reading.
         {{/canEdit}}
     </div>
@@ -185,6 +217,10 @@
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAsPFPL4ttV7hbmVIF-BELdB9WD_c5SjJA&callback=initMap">
     </script>
+    <script src="/js/lib/jQuery.unitnorm.js"></script>
+    <script src="/js/lib/jquery.spoiler.min.js"></script>
+    <script src="/js/lib/modernizr-custom.js"></script>
+    <script src="/js/lib/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/reading.js"></script>
 
 </body>

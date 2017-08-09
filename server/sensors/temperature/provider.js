@@ -3,27 +3,27 @@ const ObjectId = require('mongodb').ObjectId;
 exports.inputTemplate = function(user, configuration, sensor) {
     let sid = ObjectId(sensor['_id']);
 
-    return `<div class="row">
-<div class="col-xs-12 col-sm-6">
-    <label class="control-label" for="values.${sid}.temperature">
-        Temperature
-    </label>
-    <div class="input-group">
-        <input class="form-control" type="number" step="any" name="values.${sid}.temperature"
-        aria-describedby="addon-values_${sid}_temperature" id="values_${sid}_temperature" min="-90" max="90"><br>
-        <span class="input-group-addon" id="addon-values_${sid}_temperature">C</span>
-    </div>
+    return `\
+<label class="control-label">Temperature</label>
+<div class="input-group">
+    <input  name="values.${sid}.temperature" class="form-control normalize"
+            type="number" step="any"
+            aria-describedby="addon-values_${sid}_temperature"
+            data-unittype="temperature" data-unit="celcius" data-unitpref="farenheit">
+    <span class="input-group-addon" id="addon-values_${sid}_temperature">Meters</span>
+    <br>
 </div>
-<div class="col-xs-12 col-sm-6">
-    <label class="control-label" for="values.${sid}.temperatureRange">
-        Temperature Range (Optional)
-    </label>
+<div class="spoiler reading-more" data-spoiler-link="${sid}"></div>
+<div class="spoiler-content" data-spoiler-link="${sid}">
+    <label class="control-label">Temperature Range (Optional)</label>
     <div class="input-group">
-        <input class="form-control" type="number" step="any" name="values.${sid}.temperatureRange"
-        aria-describedby="addon-values_${sid}_temperatureRange" id="values_${sid}_temperatureRange" min="-90" max="90"><br>
-        <span class="input-group-addon" id="addon-values_${sid}_temperatureRange">C</span>
+        <input  name="values.${sid}.temperatureRange" class="form-control normalize"
+                type="number" step="any" 
+                aria-describedby="addon-values_${sid}_temperatureRange"
+                data-unittype="temperature" data-unit="celcius" data-unitpref="farenheit">
+        <span id="addon-values_${sid}_temperatureRange" class="input-group-addon">Meters</span>
+        <br>
     </div>
-</div>
 </div>`;
 }
 

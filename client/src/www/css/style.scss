@@ -37,3 +37,27 @@ body:not(.no-nav) {
     // height: 64px;
     // line-height: 64px;
 }
+
+.reading-more {
+    width: 100%;
+    position: relative;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    font-size: 10px;
+    /* this is literally just a grey pixel */
+    background-image: url('/img/reading/blackpixel.png');
+    color: #DDDDDD;
+
+    background-repeat: repeat-x;
+    background-position-y: center;
+
+    &::before {
+        content: "Show More";
+        background: #fff;
+    }
+
+    &.spoiler-active::before {
+        content: "Show Less";
+    }
+}

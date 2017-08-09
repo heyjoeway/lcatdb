@@ -9,11 +9,11 @@ function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (pos) => { // Success
-                $('#location_lat').val(pos.coords.latitude);
-                $('#location_long').val(pos.coords.longitude);
-                $('#location_range').val(pos.coords.accuracy);
-                $('#location_alt').val(pos.coords.altitude);
-                $('#location_altRange').val(pos.coords.altitudeAccuracy);
+                $('input[name="location.lat"]').val(pos.coords.latitude);
+                $('input[name="location.long"]').val(pos.coords.longitude);
+                $('input[name="location.range"]').val(pos.coords.accuracy);
+                $('input[name="location.alt"]').val(pos.coords.altitude);
+                $('input[name="location.altRange"]').val(pos.coords.altitudeAccuracy);
                 updateMap();
             },
             (error) => { // Failure
@@ -85,13 +85,28 @@ function listenPrefs() {
 function init() {
     configurationId = location.pathname.split('/')[2];
 
+
     loadPrefs();
     listenPrefs();
     modalSensorNew.init();
     modalSensorExisting.init();
 
-    $("#location_lat").change(updateMap);
-    $("#location_long").change(updateMap);
+    $('input[name="location.lat"]').change(updateMap);
+    $('input[name="location.long"]').change(updateMap);
+
+    $('.normalize').unitnorm();
+    $(".spoiler").spoiler();
+
+    if(!Modernizr.inputtypes['datetime-local']) {
+        $('input[type=datetime-local]').datetimepicker({
+            "showMeridian": true,
+            "format": "yyyy-mm-ddThh:ii",
+            "startView": 2,
+            "minView": 0,
+            "todayBtn": true,
+            "todayHighlight": true
+        });
+    }
 }
 
 function updateSensors(success) {
@@ -107,6 +122,9 @@ function updateSensors(success) {
                 $("#sensors-none").hide();
             }
         });
+
+        $('.normalize').unitnorm();
+        $(".spoiler").spoiler();
 
         success();
     });
@@ -259,15 +277,24 @@ function initMap() {
     });
     
     marker = new google.maps.Marker({
-        map: map
+        map: map,
+        draggable: true,
+        animation: google.maps.Animation.DROP
+    });
+
+    google.maps.event.addListener(marker, 'dragend', () => {
+        var pos = marker.getPosition();
+        $('input[name="location.lat"]').val(pos.lat());
+        $('input[name="location.long"]').val(pos.long());
+        updateMap();
     });
     updateMap();
 }
 
 function updateMap() {
     let pos = new google.maps.LatLng(
-        $('#location_lat').val(),
-        $('#location_long').val()
+        $('input[name="location.lat"]').val(),
+        $('input[name="location.long"]').val()
     );
 
     marker.setPosition(pos);

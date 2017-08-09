@@ -874,14 +874,16 @@ $(() => {
     dataSetManager = new DataSetManager();
     graphManager = new GraphManager(dataSetManager);
 
-    $('.datetimepicker').datetimepicker({
-        "showMeridian": true,
-        "format": "m/dd/yyyy H:ii p Z",
-        "startView": 2,
-        "minView": 0,
-        "todayBtn": true,
-        "todayHighlight": true
-    });
+    if(!Modernizr.inputtypes['datetime-local']) {
+        $('input[type=datetime-local]').datetimepicker({
+            "showMeridian": true,
+            "format": "yyyy-mm-ddThh:ii",
+            "startView": 2,
+            "minView": 0,
+            "todayBtn": true,
+            "todayHighlight": true
+        });
+    }
 
     $('input[name="time.enabled"]').change(function() {
         $('.set-control_time').attr(

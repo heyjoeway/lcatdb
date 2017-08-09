@@ -1,7 +1,12 @@
 /server/node_modules
 /.vscode
-/server/.eslintrc.json
+/server/config.json
+/server/www
+/server/views
 /client/node_modules
 /client/tmp
 /client/build
 /client/.sass-cache
+
+.eslintrc.json
+package-lock.json

@@ -3,27 +3,31 @@ const ObjectId = require('mongodb').ObjectId;
 exports.inputTemplate = function(user, configuration, sensor) {
     let sid = ObjectId(sensor['_id']);
 
-    return `<div class="row">
-<div class="col-xs-12 col-sm-6">
-    <label class="control-label" for="values.${sid}.depth">
-        Depth
-    </label>
-    <div class="input-group">
-        <input class="form-control" type="number" step="any" name="values.${sid}.depth"
-        aria-describedby="addon-values_${sid}_depth" id="values_${sid}_depth" min="-90" max="90"><br>
-        <span class="input-group-addon" id="addon-values_${sid}_depth">Meters</span>
-    </div>
+    return `\
+<label class="control-label" for="values.${sid}.depth">
+    Depth
+</label>
+<div class="input-group">
+    <input  name="values.${sid}.depth" class="form-control normalize"
+            type="number" step="any"
+            aria-describedby="addon-values_${sid}_depth"
+            data-unittype="length" data-unit="meters" data-unitpref="feet">
+    <br>
+    <span class="input-group-addon" id="addon-values_${sid}_depth">Meters</span>
 </div>
-<div class="col-xs-12 col-sm-6">
+<div class="spoiler reading-more" data-spoiler-link="${sid}"></div>
+<div class="spoiler-content" data-spoiler-link="${sid}">
     <label class="control-label" for="values.${sid}.depthRange">
         Depth Range (Optional)
     </label>
     <div class="input-group">
-        <input class="form-control" type="number" step="any" name="values.${sid}.depthRange"
-        aria-describedby="addon-values_${sid}_depthRange" id="values_${sid}_depthRange" min="-90" max="90"><br>
-        <span class="input-group-addon" id="addon-values_${sid}_depthRange">Meters</span>
+        <input  name="values.${sid}.depthRange" class="form-control normalize"
+                type="number" step="any" 
+                aria-describedby="addon-values_${sid}_depthRange"
+                data-unittype="length" data-unit="meters" data-unitpref="feet">
+        <br>
+        <span id="addon-values_${sid}_depthRange" class="input-group-addon">Meters</span>
     </div>
-</div>
 </div>`;
 }
 
