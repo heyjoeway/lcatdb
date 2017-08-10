@@ -1,0 +1,9 @@
+.spoiler-content {
+    overflow: initial !important;
+    height: initial !important;
+    display: none;
+
+    &.spoiler-content-visible {
+        display: block;
+    }
+}

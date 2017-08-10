@@ -8,18 +8,18 @@
 
     <div class="container">
         {{#canEdit}}
-        <form id="form" class="container" action="./readingDo" method="post">
+        <form id="form" action="./readingDo" method="post">
             <div class="row">
 
                 <div class="col-xs-12 col-md-7">
 
                     <h2>New Reading</h2>
-                    &nbsp;&nbsp;&nbsp;Configuration <a href="./">{{configuration.name}} ({{configuration._id}})</a>
+                    <a href="./">&lt; Back to Configuration ({{configuration.name}})</a>
                     <br><br>
 
                     <!-- Location + Time -->
                     <div class="js">
-                        <button id="locationget" type="button" class="btn btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button id="locationget" type="button" class="btn btn-sm btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <label class="custom-control custom-checkbox">
                             <input type="checkbox" id="locationalways" class="custom-control-input">
                             <span class="custom-control-indicator"></span>
@@ -113,7 +113,6 @@
                                         data-unittype="length" data-unit="meters" data-unitpref="feet">
                                 <span class="input-group-addon" id="addon-location_altRange">Meters</span>
                             </div>
-                            <br>
                         </div>
 
                     </div>
@@ -123,14 +122,14 @@
                     <br>
                     <h3 class="h-inline">Sensors</h3>
                     &nbsp;&nbsp;
-                    <a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-primary">Add New</a>
+                    <a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-sm btn-primary">Add New</a>
                     &nbsp;&nbsp;
-                    <a id="sensor-existing" href="./addSensor" class="btn btn-secondary">Add Existing</a>
+                    <a id="sensor-existing" href="./addSensor" class="btn btn-sm btn-secondary">Add Existing</a>
                     <br>
                     <div id="sensors">
                         {{#sensors}}
                         <div class="sensor" id="sensor_{{_id}}">
-                            <h4 class="h-inline">{{name}}</h4>&nbsp;&nbsp;<a href="/sensors/{{_id}}">({{_id}})</a><br>
+                            <a href="/sensors/{{_id}}"><h4 class="h-inline">{{name}}</h4></a><br>
                             {{{html}}}
                             <br>
                         </div>

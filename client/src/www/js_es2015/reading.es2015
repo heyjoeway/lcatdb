@@ -272,7 +272,11 @@ let modalSensorNew = {
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
+        "zoom": 11,
+        "center": {
+            "lat": 44.57670853058025,
+            "lng": -73.32539651979982
+        },
         "scrollwheel": false
     });
     
@@ -285,17 +289,25 @@ function initMap() {
     google.maps.event.addListener(marker, 'dragend', () => {
         var pos = marker.getPosition();
         $('input[name="location.lat"]').val(pos.lat());
-        $('input[name="location.long"]').val(pos.long());
+        $('input[name="location.long"]').val(pos.lng());
         updateMap();
     });
     updateMap();
 }
 
 function updateMap() {
-    let pos = new google.maps.LatLng(
-        $('input[name="location.lat"]').val(),
-        $('input[name="location.long"]').val()
-    );
+    let lat = $('input[name="location.lat"]').val();
+    let long = $('input[name="location.long"]').val();
+
+    console.log(lat);
+    console.log(long);
+
+    if ((lat == 0) && (long == 0)) {
+        lat = 44.57670853058025;
+        long = -73.32539651979982;
+    }
+    
+    let pos = new google.maps.LatLng(lat, long);
 
     marker.setPosition(pos);
     map.setCenter(pos);
