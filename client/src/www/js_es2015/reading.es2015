@@ -277,6 +277,8 @@ function initMap() {
             "lat": 44.57670853058025,
             "lng": -73.32539651979982
         },
+        "streetViewControl": false,
+        "mapTypeId": "terrain",
         "scrollwheel": false
     });
     
@@ -298,9 +300,6 @@ function initMap() {
 function updateMap() {
     let lat = $('input[name="location.lat"]').val();
     let long = $('input[name="location.long"]').val();
-
-    console.log(lat);
-    console.log(long);
 
     if ((lat == 0) && (long == 0)) {
         lat = 44.57670853058025;
