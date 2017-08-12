@@ -385,12 +385,14 @@ sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit', ['models']);
 
 sessionGet('/sensors/new', (req, res, user) => {
     let types = SensorTypes.getTypesMustache();
+    console.log(types);
 
     res.render('sensorNew', {
         "user": user,
         "types": types,
         "typeFirst": types[0].key,
-        "configuration": req.query.configuration
+        "query": req.query
+        // "configuration": req.query.configuration
     });
 });
 

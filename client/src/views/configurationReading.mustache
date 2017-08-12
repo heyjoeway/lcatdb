@@ -129,7 +129,10 @@
                     <div id="sensors">
                         {{#sensors}}
                         <div class="sensor" id="sensor_{{_id}}">
-                            <a href="/sensors/{{_id}}"><h4 class="h-inline">{{name}}</h4></a><br>
+                            <h4 class="h-inline"><a href="/sensors/{{_id}}">{{name}}</a></h4>
+                            &nbsp;&nbsp;&nbsp;
+                            <h6 class="h-inline">{{model}}</h6>
+                            <br>
                             {{{html}}}
                             <br>
                         </div>
@@ -154,7 +157,7 @@
         {{/canEdit}}
         {{^canEdit}}
         <h2>New Reading</h2>
-        &nbsp;&nbsp;&nbsp;Configuration <a href="./">{{configuration.name}} ({{configuration._id}})</a>
+        <a href="./">&lt; Back to Configuration ({{configuration.name}})</a>
         <br><br>
         <p>Sorry, you do not have permission to create a reading.
         {{/canEdit}}
@@ -173,7 +176,7 @@
                 </div>
                 <div class="modal-step modal-body modal-step-2">
                     <h5>Select a model.</h5>
-                    <ul id="modal-sensor-models" class="list-group"></ul>                  
+                    <ul id="modal-sensor-models" class="list-group"></ul>
                 </div>
                 <div class="modal-step modal-body modal-step-loading">
                     <p>Loading...</p>

@@ -3,12 +3,47 @@
     <!--head-->
     <title><!--title--> - New Sensor</title>
 </head>
+{{#query.modal}}
+<body class="no-nav">
+    <div class="hide" id="configuration">{{query.configuration}}</div>
+
+    <div id="step-1">
+        <ul class="nav nav-tabs">
+            {{#types}}
+            <li><a data-toggle="tab" href="#{{key}}">{{type.data.name}}</a></li>
+            {{/types}}
+        </ul>
+
+        <div class="tab-content">
+            {{#types}}
+            <div id="{{key}}" class="tab-pane">
+                <ul id="modal-sensor-models" class="list-group">
+                    {{#type.data.models}}
+                    <li><a data-type="{{key}}" data-model="{{name}}" href="#" class="model list-group-item">{{name}}</a></li>
+                    {{/type.data.models}}
+                </ul>
+            </div>
+            {{/types}}
+        </div>
+    </div>
+
+    <div id="loading" style="display:none">
+        Loading...
+    </div>
+
+    <!--scripts-->
+
+    <script src="/js/modalSensorNew.js"></script>
+
+</body>
+{{/query.modal}}
+{{^query.modal}}
 <body>
     <!--nav-->
 
     <div class="container">
         <h2>New Sensor</h2>
-        <form action="/sensors/newDo{{#configuration}}?configuration={{.}}{{/configuration}}" method="post" class="form-horizontal"><fieldset class="container">
+        <form action="/sensors/newDo{{#query.configuration}}?configuration={{.}}{{/query.configuration}}" method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
                 <label class="col-xs-2 control-label" for="sid">Type</label>
                 <div class="col-xs-10">
@@ -22,12 +57,12 @@
             <div class="form-group">
                 <label class="col-xs-2 control-label" for="sid">Add to Configuration (Optional)</label>
                 <div class="col-xs-10">
-                    <input class="form-control" type="text" name="configuration" value="{{configuration}}">
+                    <input class="form-control" type="text" name="configuration" value="{{query.configuration}}">
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-xs-10 col-xs-offset-2">
-                    <a href="{{#configuration}}/configurations/{{.}}/{{/configuration}}{{^configuration}}./{{/configuration}}" class="btn btn-default">Cancel</a>
+                    <a href="{{#query.configuration}}/configurations/{{.}}/{{/query.configuration}}{{^query.configuration}}./{{/query.configuration}}" class="btn btn-default">Cancel</a>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
@@ -36,3 +71,4 @@
 
     <!--scripts-->
 </body>
+{{/query.modal}}
