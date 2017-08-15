@@ -1,0 +1,19 @@
+$(() => {
+    $('.sensor').click(function() {
+        $('#step-1').hide();
+        $('#loading').show();
+
+        let $this = $(this);
+
+        window.parent.postMessage('modal.lock', '*');
+
+        $.post('./addSensorDo',
+            {
+                "sid": $this.attr('id')
+            },
+            (data, success) => {
+                window.parent.postMessage('modal.done', '*');
+            }
+        );
+    });
+});

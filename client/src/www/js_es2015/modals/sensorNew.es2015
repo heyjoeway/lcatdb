@@ -5,6 +5,8 @@ $(function() {
 
         let $this = $(this);
 
+        window.parent.postMessage('modal.lock', '*');
+
         $.post(`/sensors/newDo`,
             {
                 "type": $this.data('type'),
@@ -12,7 +14,7 @@ $(function() {
                 "configuration": $('#configuration').text()
             },
             (data, success) => {
-                window.parent.postMessage("modal.done", "*");
+                window.parent.postMessage('modal.done', '*');
             }
         );
     });

@@ -5,7 +5,7 @@ $(() => {
 
 function modal(title, url, callback) {
     let $element = $('<div></div>');
-    $element.addClass('modal,fade').html(`\
+    $element.addClass('modal fade').html(`\
 <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
@@ -16,18 +16,36 @@ function modal(title, url, callback) {
             <iframe src="${url}" scrolling="no"></iframe>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Cancel</button>
         </div>
     </div>
 </div>`);
 
-    if (iFrameResize) {
-        let $iframe = $($element.children('iframe'));
+    $('body').append($element);
+    $element.modal('show');
+
+    if (window.iFrameResize) {
+        let $iframe = $($element.find('iframe'));
         $iframe.iFrameResize();
     }
 
     window.addEventListener('message', (e) => {
-        // if ()
-        console.log(e);
+        let msg = e.data;
+
+        if (msg == 'modal.hide') {
+            $element.modal('hide');
+        } else if (msg == 'modal.lock') {
+            $element.find('.close').hide();
+            $element.find('.btn-close').hide();
+        } else if (msg == 'modal.unlock') {
+            $element.find('.close').show();
+            $element.find('.btn-close').show();
+        } else if (msg == 'modal.done') {
+            callback($element);
+        }
     }, false);
+
+    $element.on('hidden.bs.modal', function() {
+        $element.remove();
+    });
 }

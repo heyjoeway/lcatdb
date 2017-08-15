@@ -533,7 +533,8 @@ function configurationRender(url, template, needs) {
                 res.render(template, {
                     "user": user,
                     "configuration": configuration,
-                    "canEdit": canEdit
+                    "canEdit": canEdit,
+                    "query": req.query
                 });
             },
             fail, needs, req.query
@@ -631,7 +632,7 @@ sessionPost(`/configurations/${configPattern}/addSensorDo`, (req, res, user) => 
 });
 
 // ------------------------------------
-// Take a Reading (Page)
+// Submit a Reading (Page)
 // ------------------------------------
 
 configurationGet(`/configurations/${configPattern}/reading`, (req, res, user, configuration) => {
@@ -671,7 +672,7 @@ configurationGet(`/configurations/${configPattern}/reading`, (req, res, user, co
 });
 
 // ------------------------------------
-// Take a Reading (Action)
+// Submit a Reading (Action)
 // ------------------------------------
 
 configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user, configuration) => {

@@ -62,3 +62,8 @@ body:not(.no-nav) {
         content: "Show Less";
     }
 }
+
+.modal iframe {
+    width: 100%;
+    border: none;
+}

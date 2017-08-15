@@ -484,7 +484,7 @@ exports.mustachify = function(user, configuration, success, failure, needs = [],
             (error) => { // Failure
                 fail({ "type": "userSensorList", "error": error });
             },
-            ['name'] // Requirements
+            ['name', 'model'] // Requirements
         );
     }
 
