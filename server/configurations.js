@@ -13,6 +13,7 @@ const deepmerge = require('deepmerge');
 const Schema = require('./schema.js');
 const Db = require('./db.js');
 const Sensor = require('./sensor.js');
+const SensorTypes = require('./sensorTypes.js');
 const Utils = require('./utils.js');
 const Auth = require('./auth.js');
 const Reading = require('./reading.js');
@@ -451,6 +452,12 @@ exports.mustachify = function(user, configuration, success, failure, needs = [],
         exports.getSensorList(configuration,
             (sensors) => {
                 configuration.sensors = sensors;
+                if (needs.includes('sensors.typeData')) {
+                    sensors.forEach((sensor) => {
+                        sensor.typeData = SensorTypes.getTypeData(sensor.type);
+                    });
+                    progress();
+                }
                 progress();
             },
             (error) => {
@@ -479,6 +486,11 @@ exports.mustachify = function(user, configuration, success, failure, needs = [],
         Sensor.getList(user, 
             (docs) => { // Success
                 user.sensors = docs;
+                if (needs.includes('user.sensors.typeData')) {
+                    user.sensors.forEach((sensor) => {
+                        sensor.typeData = SensorTypes.getTypeData(sensor.type);
+                    });
+                }
                 progress();
             },
             (error) => { // Failure

@@ -163,3 +163,29 @@ thing(way, too, many, effing, arguments, asdf);
 Yeah. Do that. K.
 
 When using a context in a chain, modify the context in place.
+
+## Rethinking routing
+
+So, let's split routing processes into a few groups
+
+1. Tests
+2. Data
+3. Page-specific code
+
+There are a few things to test for:
+
+1. Session (User)
+2. Configurations
+2. Sensors
+4. Readings
+
+These should be able to be layered on top of one another and produce a "data context".
+
+Things each function needs:
+
+1. req
+2. res
+3. data
+4. callback
+
+The callback should pass the first 3 things.

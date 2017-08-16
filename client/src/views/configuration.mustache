@@ -6,7 +6,6 @@
 <body>
     <!--nav-->
 
-
     <div class="container">
     {{#configuration}}
         <div class="hide" id="configuration">{{_id}}</div>
@@ -71,9 +70,9 @@
             {{/sensors}}
         </ul>
         {{#canEdit}}
-        <a id="add-new" class="btn btn-primary" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
+        <a id="sensor-new" class="btn btn-primary" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
         &nbsp;
-        <a id="add-existing" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
+        <a id="sensor-existing" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
         {{/canEdit}} 
         <h3>Edits</h3>
         <ul class="list-group">

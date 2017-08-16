@@ -1,5 +1,5 @@
 $(function() {
-    $('#add-new').click(function(e) {
+    $('#sensor-new').click(function(e) {
         e.preventDefault();
 
         let configuration = $('#configuration').text();
@@ -10,7 +10,7 @@ $(function() {
         );
     });
 
-    $('#add-existing').click(function(e) {
+    $('#sensor-existing').click(function(e) {
         e.preventDefault();
 
         let configuration = $('#configuration').text();

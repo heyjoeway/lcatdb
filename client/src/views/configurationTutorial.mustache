@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Tutorial</title>
+</head>
+<body>
+    <!--nav-->
+    <div class="container text-center">
+        {{#configuration}}
+        <div class="hide" id="configuration">{{_id}}</div>
+
+        <h2>Add Some Sensors</h2>
+        <div class="js">
+            <p>Please add whichever sensors you plan to take readings with, <strong>including at least one depth and one temperature sensor.</strong></p>
+
+            <button id="sensor-new" class="btn btn-lg btn-primary">Add New</button>
+            <br><br>
+            <div class="row"><div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2 col-xxs-12 col-xxs-offset-0">
+                <ul id="sensors" class="list-group">
+                    {{#sensors}}
+                    <li class="list-group-item sensor" data-type="{{type}}">
+                        {{typeData.name}} - {{model}}
+                    </li>
+                    {{/sensors}}
+                    {{^sensors}}
+                    <p>No sensors found.</p>
+                    {{/sensors}}
+                </ul>
+            </div></div>
+
+            <a id="done" class="btn btn-primary" disabled>Done</a>
+        </div>
+        <div class="no-js">
+            <p>Standard setup requires Javascript to be enabled.</p>
+            <a class="btn btn-lg btn-primary" href="./tutorial">Reload</a><br>
+            <br>
+            <a class="btn btn-secondary" href="/dashboard">Go to Dashboard</a>
+        </div>
+        {{/configuration}}
+    </div>
+
+    <!--scripts-->
+
+    <script src="/js/pages/configurationTutorial.js"></script>
+</body>

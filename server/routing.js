@@ -94,7 +94,7 @@ app.post('/registerdo', (req, res) => {
             req.session.oid = oid.toString();
 
             if (typeof req.query.quick != 'undefined')
-                res.redirect('/quickreading');
+                res.redirect('/tutorial/standard');
             else
                 res.redirect('/tutorial');
         },
@@ -145,11 +145,11 @@ sessionRender('/dashboard', 'dashboard');
 sessionRender('/tutorial', 'tutorial');
 sessionRender('/visualize', 'visualize', true);
 
-sessionGet('/quickreading', (req, res, user) => {
+sessionGet('/tutorial/standard', (req, res, user) => {
     Configurations.getList(user, (list) => {
         if (!Utils.exists(list)) {
             Configurations.new(user, (cid) => {
-                res.redirect(`/configurations/${cid}/reading?quick`);
+                res.redirect(`/configurations/${cid}/tutorial`);
             });
         } else res.redirect('/configurations?reading');
     });
@@ -385,14 +385,12 @@ sensorRender(`/sensors/${sensorPattern}/edit`, 'sensorEdit', ['models']);
 
 sessionGet('/sensors/new', (req, res, user) => {
     let types = SensorTypes.getTypesMustache();
-    console.log(types);
 
     res.render('sensorNew', {
         "user": user,
         "types": types,
         "typeFirst": types[0].key,
         "query": req.query
-        // "configuration": req.query.configuration
     });
 });
 
@@ -584,6 +582,7 @@ sessionGet('/configurations', (req, res, user) => {
 let configPattern = '([0-9a-f]{24})';
 
 configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'edits.time', 'owner']);
+configurationRender(`/configurations/${configPattern}/tutorial`, 'configurationTutorial', ['sensors', 'sensors.typeData']);
 configurationRender(`/configurations/${configPattern}/edit`, 'configurationEdit');
 configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor', ['user.sensors']);
 configurationRender(`/configurations/${configPattern}/readings`, 'configurationReadingList', ['readings']);

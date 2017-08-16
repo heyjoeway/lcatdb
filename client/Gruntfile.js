@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
 const PACKAGE = require("./package.json");
 
-const TITLE = "LCAT";
+const TITLE = "LCATDB";
 
 // All paths should end in "/". I'm lazy.
 

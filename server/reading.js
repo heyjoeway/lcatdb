@@ -134,8 +134,6 @@ exports.new = function(user, configuration, data, success, failure, publish) {
         Schema.defaults('/Reading')
     );
 
-    console.log(newData);
-
     [
         newData.configuration,
         newData.creator,
