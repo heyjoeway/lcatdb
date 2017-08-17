@@ -1,15 +1,4 @@
 $(function() {
-    $('#sensor-new').click(function(e) {
-        e.preventDefault();
-
-        let configuration = $('#configuration').text();
-        modal(
-            'Add New Sensor',
-            `/sensors/new?configuration=${configuration}&modal=true`,
-            function() { window.location.reload(); }
-        );
-    });
-
     let hasTemperature = false;
     let hasDepth = false;
 

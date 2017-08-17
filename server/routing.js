@@ -360,7 +360,8 @@ sessionGet('/sensors', (req, res, user) => {
     Sensor.getList(user, 
         (docs) => { // Success
             res.render('sensorList', {
-                "sensors": docs
+                "sensors": docs,
+                "user": user
             });
         },
         (error) => { // Failure

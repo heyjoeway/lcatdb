@@ -423,10 +423,14 @@ class DataSetManager {
             this.sets.length - 1
         );
 
-        if (this.setCurrent == -1)
+        if (this.setCurrent == -1) {
             $('#section_properties').hide();
-        else {
+            $('#view_graphs').hide();
+            $('#section_description').show();
+        } else {
             $('#section_properties').show();
+            $('#view_graphs').show();
+            $('#section_description').hide();
             this.sets[this.setCurrent].propsToControls();
         }
 
@@ -536,10 +540,45 @@ class Graph {
     }
 
     createGraph() {
-        let html;
+        let html = '';
         return html;
     }
 
+}
+
+class GraphQuery extends Graph {
+    defaultProps() {
+        return { };
+    }
+
+    constructor(data) {
+        super(data);
+        this.type = "query";
+    }
+
+    propsToControls() {
+        super.propsToControls();
+        $('.graph_typeprefs#query').show();
+    }
+
+    getData(callback) {
+        this.data = [];
+
+        this.sets.forEach((set) => {
+            let query = set.propsToQuery();
+            this.data.push(query);
+        });
+
+        callback(this.data);
+    }
+
+    createGraph() {
+        let $element = $('<pre></pre>', {
+            "class": "graph_filter",
+            "html": "<code>" + JSON.stringify(this.data, null, '\t') + "</code>"
+        });
+        return $element;
+    }
 }
 
 class GraphRaw extends Graph {
@@ -698,7 +737,8 @@ class Graph2d extends Graph {
 
 const graphTypeDict = {
     "2d": Graph2d,
-    "raw": GraphRaw
+    "raw": GraphRaw,
+    "query": GraphQuery
 }
 
 class GraphManager {
@@ -715,8 +755,8 @@ class GraphManager {
             this.controlChange();
         });
 
-        $('#new_graph').click(() => {
-            this.newGraph();
+        $('.new_graph').click((e) => {
+            this.newGraph($(e.target).data('type'));
         });
 
         $('#delete_graph').click(() => {
@@ -765,10 +805,8 @@ class GraphManager {
         $("#list_graph").html(html);
     }
 
-    newGraph() {
-        let graphType = graphTypeDict[
-            $("#list_graphtypes").val()
-        ];
+    newGraph(type) {
+        let graphType = graphTypeDict[type];
 
         this.graphs.push(new graphType(
             "Graph " + (this.nameCounter++)
@@ -785,10 +823,14 @@ class GraphManager {
             this.graphs.length - 1
         );
 
-        if (this.graphCurrent == -1)
+        if (this.graphCurrent == -1) {
             $('#section_graph_properties').hide();
-        else {
+            $('#section_graph_description').show();
+            $('#create_graph').attr('disabled', 'true');
+        } else {
+            $('#section_graph_description').hide();
             $('#section_graph_properties').show();
+            $('#create_graph').removeAttr('disabled');
             this.graphs[this.graphCurrent].propsToControls();
         }
 

@@ -15,17 +15,23 @@
 
                     <h2>New Reading</h2>
                     <a href="./">&lt; Back to Configuration ({{configuration.name}})</a>
-                    <br><br>
+                    <hr>
 
                     <!-- Location + Time -->
                     <div class="js">
-                        <button id="locationget" type="button" class="btn btn-sm btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <label class="custom-control custom-checkbox">
-                            <input type="checkbox" id="locationalways" class="custom-control-input">
-                            <span class="custom-control-indicator"></span>
-                            <span class="custom-control-description">Get Location Automatically</span>
-                        </label>
-                        <br><br>
+                        <div id="location_mobile" style="display:none">
+                            <p>Choose a location by using GPS, dragging the marker to the desired spot, or by inputting coordinates in the boxes below.</p>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <label class="custom-control custom-checkbox">
+                                <input type="checkbox" id="locationalways" class="custom-control-input">
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">Get Location Automatically</span>
+                            </label>
+                            <br><br>
+                        </div>
+                        <div id="location_desktop" style="display:none">
+                            <p>Choose a location by either dragging the marker to the desired spot or by inputting coordinates in the boxes below.</p>
+                        </div>
                         <div class="map" id="map"></div>
                     </div>
 
@@ -163,62 +169,12 @@
         {{/canEdit}}
     </div>
 
-    <div id="modal-sensor-new" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Create a New Sensor</h4>
-                </div>
-                <div class="modal-step modal-body modal-step-1">
-                    <h5>Select a type.</h5>
-                    <ul id="modal-sensor-types" class="list-group"></ul>
-                </div>
-                <div class="modal-step modal-body modal-step-2">
-                    <h5>Select a model.</h5>
-                    <ul id="modal-sensor-models" class="list-group"></ul>
-                </div>
-                <div class="modal-step modal-body modal-step-loading">
-                    <p>Loading...</p>
-                </div>
-                <div class="modal-step modal-body modal-step-error">
-                    <p>An error has occurred. (<span class="modal-error"></span>)</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-sensor-existing" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Add an Existing Sensor</h4>
-                </div>
-                <div class="modal-step modal-body modal-step-1">
-                    <h5>Select a sensor.</h5>
-                    <ul id="sensors-existing" class="list-group"></ul>
-                </div>
-                <div class="modal-step modal-body modal-step-loading">
-                    <p>Loading...</p>
-                </div>
-                <div class="modal-step modal-body modal-step-error">
-                    <p>An error has occurred. (<span class="modal-error"></span>)</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <!--scripts-->
 
     <script src="/js/lib/jQuery.unitnorm.js"></script>
     <script src="/js/lib/jquery.spoiler.min.js"></script>
     <script src="/js/lib/modernizr-custom.js"></script>
+    <script src="/js/lib/mobile-detect.min.js"></script>
     <script src="/js/lib/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/pages/reading.js"></script>
     <script async defer

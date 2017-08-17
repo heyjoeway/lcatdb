@@ -43,7 +43,7 @@
         {{#canEdit}}        
         <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/edit">Edit Details</a>
         {{/canEdit}}
-        <br>
+        <!-- <br>
         <div id="members" style="display: none">
             <h3>Members</h3>
             <ul>
@@ -59,7 +59,10 @@
             {{#canEdit}}
             <a href="/configurations/{{_id}}/addMember">Add New Member</a>
             {{/canEdit}} 
-        </div>
+        </div> -->
+
+        <hr>
+
         <h3>Sensors</h3>
         <ul class="list-group">
             {{#sensors}}
@@ -74,6 +77,9 @@
         &nbsp;
         <a id="sensor-existing" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
         {{/canEdit}} 
+
+        <hr>
+
         <h3>Edits</h3>
         <ul class="list-group">
             {{#edits}}
@@ -88,5 +94,5 @@
 
     <!--scripts-->
 
-    <script src="/js/pages/configuration.js"></script>
+    <script src="/js/modals.js"></script>
 </body>

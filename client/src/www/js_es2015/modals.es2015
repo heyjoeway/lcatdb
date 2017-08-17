@@ -16,7 +16,7 @@ $(function() {
         let configuration = $('#configuration').text();
         modal(
             'Add Existing Sensor',
-            window.location.pathname + 'addSensor?modal=true',
+            `/configurations/${configuration}/addSensor?modal=true`,
             function() { window.location.reload(); }
         );
     });

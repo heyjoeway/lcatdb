@@ -24,10 +24,17 @@ function modal(title, url, callback) {
     $('body').append($element);
     $element.modal('show');
 
+    let $iframe = $($element.find('iframe'));
+    
     if (window.iFrameResize) {
-        let $iframe = $($element.find('iframe'));
         $iframe.iFrameResize();
     }
+
+    $iframe.load(function() {
+        console.log('test');
+        let pathName = $iframe.contents().get(0).location.pathname;
+        if (pathName == '/login') window.location.reload();
+    });
 
     window.addEventListener('message', (e) => {
         let msg = e.data;

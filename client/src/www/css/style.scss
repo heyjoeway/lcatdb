@@ -7,7 +7,7 @@
 @import "tutorial";
 
 body:not(.no-nav) {
-    padding-top: 54px;
+    padding-top: 70px;
 }
 
 .js {
@@ -22,6 +22,7 @@ body:not(.no-nav) {
 .h-inline {
     display: inline-block;
     vertical-align: middle;
+    margin-top: 0;
 }
 
 .btn-img {
@@ -66,4 +67,17 @@ body:not(.no-nav) {
 .modal iframe {
     width: 100%;
     border: none;
+}
+
+.dropdown-menu {
+    padding: 16px;
+    user-select: none;
+}
+
+.dropdown-item {
+    cursor: pointer;
+}
+
+.navbar-brand {
+    padding: 16px;
 }

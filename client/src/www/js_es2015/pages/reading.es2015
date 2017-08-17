@@ -1,11 +1,7 @@
-let configurationId, map, marker;
-
-function prefValue(key, val) {
-    if (val) localStorage[`configurations.${configurationId}.${key}`] = val;
-    return localStorage[`configurations.${configurationId}.${key}`];
-}
+let configurationId, map, marker, mobileDetect;
 
 function getLocation() {
+    if (!mobileDetect.phone()) return;
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (pos) => { // Success
@@ -36,6 +32,13 @@ function getLocation() {
             "type": 'warning'
         });
     }
+}
+
+// ----------------------------------------------------------------------------
+
+function prefValue(key, val) {
+    if (val) localStorage[`configurations.${configurationId}.${key}`] = val;
+    return localStorage[`configurations.${configurationId}.${key}`];
 }
 
 let prefHandlers = [
@@ -82,6 +85,8 @@ function listenPrefs() {
     });
 }
 
+// ----------------------------------------------------------------------------
+
 function modalFinish($element) {
     updateSensors(() => {
         $element.modal('hide');
@@ -110,32 +115,7 @@ function initSensorBtns() {
     });
 }
 
-function init() {
-    configurationId = location.pathname.split('/')[2];
-
-    loadPrefs();
-    listenPrefs();
-    initSensorBtns();
-    // modalSensorNew.init();
-    // modalSensorExisting.init();
-
-    $('input[name="location.lat"]').change(updateMap);
-    $('input[name="location.long"]').change(updateMap);
-
-    $('.normalize').unitnorm();
-    $('.spoiler').spoiler();
-
-    if(!Modernizr.inputtypes['datetime-local']) {
-        $('input[type=datetime-local]').datetimepicker({
-            "showMeridian": true,
-            "format": "yyyy-mm-ddThh:ii",
-            "startView": 2,
-            "minView": 0,
-            "todayBtn": true,
-            "todayHighlight": true
-        });
-    }
-}
+// ----------------------------------------------------------------------------
 
 function updateSensors(success) {
     $.get('./reading', (data, status) => {
@@ -158,145 +138,21 @@ function updateSensors(success) {
     });
 }
 
-// let modalSensorExisting = {
-//     fail: function(error) {
- 
-//     },
 
-//     addSensor: function(sid) {
-//         $('#modal-sensor-existing .modal-step').hide();
-//         $('#modal-sensor-existing .modal-step-loading').show();
+function updateMap() {
+    let lat = $('input[name="location.lat"]').val();
+    let long = $('input[name="location.long"]').val();
 
-//         $.post(`./addSensorDo`,
-//             {
-//                 "sid": sid
-//             },
-//             (data, success) => {
-//                 updateSensors(() => {
-//                     $('#modal-sensor-existing').modal('hide');
-//                 });
-//             }
-//         );
-//     },
+    if ((lat == 0) && (long == 0)) {
+        lat = 44.57670853058025;
+        long = -73.32539651979982;
+    }
+    
+    let pos = new google.maps.LatLng(lat, long);
 
-//     showSensors: function() {
-//         $.get('./addSensor', (data, status) => {
-//             let sensors = $(data).find('#sensors');
-
-//             $('#sensors-existing').html(sensors);
-
-//             $('#sensors-existing .sensor').click((e) => {
-//                 e.preventDefault();
-//                 this.addSensor(e.currentTarget.id);
-//             });
-
-//             $('#modal-sensor-existing .modal-step').hide();
-//             $('#modal-sensor-existing .modal-step-1').show();
-//         });
-//     },
-
-//     init: function() {
-//         $('#sensor-existing').click((e) => {
-//             e.preventDefault();
-            
-//             $('#modal-sensor-existing .modal-step').hide();
-//             $('#modal-sensor-existing .modal-step-loading').show();
-
-//             $('#modal-sensor-existing').modal('show');
-
-//             this.showSensors();
-//         });
-//     }
-// }
-
-// let modalSensorNew = {
-
-//     fail: function(error) {
-//         $('#modal-sensor-new .modal-step-error').show();
-//     },
-
-//     createSensor: function(typeKey, model) {
-//         $('#modal-sensor-new .modal-step').hide();
-//         $('#modal-sensor-new .modal-step-loading').show();
-
-//         let cid = window.location.pathname.split('/')[2];
-
-//         $.post(`/sensors/newDo`,
-//             {
-//                 "type": typeKey,
-//                 "model": model,
-//                 "configuration": cid
-//             },
-//             (data, success) => {
-//                 updateSensors(() => {
-//                     $('#modal-sensor-new').modal('hide');
-//                 });
-//             }
-//         );
-//     },
-
-//     showModels: function(typeKey) {
-//         $('#modal-sensor-new .modal-step').hide();
-//         $('#modal-sensor-models').html('');
-
-//         this.types[typeKey].models.forEach((model) => {
-//             $("#modal-sensor-models").append(`<a href="#">
-//                 <li class="list-group-item sensor-model">
-//                     ${model.name}
-//                 </li>
-//             </a>`);
-//         });
-        
-//         $('#modal-sensor-models .sensor-model').click((e) => {
-//             e.preventDefault();
-//             this.createSensor(typeKey, e.currentTarget.innerText);
-//         });
-
-//         $('#modal-sensor-new .modal-step-2').show();
-//     },
-
-//     showTypes: function() {
-//         Object.keys(this.types).forEach((key) => {
-//             let type = this.types[key];
-//             $("#modal-sensor-types").append(`<a href="#">
-//                 <li class="list-group-item sensor-type" id="sensor-type_${key}">
-//                     ${type.name}
-//                 </li>
-//             </a>`);
-//         });
-
-//         $('#modal-sensor-types .sensor-type').click((e) => {
-//             e.preventDefault();
-//             let id = e.target.id.split('_')[1];
-//             this.showModels(id);
-//         });
-        
-//         $('#modal-sensor-new .modal-step').hide();
-//         $('#modal-sensor-new .modal-step-1').show();
-//     },
-
-//     init: function() {
-//         $('#modal-sensor-new .modal-step').hide();
-//         $('#modal-sensor-new .modal-step-loading').show();
-
-//         $.getJSON('/api/sensorTypes', (data, status) => {
-//             if (['success', 'notmodified'].includes(status)) {
-//                 this.types = data;
-//                 this.showTypes();
-
-//             } else this.fail('types');
-//         });
-
-//         $('#sensor-new').click((e) => {
-//             e.preventDefault();
-//             $('#modal-sensor-new').modal('show');
-//             if (this.types) {
-//                 $('#modal-sensor-new .modal-step').hide();
-//                 $('#modal-sensor-new .modal-step-1').show();
-//             }
-//         });
-//     }
-// }
+    marker.setPosition(pos);
+    map.setCenter(pos);
+}
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -326,19 +182,36 @@ function initMap() {
     updateMap();
 }
 
-function updateMap() {
-    let lat = $('input[name="location.lat"]').val();
-    let long = $('input[name="location.long"]').val();
+function init() {
+    mobileDetect = new MobileDetect(window.navigator.userAgent);
 
-    if ((lat == 0) && (long == 0)) {
-        lat = 44.57670853058025;
-        long = -73.32539651979982;
+    if (mobileDetect.phone())
+        $('#location_mobile').show();
+    else
+        $('#location_desktop').show();
+
+    configurationId = location.pathname.split('/')[2];
+
+    loadPrefs();
+    listenPrefs();
+    initSensorBtns();
+
+    $('input[name="location.lat"]').change(updateMap);
+    $('input[name="location.long"]').change(updateMap);
+
+    $('.normalize').unitnorm();
+    $('.spoiler').spoiler();
+
+    if(!Modernizr.inputtypes['datetime-local']) {
+        $('input[type=datetime-local]').datetimepicker({
+            "showMeridian": true,
+            "format": "yyyy-mm-ddThh:ii",
+            "startView": 2,
+            "minView": 0,
+            "todayBtn": true,
+            "todayHighlight": true
+        });
     }
-    
-    let pos = new google.maps.LatLng(lat, long);
-
-    marker.setPosition(pos);
-    map.setCenter(pos);
 }
 
 $(window).ready(init);
