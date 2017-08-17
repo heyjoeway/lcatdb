@@ -14,7 +14,9 @@
                 <div class="col-xs-12 col-md-7">
 
                     <h2>New Reading</h2>
+                    {{^query.quick}}
                     <a href="./">&lt; Back to Configuration ({{configuration.name}})</a>
+                    {{/query.quick}}
                     <hr>
 
                     <!-- Location + Time -->

@@ -26,15 +26,8 @@ function modal(title, url, callback) {
 
     let $iframe = $($element.find('iframe'));
     
-    if (window.iFrameResize) {
+    if (window.iFrameResize)
         $iframe.iFrameResize();
-    }
-
-    $iframe.load(function() {
-        console.log('test');
-        let pathName = $iframe.contents().get(0).location.pathname;
-        if (pathName == '/login') window.location.reload();
-    });
 
     window.addEventListener('message', (e) => {
         let msg = e.data;
@@ -49,6 +42,8 @@ function modal(title, url, callback) {
             $element.find('.btn-close').show();
         } else if (msg == 'modal.done') {
             callback($element);
+        } else if (msg == 'modal.reload') {
+            window.location.reload();
         }
     }, false);
 
