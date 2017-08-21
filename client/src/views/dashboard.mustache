@@ -5,25 +5,36 @@
 </head>
 <body>
     <!--nav-->
-    <div class="container text-center">
-        {{#user}}
-        <h2>Welcome, {{username}}!</h2>
-        <h3>What would you like to do?</h3>
-        <a href="/configurations?reading"><div class="btn btn-image">
-            <img src="/img/dashboard/reading.png">
-            <div class="btn-image-short">Submit a Reading</div>
-        </div></a>
-        <br>
-        <a href="/visualize"><div class="btn btn-image">
-            <img src="/img/dashboard/visualize.png">
-            <div class="btn-image-short">Visualize Data</div>
-        </div></a>
-        <br>
-        <a href="/configurations"><div class="btn btn-image">
-            <img src="/img/dashboard/configurations.png">
-            <div class="btn-image-short">View Configurations</div>
-        </div></a>
-        {{/user}}
+
+    <div class="container">
+        <div class="row">
+            <!-- <div class="col-xs-12 col-sm-6 col-md-5"> -->
+            <div class="col-xs-12 text-center">
+                {{#user}}
+                <h3>Welcome, {{username}}!</h3>
+                <h4>What would you like to do?</h4>
+                <a href="/configurations?reading"><div class="btn btn-image">
+                    <img src="/img/dashboard/reading.png">
+                    <div class="btn-image-short">Submit a Reading</div>
+                </div></a>
+                <br>
+                <a href="/visualize"><div class="btn btn-image">
+                    <img src="/img/dashboard/visualize.png">
+                    <div class="btn-image-short">Visualize Data</div>
+                </div></a>
+                <br>
+                <a href="/configurations"><div class="btn btn-image">
+                    <img src="/img/dashboard/configurations.png">
+                    <div class="btn-image-short">View Configurations</div>
+                </div></a>
+                <br>
+                {{/user}}
+            </div>
+            <!-- <div class="col-xs-12 col-sm-6 col-md-7">
+                <h3>Map</h3>
+                <iframe class="map-dashboard map-iframe" src="/map?embed=true"></iframe>
+            </div> -->
+        </div>
     </div>
 
     <!--scripts-->

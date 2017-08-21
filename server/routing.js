@@ -132,7 +132,8 @@ function sessionRender(url, template, allowAnon) {
 
     sessionGet(url, (req, res, user) => {
         res.render(template, {
-            "user": user
+            "user": user,
+            "query": req.query
         });
     }, allowAnon);
 }
@@ -821,7 +822,7 @@ configurationGet(`/configurations/${configPattern}/readingsExport`, (req, res, u
  */
 
 function readingTest(req, res, user, success) {
-    let id = req.originalUrl.split('/')[2];
+    let id = req.originalUrl.split('/')[2].split('?')[0];
 
     Reading.find(id,
         (reading) => { // Success
@@ -847,10 +848,10 @@ function readingTest(req, res, user, success) {
  *      - reading: reading object.
  */
 
-function readingGet(url, success) {
+function readingGet(url, success, allowAnon) {
     sessionGet(url, function(req, res, user) {
         readingTest(req, res, user, success);
-    });
+    }, allowAnon);
 }
 
 // ----------------------------------------------------------------------------
@@ -868,7 +869,7 @@ function readingGet(url, success) {
  * template 'readingNF'.
  */
 
-function readingRender(url, template) {
+function readingRender(url, template, allowAnon) {
     readingGet(url, (req, res, user, reading) => {
         reading.values.forEach((value) => {
             try {
@@ -887,9 +888,10 @@ function readingRender(url, template) {
 
         res.render(template, {
             "user": user,
-            "reading": reading
+            "reading": reading,
+            "query": req.query
         });
-    });
+    }, allowAnon);
 }
 
 // ----------------------------------------------------------------------------
@@ -902,6 +904,6 @@ function readingRender(url, template) {
 
 let readingPattern = '([0-9a-f]{24})';
 
-readingRender(`/readings/${readingPattern}`, 'reading', ['values.typeData']);
+readingRender(`/readings/${readingPattern}`, 'reading', true);
 
 }; // End init()

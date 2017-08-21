@@ -3,6 +3,16 @@
     <!--head-->
     <title><!--title--> - Map</title>
 </head>
+{{#query.embed}}
+<body class="no-nav page-map">
+    <div id="map"></div>
+
+    <!--scripts-->
+    <!--script_map-->
+    <script src="/js/pages/map.js"></script>
+</body>
+{{/query.embed}}
+{{^query.embed}}
 <body class="page-map">
     <!--nav-->
 
@@ -10,6 +20,7 @@
         <h2>Map</h2>
         <div id="map"></div>
     </div>
+
 
     <!-- <div class="dropdown show">
         <a class="btn btn-secondary dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -33,5 +44,8 @@
 
     <!--scripts-->
     <!--script_map-->
+    
+    <script src="/js/lib/jQuery.unitnorm.js"></script>
     <script src="/js/pages/map.js"></script>
 </body>
+{{/query.embed}}

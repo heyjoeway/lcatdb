@@ -69,8 +69,23 @@ function updateMap() {
     data.forEach((dataSet) => {
         dataSet.forEach((reading) => {
             let marker = new google.maps.Marker({
-                map: map,
-                icon: markerImages[markerImageIndex]
+                "map": map,
+                "icon": markerImages[markerImageIndex]
+            });
+
+            let markerInfoContent = `
+<iframe class="map-iframe"
+    src="/readings/${reading['_id']}?marker=true">
+</iframe>`;
+
+
+            let markerInfo = new google.maps.InfoWindow({
+                "content": markerInfoContent,
+                "maxWidth": 1000
+            });
+
+            marker.addListener('click', function() {
+                markerInfo.open(map, marker);
             });
 
             let location = new google.maps.LatLng(

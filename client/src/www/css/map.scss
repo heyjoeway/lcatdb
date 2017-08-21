@@ -13,12 +13,32 @@
         padding-bottom: 16px;
     }
 
-    &.no-nav .container {
-        padding-top: 16px;
-    }
-
     #map {
         height: 100%;
         flex: 1;
     }
+
+    &.no-nav {
+        .container {
+            padding-top: 16px;
+        }
+
+        #map {
+            width: 100%;
+            position: absolute;
+        }
+    } 
+}
+
+.map-markerInfo {
+    padding-top: 3px;
+}
+
+.map-iframe {
+    width: 100%;
+    border: none;
+}
+
+.map-dashboard {
+    height: 500px;
 }
