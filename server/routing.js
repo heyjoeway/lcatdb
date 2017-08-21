@@ -781,7 +781,8 @@ configurationGet(`/configurations/${configPattern}/readingsExport`, (req, res, u
         res.send(`Error exporting data. (${error.type})`);
     }
 
-    let format = req.query.format.toLowerCase();
+    let format = req.query.format || 'json';
+    format = format.toLowerCase();
 
     if (!(['json', 'csv']).includes(format))
         fail({ "type": "unknownFormat" });

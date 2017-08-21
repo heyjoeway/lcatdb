@@ -15,10 +15,10 @@
 
             <button id="sensor-new" class="btn btn-lg btn-primary">Add New</button>
             <br><br>
-            <div class="row"><div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2 col-xxs-12 col-xxs-offset-0">
+            <div class="row text-left"><div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2 col-xxs-12 col-xxs-offset-0">
                 <ul id="sensors" class="list-group">
                     {{#sensors}}
-                    <li class="list-group-item">
+                    <li class="list-group-item sensor" data-type="{{type}}">
                         <div class="row small">
                             <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
                             <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
