@@ -6,20 +6,30 @@
 <body>
     <!--nav-->
     <br>
-    <div class="container">
+    <div class="container"><div class="col-md-8 col-md-offset-2 col-xs-12">
         <h2 class="h-inline">Sensors</h2>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a role="button" class="btn btn-primary btn-lg" href="/sensors/new">Add New</a><br>
+        <!-- <a role="button" class="btn btn-secondary btn-sm" href="/sensors/new">Add New</a><br> -->
         <br>
+        <p>This page lists the sensors that are owned by you. Sensors are not usable on their own; they must be a part of a <a href="/configurations">configuration</a> in order to be usable.</p>
+        <hr>
         <ul class="list-group">
             {{#sensors}}
-            <li class="list-group-item"><a href="/sensors/{{_id}}">{{name}}</a></li>
+            <li class="list-group-item">
+                <div class="row small">
+                    <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
+                    <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
+                </div>
+                <a href="/sensors/{{_id}}">
+                    <span>{{model}} ({{name}})</span>
+                </a>
+            </li>
             {{/sensors}}
         </ul>
         {{^sensors.length}}
             No sensors found.
         {{/sensors.length}}
-    </div>
+    </div></div>
 
     <!--scripts-->
 </body>

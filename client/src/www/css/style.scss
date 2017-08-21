@@ -5,6 +5,8 @@
 @import "home";
 @import "spoiler";
 @import "tutorial";
+@import "reading";
+@import "map";
 
 body:not(.no-nav) {
     padding-top: 70px;
@@ -80,4 +82,8 @@ body:not(.no-nav) {
 
 .navbar-brand {
     padding: 16px;
+}
+
+.extra-small {
+    font-size: 65%;
 }

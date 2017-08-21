@@ -8,33 +8,140 @@
 
     <div class="container">
         {{#reading}}
-        <h2>Reading</h2>
-        Configuration Id: <a href="/configurations/{{configuration}}">{{configuration}}</a><br>
-        Creator Id: {{creator}}<br>
-        Time Created: {{timeCreated}}<br>
+        <br>
+        <h2 class="h-inline">Reading</h2>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/configurations/{{configuration}}/reading" class="btn btn-primary">
+            Submit New Reading
+        </a>
+        &nbsp;&nbsp;
+        <a href="/configurations/{{configuration}}" class="btn btn-sm btn-secondary">
+            View Configuration
+        </a>
+        <br>
 
-        Publisher Id: {{publisher}}<br>
-        Published: {{published}}<br>
-        Time Published: {{timePublished}}<br>
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">ID</div>
+            <div>{{_id}}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Creator ID</div>
+            <div>{{creator}}</div>
+        </div>
+        
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Time Created</div>
+            <div class="normalize"
+                data-unittype="time"
+                data-unit="unix"
+                data-unitpref="human12hr">
+                {{timeCreated}}
+            </div>
+        </div>
+
+        {{#published}}
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Time Published</div>
+            <div class="normalize"
+                data-unittype="time"
+                data-unit="unix"
+                data-unitpref="human12hr">
+                {{timePublished}}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Publisher ID</div>
+            <div>{{publisher}}</div>
+        </div>
+        {{/published}}
+
+        <hr>
+
         {{#location}}
         <h2>Location</h2>
-        Latitude: {{lat}}<br>
-        Longitude: {{long}}<br>
-        Range: {{range}}<br>
-        Altitude: {{altitude}}<br>
-        Altitude Range: {{altRange}}<br>
+
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Latitude</div>
+            <div class="normalize"
+                data-unittype="location"
+                data-unit="degrees"
+                data-unitpref="degMinSec">
+                {{lat}}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Longitude</div>
+            <div class="normalize"
+                data-unittype="location"
+                data-unit="degrees"
+                data-unitpref="degMinSec">
+                {{long}}
+            </div>
+        </div>
+
+        {{#range}}
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Range</div>
+            <div class="normalize"
+                data-unittype="length"
+                data-unit="meters"
+                data-unitpref="feet">
+                {{.}}
+            </div>
+        </div>
+        {{/range}}
+
+
+        {{#altitude}}
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Altitude</div>
+            <div class="normalize"
+                data-unittype="length"
+                data-unit="meters"
+                data-unitpref="feet">
+                {{.}}
+            </div>
+        </div>
+        {{/altitude}}
+
+        {{#altRange}}
+        <div class="row">
+            <div class="col-xs-4 col-sm-2 text-right">Altitude Range</div>
+            <div class="normalize"
+                data-unittype="length"
+                data-unit="meters"
+                data-unitpref="feet">
+                {{.}}
+            </div>
+        </div>
+        {{/altRange}}
+
         {{/location}}
+
+        <hr>
+
         <h2>Values</h2>
-        {{#values}}
-            Sensor Id: {{sensor}}<br>
-            Type: {{type}}<br>
-            {{{html}}}<br>
-        {{/values}}
-        {{^values}}
+        <div class="row">
+            {{#values}}
+            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                <div class="panel reading-panel">
+                    <a href="/sensors/{{sensor}}" class="extra-small text-muted reading-sid">{{sensor}}</a>
+                    {{{html}}}
+                </div>
+            </div>
+            {{/values}}
+            {{^values}}
             <p>No values found for this reading.</p>
-        {{/values}}
+            {{/values}}
+        </div>
         {{/reading}}
     </div>
 
     <!--scripts-->
+
+    <script src="/js/lib/jQuery.unitnorm.js"></script>
+    <script src="/js/pages/reading.js"></script>
 </body>

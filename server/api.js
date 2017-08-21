@@ -40,6 +40,15 @@ app.get('/api/readings', (req, res) => {
 app.post(`/api/readings`, (req, res) => {
     let query = req.body;
 
+    let queryValidity = Schema.validate('/Query', query);
+    
+    if (!queryValidity) return fail(req, res, {
+        "errorName": "queryValidity",
+        "errorData": {
+            "schemaErrors": Schema.errors()
+        }
+    });
+
     Reading.findQuery(
         query,
         (list) => { res.send(list); },

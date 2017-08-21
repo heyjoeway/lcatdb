@@ -65,6 +65,9 @@ let replacements = [{
     from: "<!--scripts-->",
     to: fs.readFileSync(TEMPLATES_DIR + "scripts.html", "utf8")
 }, {
+    from: "<!--script_map-->",
+    to: fs.readFileSync(TEMPLATES_DIR + "script_map.html", "utf8")
+}, {
     from: "<!--title-->",
     to: TITLE
 }, {

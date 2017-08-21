@@ -1,0 +1,132 @@
+let queries, map, markers, data, mapLoaded = false, dataLoaded = false;
+
+let markerImages = [
+    '/img/map/markerRed.png',
+    '/img/map/markerYellow.png',
+    '/img/map/markerBlue.png',
+    '/img/map/markerGreen.png',
+    '/img/map/markerPurple.png',
+    '/img/map/markerOrange.png',
+    '/img/map/markerCyan.png',
+    '/img/map/markerBrown.png',
+    '/img/map/markerWhite.png',
+    '/img/map/markerGrey.png',
+    '/img/map/markerBlack.png'
+];
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        "zoom": 11,
+        "center": {
+            "lat": 44.57670853058025,
+            "lng": -73.32539651979982
+        },
+        "streetViewControl": false,
+        "mapTypeId": "terrain",
+        "scrollwheel": false
+    });
+
+    mapLoaded = true;
+    updateMap();
+}
+
+function initData() {
+    dataLoaded = false;
+    data = [];
+    let queriesLeft = queries.length;
+
+    queries.forEach((query, arr, i) => {
+        $.post('/api/readings', query, function(dataSet, textStatus) {        
+            if (textStatus == 'success') {
+                data.push(dataSet);
+                queriesLeft--;
+                if (queriesLeft == 0) {
+                    dataLoaded = true;
+                    updateMap();
+                }
+            }
+        });
+    });
+}
+
+function updateMap() {
+    if (!dataLoaded || !mapLoaded) return;
+
+    markers = markers || [];
+    markers.forEach((marker) => {
+        marker.setMap(null);
+    });
+    markers = [];
+
+    // ----
+
+    if (!data || !mapLoaded) return;
+
+    let bounds = new google.maps.LatLngBounds();
+
+    let markerImageIndex = 0;
+
+    data.forEach((dataSet) => {
+        dataSet.forEach((reading) => {
+            let marker = new google.maps.Marker({
+                map: map,
+                icon: markerImages[markerImageIndex]
+            });
+
+            let location = new google.maps.LatLng(
+                reading.location.lat,
+                reading.location.long
+            );
+
+            marker.setPosition(location);
+            bounds.extend(location);
+
+            markers.push(marker);
+        });
+        markerImageIndex = (markerImageIndex + 1) % markerImages.length;
+    });
+
+    map.fitBounds(bounds);
+    let zoomInterval = setTimeout(() => {
+        if (map.getZoom() > 12) map.setZoom(12);
+        else clearInterval(zoomInterval);
+    }, 100);
+}
+
+function init() {
+    // let urlQuery = window.location.split('?')[1];
+    // urlQuerySplit = urlQuery.split(',');
+    // urlQueryObj = {};
+    // urlQuerySplit.forEach((item) => {
+    //     let itemSplit = item.split('=');
+    //     let key = itemSplit[0];
+    //     let val = undefined; 
+        
+    //     if (itemSplit.length > 1)
+    //         val = itemSplit.splice(1).join('=');
+
+    //     urlQueryObj[key] = val;
+    // });
+
+    // if (urlQueryObj.queries) {
+    //     queries = JSON.parse(urlQueryObj.queries);
+    //     initData();
+    // } else {
+    //     console.log("Invalid queries object.");
+    // }
+
+    queries = [{
+        "fields": {
+            "location.lat": 1,
+            "location.long": 1
+        },
+        "sort": [
+            ["_id", -1]
+        ],
+        "page": 1,
+        "pageSize": 50
+    }];
+    initData();
+}
+
+$(init);

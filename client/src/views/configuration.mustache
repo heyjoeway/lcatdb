@@ -66,7 +66,15 @@
         <h3>Sensors</h3>
         <ul class="list-group">
             {{#sensors}}
-            <li class="list-group-item"><a href="/sensors/{{_id}}">{{name}}</a></li>
+            <li class="list-group-item">
+                <div class="row small">
+                    <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
+                    <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
+                </div>
+                <a href="/sensors/{{_id}}">
+                    <span>{{model}} ({{name}})</span>
+                </a>
+            </li>
             {{/sensors}}
             {{^sensors}}
             <p>No sensors found for this configuration.</p>

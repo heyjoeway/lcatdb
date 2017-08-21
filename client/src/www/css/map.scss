@@ -1,0 +1,24 @@
+.page-map {
+    width: 100%;
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        padding-top: 70px;
+        padding-bottom: 16px;
+    }
+
+    &.no-nav .container {
+        padding-top: 16px;
+    }
+
+    #map {
+        height: 100%;
+        flex: 1;
+    }
+}

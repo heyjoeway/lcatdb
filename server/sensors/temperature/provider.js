@@ -28,9 +28,36 @@ exports.inputTemplate = function(user, configuration, sensor) {
 }
 
 exports.outputTemplate = function(user, value) {
-    return `\
-Temperature: ${value.temperature}<br>
-<div class="sensor_output_more">
-    Temperature Range: ${value.temperatureRange}<br>
-</div>`;
+    let html = `
+<h5 class="h-inline">Temperature</h5>
+<div>
+    <span class="normalize"
+        data-unittype="temperature"
+        data-unit="celcius"
+        data-unitpref="farenheit"
+        aria-describedby="${value.sensor}_temperatureLabel">
+        ${value.temperature}
+    </span>
+    &nbsp;
+    <span id="${value.sensor}_temperatureLabel">Celcius</span>
+</div>
+`;
+
+    if (value.temperatureRange)
+        html += `
+<h5 class="h-inline">Temperature Range</h5>
+<div>
+    <span class="normalize"
+        data-unittype="temperature"
+        data-unit="celcius"
+        data-unitpref="farenheit"
+        aria-describedby="${value.sensor}_temperatureRangeLabel">
+        ${value.temperatureRange}
+    </span>
+    &nbsp;
+    <span id="${value.sensor}_temperatureRangeLabel">Celcius</span>
+</div>
+`;
+
+    return html;
 }

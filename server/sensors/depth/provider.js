@@ -32,10 +32,36 @@ exports.inputTemplate = function(user, configuration, sensor) {
 }
 
 exports.outputTemplate = function(user, value) {
-    return `
-Depth: ${value.depth}<br>
-<div class="sensor_output_more">
-    Depth Range: ${value.depthRange}<br>
+    let html = `
+<h5 class="h-inline">Depth</h5>
+<div>
+    <span class="normalize"
+        data-unittype="length"
+        data-unit="meters"
+        data-unitpref="feet"
+        aria-describedby="${value.sensor}_depthLabel">
+        ${value.depth}
+    </span>
+    &nbsp;
+    <span id="${value.sensor}_depthLabel">Meters</span>
 </div>
 `;
+
+    if (value.depthRange)
+        html += `
+<h5 class="h-inline">Depth Range</h5>
+<div>
+    <span class="normalize"
+        data-unittype="length"
+        data-unit="meters"
+        data-unitpref="feet"
+        aria-describedby="${value.sensor}_depthRangeLabel">
+        ${value.depthRange}
+    </span>
+    &nbsp;
+    <span id="${value.sensor}_depthRangeLabel">Meters</span>
+</div>
+`;
+
+    return html;
 }

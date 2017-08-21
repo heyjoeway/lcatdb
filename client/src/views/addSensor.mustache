@@ -8,7 +8,15 @@
     <div id="step-1">
         <ul id="sensors" class="list-group">
             {{#user.sensors}}
-            <a href="#" class="sensor" id="{{_id}}"><li class="list-group-item">{{name}} ({{model}})</li></a>
+            <li class="list-group-item">
+                <div class="row small">
+                    <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
+                    <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
+                </div>
+                <a href="#" class="sensor" id="{{_id}}">
+                    <span>{{model}} ({{name}})</span>
+                </a>
+            </li>
             {{/user.sensors}}
             {{^user.sensors.length}}
             <p>No sensors found.</p>
@@ -51,7 +59,15 @@
         <div class="js">
             <ul id="sensors" class="list-group">
                 {{#user.sensors}}
-                <a href="#" class="sensor" id="{{_id}}"><li class="list-group-item">{{name}} ({{_id}})</li></a>
+            <li class="list-group-item">
+                <div class="row small">
+                    <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
+                    <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
+                </div>
+                <a href="#" class="sensor" id="{{_id}}">
+                    <span>{{model}} ({{name}})</span>
+                </a>
+            </li>
                 {{/user.sensors}}
                 {{^user.sensors.length}}
                 <p>No sensors found.</p>

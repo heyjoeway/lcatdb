@@ -144,6 +144,8 @@ function sessionRender(url, template, allowAnon) {
 sessionRender('/dashboard', 'dashboard');
 sessionRender('/tutorial', 'tutorial');
 sessionRender('/visualize', 'visualize', true);
+sessionRender('/map', 'map', true);
+sessionRender('/map/*', 'map', true);
 
 sessionGet('/tutorial/standard', (req, res, user) => {
     Configurations.getList(user, (list) => {
@@ -358,16 +360,19 @@ function sensorPost(url, success) {
 
 sessionGet('/sensors', (req, res, user) => {
     Sensor.getList(user, 
-        (docs) => { // Success
+        (sensors) => { // Success
+            sensors.forEach((sensor) => {
+                sensor.typeData = SensorTypes.getTypeData(sensor.type);
+            });
             res.render('sensorList', {
-                "sensors": docs,
+                "sensors": sensors,
                 "user": user
             });
         },
         (error) => { // Failure
             res.send(`Unknown error. (${error.type})`);
         },
-        ['name'] // Requirements
+        ['name', 'model', 'type'] // Requirements
     );
 });
 
@@ -582,10 +587,10 @@ sessionGet('/configurations', (req, res, user) => {
 
 let configPattern = '([0-9a-f]{24})';
 
-configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'edits.time', 'owner']);
+configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'sensors.typeData', 'edits.time', 'owner']);
 configurationRender(`/configurations/${configPattern}/tutorial`, 'configurationTutorial', ['sensors', 'sensors.typeData']);
 configurationRender(`/configurations/${configPattern}/edit`, 'configurationEdit');
-configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor', ['user.sensors']);
+configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor', ['user.sensors', 'user.sensors.typeData']);
 configurationRender(`/configurations/${configPattern}/readings`, 'configurationReadingList', ['readings']);
 
 // ------------------------------------
@@ -897,6 +902,6 @@ function readingRender(url, template) {
 
 let readingPattern = '([0-9a-f]{24})';
 
-readingRender(`/readings/${readingPattern}`, 'reading');
+readingRender(`/readings/${readingPattern}`, 'reading', ['values.typeData']);
 
 }; // End init()

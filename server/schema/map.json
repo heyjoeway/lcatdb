@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "properties": {
+        "queries": { 
+            "type": "array",
+            "items": { "$ref": "/ApiQuery" }
+        },
+        "name": { "type": "string" },
+        "urlName": {
+            "type": "string",
+            "pattern": "^.{5,20}$"
+        }
+    },
+    "additionalProperties": false,
+    "required": []
+}

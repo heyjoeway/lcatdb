@@ -490,13 +490,14 @@ exports.mustachify = function(user, configuration, success, failure, needs = [],
                     user.sensors.forEach((sensor) => {
                         sensor.typeData = SensorTypes.getTypeData(sensor.type);
                     });
+                    progress();
                 }
                 progress();
             },
             (error) => { // Failure
                 fail({ "type": "userSensorList", "error": error });
             },
-            ['name', 'model'] // Requirements
+            ['name', 'model', 'type'] // Requirements
         );
     }
 
@@ -520,6 +521,7 @@ exports.mustachify = function(user, configuration, success, failure, needs = [],
     if (needs.includes('readings')) {
         Reading.findConfiguration(configuration['_id'],
             (list) => {
+                console.log("test");
                 list.sort((a, b) => {
                     let timeA = parseInt(a.timeCreated);
                     let timeB = parseInt(b.timeCreated);
