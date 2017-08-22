@@ -80,6 +80,10 @@
                     "from": function(dm) {
                         var degrees = minutes = seconds = 0;
 
+                        var negative = dm.substring(0, 1) == '-';
+
+                        if (negative) dm = dm.substring(1);
+
                         var values = dm.split(' ');
                         for (var i = 0; i < values.length; i++) {
                             var valueStr = values[i];
@@ -96,11 +100,6 @@
                             // ------
 
                             switch(valueUnit) {
-                                case 'deg':
-                                case 'd':
-                                case '\xB0':
-                                    degrees = valueNum;
-                                    break;
                                 case 'min':
                                 case 'm':
                                 case "'":
@@ -110,20 +109,85 @@
                                 case 's':
                                 case '"':
                                     seconds = valueNum;
+                                    break;
+                                case 'deg':
+                                case 'd':
+                                case '\xB0':
                                 default:
+                                    degrees = valueNum;
                                     break;
                             }
                         }
 
-                        return degrees + (minutes / 60) + (seconds / 3600);
+                        return (degrees + (minutes / 60) + (seconds / 3600)) * (negative ? -1 : 1);
                     },
                     "to": function(d) {
+                        var negative = d < 0 ? '-' : '';
+                        d = Math.abs(d);
                         var degrees = Math.floor(d);
                         var minutes = Math.floor((d - degrees) * 60);
                         var seconds = (d - degrees - (minutes / 60)) * 3600;
                         seconds = Math.round(seconds * 100) / 100; // restrict to 2 decimal places
 
-                        var output = degrees + '\xB0 '+ minutes + "' " + seconds + '"';
+                        var output = negative + degrees + '\xB0 '+ minutes + "' " + seconds + '"';
+                        return output;
+                    }
+                },
+                "degMin": {
+                    "name": "Deg Min",
+                    "inputType": "text",
+                    "suffix": "",
+                    "from": function(dm) {
+                        var degrees = minutes = seconds = 0;
+
+                        var negative = dm.substring(0, 1) == '-';
+
+                        if (negative) dm = dm.substring(1);
+
+                        var values = dm.split(' ');
+                        for (var i = 0; i < values.length; i++) {
+                            var valueStr = values[i];
+                            
+                            if (valueStr.trim() == '') continue;
+                            
+                            var valueNum = parseFloat(valueStr);
+
+                            if (isNaN(valueNum)) continue;
+
+                            var valueUnit = valueStr.substring(
+                                valueNum.toString().length);
+
+                            // ------
+
+                            switch(valueUnit) {
+                                case 'min':
+                                case 'm':
+                                case "'":
+                                    minutes = valueNum;
+                                    break;
+                                case 'sec':
+                                case 's':
+                                case '"':
+                                    seconds = valueNum;
+                                    break;
+                                case 'deg':
+                                case 'd':
+                                case '\xB0':
+                                default:
+                                    degrees = valueNum;
+                                    break;
+                            }
+                        }
+
+                        return (degrees + (minutes / 60) + (seconds / 3600)) * (negative ? -1 : 1);
+                    },
+                    "to": function(d) {
+                        var negative = d < 0 ? '-' : '';
+                        d = Math.abs(d);
+                        var degrees = Math.floor(d);
+                        var minutes = Math.round((d - degrees) * 60 * 100) / 100; // restrict to 2 decimal places
+
+                        var output = negative + degrees + '\xB0 '+ minutes + "'";
                         return output;
                     }
                 }
@@ -284,6 +348,8 @@
         $clone.removeAttr('name');
         // also remove id to avoid confusion (!!!!)
         $clone.removeAttr('id');
+        // also remove value
+        $clone.removeAttr('value');
         // remove unit attribute to avoid confusion
         // (unitPref represents clone's unit)
         $clone.removeAttr('data-unit');
@@ -360,7 +426,7 @@
                 cloneUnit,
                 originalUnit,
                 $clone[valMethod]()
-            )).trigger('change.unitnorm', true);//{
+            )).trigger('change', true);//{
                // "originClone": true
             //});
         });
@@ -381,7 +447,7 @@
                 originalUnit,
                 cloneUnit,
                 $original[valMethod]()
-            )).trigger('change.unitnorm', true);
+            )).trigger('change', true);
         });
 
         return true;
