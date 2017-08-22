@@ -14,7 +14,7 @@ const Ajv = require('ajv');
 
 // WARNING
 // removeAdditional will modify validated data in place, removing any 
-// additional properties (in areas where additionalProperties: true exists)
+// additional properties (in areas where additionalProperties: false exists
 // in the relevant schema).
 // Same with coerceTypes.
 // USE WITH CAUTION

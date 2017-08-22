@@ -521,7 +521,6 @@ exports.mustachify = function(user, configuration, success, failure, needs = [],
     if (needs.includes('readings')) {
         Reading.findConfiguration(configuration['_id'],
             (list) => {
-                console.log("test");
                 list.sort((a, b) => {
                     let timeA = parseInt(a.timeCreated);
                     let timeB = parseInt(b.timeCreated);

@@ -3,7 +3,6 @@
     "type": "object",
     "properties": {
         "filter": {
-            "type": "object",
             "properties": {
                 "$gt": { "type": "number" },
                 "$gte": { "type": "number" },

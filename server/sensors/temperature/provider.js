@@ -27,7 +27,7 @@ exports.inputTemplate = function(user, configuration, sensor) {
 </div>`;
 }
 
-exports.outputTemplate = function(user, value) {
+exports.outputTemplate = function(value, user) {
     let html = `
 <h5 class="h-inline">Temperature</h5>
 <div>
@@ -36,14 +36,14 @@ exports.outputTemplate = function(user, value) {
         data-unit="celcius"
         data-unitpref="farenheit"
         aria-describedby="${value.sensor}_temperatureLabel">
-        ${value.temperature}
+        ${value.data.temperature}
     </span>
     &nbsp;
     <span id="${value.sensor}_temperatureLabel">Celcius</span>
 </div>
 `;
 
-    if (value.temperatureRange)
+    if (value.data.temperatureRange)
         html += `
 <h5 class="h-inline">Temperature Range</h5>
 <div>
@@ -52,7 +52,7 @@ exports.outputTemplate = function(user, value) {
         data-unit="celcius"
         data-unitpref="farenheit"
         aria-describedby="${value.sensor}_temperatureRangeLabel">
-        ${value.temperatureRange}
+        ${value.data.temperatureRange}
     </span>
     &nbsp;
     <span id="${value.sensor}_temperatureRangeLabel">Celcius</span>

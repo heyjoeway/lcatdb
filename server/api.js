@@ -40,7 +40,7 @@ app.get('/api/readings', (req, res) => {
 app.post(`/api/readings`, (req, res) => {
     let query = req.body;
 
-    let queryValidity = Schema.validate('/Query', query);
+    let queryValidity = Schema.validate('/ApiQuery', query);
     
     if (!queryValidity) return fail(req, res, {
         "errorName": "queryValidity",
@@ -49,11 +49,22 @@ app.post(`/api/readings`, (req, res) => {
         }
     });
 
-    Reading.findQuery(
-        query,
-        (list) => { res.send(list); },
-        (error) => { fail(req, res, error ); }
-    );
+    query.filter = query.filter || {};
+
+    if (query.filter['_id']) {
+        Reading.find(
+            query.filter['_id'],
+            (reading) => { res.send([reading]); },
+            (error) => { fail(req, res, error ); }
+        )
+    } else {
+        Reading.findQuery(
+            query,
+            (list) => { res.send(list); },
+            (error) => { fail(req, res, error ); }
+        );
+    }
+
 });
 
 // app.get('/api/sensorTypes/*', (req, res) => {

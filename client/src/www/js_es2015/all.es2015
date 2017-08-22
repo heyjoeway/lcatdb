@@ -1,7 +1,57 @@
 $(() => {
     $('.js').removeClass('js');
     $('.no-js').hide();
+
+    $('#map-time-picker').change(function() {
+        let queryObj = urlQueryObj($('#map-time').attr('src'));
+        queryObj.timeAgo = $(this).val();
+        let newUrl = '/map?';
+
+        Object.keys(queryObj).forEach((key) => {
+            newUrl += key + '=' + queryObj[key] + ',';
+        });
+
+        newUrl = newUrl.substring(0, newUrl.length - 1);
+
+        $('#map-time').attr('src', newUrl);
+    });
+
+    $('#map-user-picker').change(function() {
+        let queryObj = urlQueryObj($('#map-time').attr('src'));
+        let creator = $(this).val();
+        if (creator == 'all') delete queryObj.creator;
+        else queryObj.creator = creator;
+        let newUrl = '/map?';
+
+        Object.keys(queryObj).forEach((key) => {
+            newUrl += key + '=' + queryObj[key] + ',';
+        });
+
+        newUrl = newUrl.substring(0, newUrl.length - 1);
+
+        $('#map-time').attr('src', newUrl);
+    });
 });
+
+function urlQueryObj(url) {
+    let query = url.split('?')[1];
+    let obj = {};
+    if (query) {
+        let querySplit = query.split(',');
+        querySplit.forEach((item) => {
+            let itemSplit = item.split('=');
+            let key = itemSplit[0];
+            let val = undefined; 
+            
+            if (itemSplit.length > 1)
+                val = itemSplit.splice(1).join('=');
+
+            obj[key] = val;
+        });
+    }
+
+    return obj;
+}
 
 function modal(title, url, callback) {
     let $element = $('<div></div>');

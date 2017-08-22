@@ -22,10 +22,19 @@
     </div>
     <br>
     <div class="container text-center js">
-        <h4>Last 50 Submissions</h4>
+        <h5 class="h-inline">View readings from the last&nbsp;</h5>
+        <select id="map-time-picker" class="selectpicker">
+            <option value="86400">24 Hours</option>
+            <option value="172800">48 Hours</option>
+            <option value="604800">1 Week</option>
+            <option value="1209600">2 Weeks</option>
+            <option value="3024000">5 Weeks</option>
+            <option value="6048000">10 Weeks</option>
+            <option value="31557600">1 Year</option>
+        </select>
         <br>
-        <iframe class="map-dashboard map-iframe" src="/map?embed=true"></iframe>
-    </div>
+        <iframe id="map-time" class="map-iframe" src="/map?embed=true,timeAgo=86400"></iframe>
+</div>
     <br>
     <div class="container text-center">
         <h4><!--title--> is supported by:</h4>

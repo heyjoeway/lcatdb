@@ -1,4 +1,5 @@
 @import "./lib/bootstrap/bootstrap";
+@import "./lib/bootstrap/bootstrap-select";
 @import "./lib/bootstrap/bootstrap-xxs";
 @import "./lib/bootstrap/bootstrap-datetimepicker";
 
@@ -92,4 +93,9 @@ body:not(.no-nav) {
 
 .extra-small {
     font-size: 65%;
+}
+
+.bootstrap-select {
+    width: 140px !important;
+    margin-bottom: 10px;
 }

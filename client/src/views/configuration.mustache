@@ -88,6 +88,22 @@
 
         <hr>
 
+        <h3 class="h-inline">Map</h3>
+        &nbsp;&nbsp;
+        <select id="map-time-picker" class="selectpicker">
+            <option value="86400">Last 24 Hours</option>
+            <option value="172800">Last 48 Hours</option>
+            <option value="604800">Last 1 Week</option>
+            <option value="1209600">Last 2 Weeks</option>
+            <option value="3024000">Last 5 Weeks</option>
+            <option value="6048000">Last 10 Weeks</option>
+            <option value="31557600">Last 1 Year</option>
+        </select>
+        <br>
+        <iframe id="map-time" class="map-iframe" src="/map?embed=true,configuration={{_id}},timeAgo=86400"></iframe>
+
+        <hr>
+
         <h3>Edits</h3>
         <ul class="list-group">
             {{#edits}}

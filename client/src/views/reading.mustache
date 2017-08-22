@@ -9,138 +9,149 @@
 
     <div class="container">
         {{#reading}}
-        <br>
-        <h2 class="h-inline">Reading</h2>
-        {{#user}}
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="/configurations/{{configuration}}/reading" class="btn btn-primary">
-            Submit New Reading
-        </a>
-        &nbsp;&nbsp;
-        <a href="/configurations/{{configuration}}" class="btn btn-sm btn-secondary">
-            View Configuration
-        </a>
-        {{/user}}
-        <br>
-
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">ID</div>
-            <div>{{_id}}</div>
-        </div>
+            <div class="col-xs-12 col-sm-6">
+                <br>
+                <h2 class="h-inline">Reading</h2>
+                {{#user}}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="/configurations/{{configuration}}/reading" class="btn btn-primary">
+                    Submit New Reading
+                </a>
+                &nbsp;&nbsp;
+                <a href="/configurations/{{configuration}}" class="btn btn-sm btn-secondary">
+                    View Configuration
+                </a>
+                {{/user}}
+                <br>
 
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Creator ID</div>
-            <div>{{creator}}</div>
-        </div>
-        
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Time Created</div>
-            <div class="normalize"
-                data-unittype="time"
-                data-unit="unix"
-                data-unitpref="human12hr">
-                {{timeCreated}}
-            </div>
-        </div>
-
-        {{#published}}
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Time Published</div>
-            <div class="normalize"
-                data-unittype="time"
-                data-unit="unix"
-                data-unitpref="human12hr">
-                {{timePublished}}
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Publisher ID</div>
-            <div>{{publisher}}</div>
-        </div>
-        {{/published}}
-
-        <hr>
-
-        {{#location}}
-        <h2>Location</h2>
-
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Latitude</div>
-            <div class="normalize"
-                data-unittype="location"
-                data-unit="degrees"
-                data-unitpref="degMinSec">
-                {{lat}}
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Longitude</div>
-            <div class="normalize"
-                data-unittype="location"
-                data-unit="degrees"
-                data-unitpref="degMinSec">
-                {{long}}
-            </div>
-        </div>
-
-        {{#range}}
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Range</div>
-            <div class="normalize"
-                data-unittype="length"
-                data-unit="meters"
-                data-unitpref="feet">
-                {{.}}
-            </div>
-        </div>
-        {{/range}}
-
-
-        {{#altitude}}
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Altitude</div>
-            <div class="normalize"
-                data-unittype="length"
-                data-unit="meters"
-                data-unitpref="feet">
-                {{.}}
-            </div>
-        </div>
-        {{/altitude}}
-
-        {{#altRange}}
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Altitude Range</div>
-            <div class="normalize"
-                data-unittype="length"
-                data-unit="meters"
-                data-unitpref="feet">
-                {{.}}
-            </div>
-        </div>
-        {{/altRange}}
-
-        {{/location}}
-
-        <hr>
-
-        <h2>Values</h2>
-        <div class="row">
-            {{#values}}
-            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                <div class="panel reading-panel">
-                    <a href="/sensors/{{sensor}}" class="extra-small text-muted reading-sid">{{sensor}}</a>
-                    {{{html}}}
+                <div class="row">
+                    <div class="col-xs-4 text-right">ID</div>
+                    <div>{{_id}}</div>
                 </div>
+
+                <div class="row">
+                    <div class="col-xs-4 text-right">Creator ID</div>
+                    <div>{{creator}}</div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-xs-4 text-right">Time Created</div>
+                    <div class="normalize"
+                        data-unittype="time"
+                        data-unit="unix"
+                        data-unitpref="human12hr">
+                        {{timeCreated}}
+                    </div>
+                </div>
+
+                {{#published}}
+                <div class="row">
+                    <div class="col-xs-4 text-right">Time Published</div>
+                    <div class="normalize"
+                        data-unittype="time"
+                        data-unit="unix"
+                        data-unitpref="human12hr">
+                        {{timePublished}}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-4 text-right">Publisher ID</div>
+                    <div>{{publisher}}</div>
+                </div>
+                {{/published}}
+
+                <hr>
+
+                {{#location}}
+                <h2>Location</h2>
+
+                <div class="row">
+                    <div class="col-xs-4 text-right">Latitude</div>
+                    <div class="normalize"
+                        data-unittype="location"
+                        data-unit="degrees"
+                        data-unitpref="degMinSec">
+                        {{lat}}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-4 text-right">Longitude</div>
+                    <div class="normalize"
+                        data-unittype="location"
+                        data-unit="degrees"
+                        data-unitpref="degMinSec">
+                        {{long}}
+                    </div>
+                </div>
+
+                {{#range}}
+                <div class="row">
+                    <div class="col-xs-4 text-right">Range</div>
+                    <div class="normalize"
+                        data-unittype="length"
+                        data-unit="meters"
+                        data-unitpref="feet">
+                        {{.}}
+                    </div>
+                </div>
+                {{/range}}
+
+
+                {{#altitude}}
+                <div class="row">
+                    <div class="col-xs-4 text-right">Altitude</div>
+                    <div class="normalize"
+                        data-unittype="length"
+                        data-unit="meters"
+                        data-unitpref="feet">
+                        {{.}}
+                    </div>
+                </div>
+                {{/altitude}}
+
+                {{#altRange}}
+                <div class="row">
+                    <div class="col-xs-4 text-right">Altitude Range</div>
+                    <div class="normalize"
+                        data-unittype="length"
+                        data-unit="meters"
+                        data-unitpref="feet">
+                        {{.}}
+                    </div>
+                </div>
+                {{/altRange}}
+
+                {{/location}}
+
+                <hr>
+
+                <h2>Values</h2>
+                <div class="row">
+                    {{#values}}
+                    <div class="col-lg-6 col-xs-12">
+                        <div class="panel reading-panel">
+                            <a href="/sensors/{{sensor}}" class="extra-small text-muted reading-sid">{{sensor}}</a>
+                            {{{html}}}
+                        </div>
+                    </div>
+                    {{/values}}
+                    {{^values}}
+                    <p>No values found for this reading.</p>
+                    {{/values}}
+                </div>
+                
+                <hr>
             </div>
-            {{/values}}
-            {{^values}}
-            <p>No values found for this reading.</p>
-            {{/values}}
-        </div>
+            <div class="col-xs-12 col-sm-6">
+                <h3>Map</h3>
+                <iframe class="map-iframe" src="/map?embed=true,id={{_id}}"></iframe>
+                <br><br>
+            </div>
         {{/reading}}
+        </div>
     </div>
 
     <!--scripts-->
@@ -156,7 +167,7 @@
     <base target="_blank">
 </head>
 <body class="no-nav">
-    <div class="map-markerInfo">
+    <div class="map-marker-info">
         {{#reading}}
         <h5 class="h-inline">Reading</h5>
         &nbsp;&nbsp;
@@ -164,6 +175,14 @@
             More Info
         </a>
         <br>
+        <div>
+            <span class="normalize"
+                data-unittype="time"
+                data-unit="unix"
+                data-unitpref="human12hr">
+                {{timeCreated}}
+            </span>
+        </div>
         <div>
             <strong>Latitude</strong> &bull; 
             <span class="normalize"

@@ -8,9 +8,8 @@
 
     <div class="container">
         <div class="row">
-            <!-- <div class="col-xs-12 col-sm-6 col-md-5"> -->
-            <div class="col-xs-12 text-center">
-                {{#user}}
+            {{#user}}
+             <div class="col-xs-12 col-sm-6 col-md-5"> 
                 <h3>Welcome, {{username}}!</h3>
                 <h4>What would you like to do?</h4>
                 <a href="/configurations?reading"><div class="btn btn-image">
@@ -28,12 +27,29 @@
                     <div class="btn-image-short">View Configurations</div>
                 </div></a>
                 <br>
-                {{/user}}
             </div>
-            <!-- <div class="col-xs-12 col-sm-6 col-md-7">
-                <h3>Map</h3>
-                <iframe class="map-dashboard map-iframe" src="/map?embed=true"></iframe>
-            </div> -->
+            <div class="col-xs-12 col-sm-6 col-md-7">
+                <br>
+                <h3 class="h-inline">Map</h3>
+                &nbsp;&nbsp;
+                <select id="map-user-picker" class="selectpicker">
+                    <option value="all">All Users</option>
+                    <option value="{{_id}}">Just Me</option>
+                </select>
+                &nbsp;&nbsp;
+                <select id="map-time-picker" class="selectpicker">
+                    <option value="86400">Last 24 Hours</option>
+                    <option value="172800">Last 48 Hours</option>
+                    <option value="604800">Last 1 Week</option>
+                    <option value="1209600">Last 2 Weeks</option>
+                    <option value="3024000">Last 5 Weeks</option>
+                    <option value="6048000">Last 10 Weeks</option>
+                    <option value="31557600">Last 1 Year</option>
+                </select>
+                <br>
+                <iframe id="map-time" class="map-iframe" src="/map?embed=true,timeAgo=86400"></iframe>
+            </div>
+            {{/user}}
         </div>
     </div>
 

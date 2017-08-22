@@ -180,8 +180,6 @@ function sessionTest(req, res, success, allowAnon) {
         res.redirect('/login');
     }
 
-    console.log(allowAnon);
-
     if (req.session && req.session.oid) {
         let oid = Utils.testOid(req.session.oid, fail);
         if (!oid) return;
@@ -697,10 +695,6 @@ configurationPost(`/configurations/${configPattern}/readingDo`, (req, res, user,
 
     // Reorganize Sensor data
 
-    // let rawData = req.body;
-    // console.log(rawData);
-    
-
     function setPath(obj, path, val) {
         let pathArray = path.split('.');
         let lastCrumb = pathArray.pop();
@@ -875,7 +869,7 @@ function readingRender(url, template, allowAnon) {
         reading.values.forEach((value) => {
             try {
                 value.html = SensorTypes.getOutputTemplate(
-                    value.type, user, value.data
+                    value, user,
                 );
             } catch(e) {
                 value.html = '<span class="error">ERROR: Could not retrieve template for value.</span>';

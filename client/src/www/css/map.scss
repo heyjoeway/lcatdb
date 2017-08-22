@@ -30,15 +30,17 @@
     } 
 }
 
-.map-markerInfo {
+.map-marker-info {
     padding-top: 3px;
 }
 
 .map-iframe {
     width: 100%;
+    min-height: 500px;
     border: none;
 }
 
-.map-dashboard {
-    height: 500px;
+.map-marker-iframe {
+    width: 100%;
+    border: none;
 }

@@ -31,7 +31,7 @@ exports.inputTemplate = function(user, configuration, sensor) {
 </div>`;
 }
 
-exports.outputTemplate = function(user, value) {
+exports.outputTemplate = function(value, user) {
     let html = `
 <h5 class="h-inline">Depth</h5>
 <div>
@@ -40,14 +40,14 @@ exports.outputTemplate = function(user, value) {
         data-unit="meters"
         data-unitpref="feet"
         aria-describedby="${value.sensor}_depthLabel">
-        ${value.depth}
+        ${value.data.depth}
     </span>
     &nbsp;
     <span id="${value.sensor}_depthLabel">Meters</span>
 </div>
 `;
 
-    if (value.depthRange)
+    if (value.data.depthRange)
         html += `
 <h5 class="h-inline">Depth Range</h5>
 <div>
@@ -56,7 +56,7 @@ exports.outputTemplate = function(user, value) {
         data-unit="meters"
         data-unitpref="feet"
         aria-describedby="${value.sensor}_depthRangeLabel">
-        ${value.depthRange}
+        ${value.data.depthRange}
     </span>
     &nbsp;
     <span id="${value.sensor}_depthRangeLabel">Meters</span>

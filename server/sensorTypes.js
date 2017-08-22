@@ -60,9 +60,10 @@ exports.getInputTemplate = function(type, user, configuration, sensor) {
     );
 };
 
-exports.getOutputTemplate = function(type, user, value) {
+exports.getOutputTemplate = function(value, user) {
+    let type = value.type;
     return types[type].provider.outputTemplate(
-        user, value
+        value, user
     );
 };
 
