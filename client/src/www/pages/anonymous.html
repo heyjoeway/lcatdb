@@ -24,7 +24,7 @@
             <div id="notExists" style="display:none">
                 <p>Your anonymous identity is as follows:</p>
 
-                <form id="form" class="container" action="/registerdo?quick" method="post" autocomplete="off">
+                <form id="form" class="container" action="/registerdo?quick" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
@@ -44,7 +44,7 @@
                         <label class="control-label" for="timezone">
                             Timezone
                         </label>
-                        <select class="hide form-control" value="-5" name="timezone">
+                        <select class="form-control" value="-5" name="timezone">
                             <option value="-5">EST - Eastern Standard Time (GMT-5:00)</option>
                             <option value="-5">IET - Indiana Eastern Standard Time (GMT-5:00)</option>
                             <option value="-4">PRT - Puerto Rico and US Virgin Islands Time (GMT-4:00)</option>
@@ -88,7 +88,7 @@
             <div id="exists" style="display:none">
                 <p>Your browser has this identity currently stored:</p>
                 
-                <form id="formExists" class="container" action="/logindo" method="post" autocomplete="off">
+                <form id="formExists" class="container" action="/logindo" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username

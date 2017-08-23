@@ -33,32 +33,32 @@ exports.inputTemplate = function(user, configuration, sensor) {
 
 exports.outputTemplate = function(value, user) {
     let html = `
-<h5 class="h-inline">Depth</h5>
-<div>
+<div class="value-title">Depth</div>
+<div class="value-var">
     <span class="normalize"
         data-unittype="length"
         data-unit="meters"
         data-unitpref="feet"
+        data-unitround="2"
         aria-describedby="${value.sensor}_depthLabel">
         ${value.data.depth}
-    </span>
-    &nbsp;
+    </span>&nbsp;
     <span id="${value.sensor}_depthLabel">Meters</span>
 </div>
 `;
 
     if (value.data.depthRange)
         html += `
-<h5 class="h-inline">Depth Range</h5>
-<div>
+<div class="value-title">Depth Range</div>
+<div class="value-var">
     <span class="normalize"
         data-unittype="length"
         data-unit="meters"
         data-unitpref="feet"
+        data-unitround="2"
         aria-describedby="${value.sensor}_depthRangeLabel">
         ${value.data.depthRange}
-    </span>
-    &nbsp;
+    </span>&nbsp;
     <span id="${value.sensor}_depthRangeLabel">Meters</span>
 </div>
 `;

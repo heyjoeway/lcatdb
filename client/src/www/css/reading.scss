@@ -8,3 +8,26 @@
     right: 8px;
     top: 8px;
 }
+
+.value-title {
+    font-size: 20px;
+}
+
+.reading-mini {
+    padding-top: 3px;
+
+
+    .value-title {
+        font-size: 13px;
+        font-weight: bold;
+        display: inline-block;
+
+        &::after {
+            content: " \2022 "
+        }
+    }
+
+    .value-var {
+        display: inline-block;        
+    }
+}

@@ -29,8 +29,8 @@ exports.inputTemplate = function(user, configuration, sensor) {
 
 exports.outputTemplate = function(value, user) {
     let html = `
-<h5 class="h-inline">Temperature</h5>
-<div>
+<div class="value-title">Temperature</div>
+<div class="value-var">
     <span class="normalize"
         data-unittype="temperature"
         data-unit="celcius"
@@ -45,8 +45,8 @@ exports.outputTemplate = function(value, user) {
 
     if (value.data.temperatureRange)
         html += `
-<h5 class="h-inline">Temperature Range</h5>
-<div>
+<div class="value-title">Temperature Range</div>
+<div class="value-var">
     <span class="normalize"
         data-unittype="temperature"
         data-unit="celcius"

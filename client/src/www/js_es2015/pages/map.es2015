@@ -66,6 +66,7 @@ function updateMap() {
 
     let markerImageIndex = 0;
 
+    let dataEmpty = true;
 
     data.forEach((dataSet) => {
         dataSet.forEach((reading) => {
@@ -98,9 +99,13 @@ function updateMap() {
             bounds.extend(location);
 
             markers.push(marker);
+
+            dataEmpty = false;
         });
         markerImageIndex = (markerImageIndex + 1) % markerImages.length;
     });
+
+    if (dataEmpty) return;
 
     map.fitBounds(bounds);
     let zoomInterval = setTimeout(() => {
