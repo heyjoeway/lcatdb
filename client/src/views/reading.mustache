@@ -93,7 +93,7 @@
                     <div class="normalize"
                         data-unittype="length"
                         data-unit="meters"
-                        data-unitpref="feet">
+                        data-unitprefsystem="imperial">
                         {{.}}
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                     <div class="normalize"
                         data-unittype="length"
                         data-unit="meters"
-                        data-unitpref="feet">
+                        data-unitprefsystem="imperial">
                         {{.}}
                     </div>
                 </div>
@@ -118,7 +118,7 @@
                     <div class="normalize"
                         data-unittype="length"
                         data-unit="meters"
-                        data-unitpref="feet">
+                        data-unitprefsystem="imperial">
                         {{.}}
                     </div>
                 </div>
@@ -128,7 +128,12 @@
 
                 <hr>
 
-                <h2>Values</h2>
+                <h2 class="h-inline">Values</h2>
+                &nbsp;&nbsp;&nbsp;
+                <select id="unit-system-picker" class="selectpicker">
+                    <option value="imperial" selected="selected">Imperial Units</option>
+                    <option value="metric">Metric Units</option>
+                </select>
                 <div class="row">
                     {{#values}}
                     <div class="col-lg-6 col-xs-12">
@@ -155,9 +160,6 @@
     </div>
 
     <!--scripts-->
-
-    <script src="/js/lib/jQuery.unitnorm.js"></script>
-    <script src="/js/pages/reading.js"></script>
 </body>
 {{/query.marker}}
 {{#query.marker}}
@@ -209,8 +211,5 @@
     </div>
 
     <!--scripts-->
-
-    <script src="/js/lib/jQuery.unitnorm.js"></script>
-    <script src="/js/pages/reading.js"></script>
 </body>
 {{/query.marker}}

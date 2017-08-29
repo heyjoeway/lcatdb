@@ -36,10 +36,14 @@
                 "properties": {
                     "uid": { "$ref": "/Definitions#/definitions/oid" },
                     "time": { "$ref": "/Definitions#/definitions/time" },
-                    "changes": { "$ref": "/ConfigurationEdit#" }
+                    "changes": { "$ref": "/ConfigurationEdit#" },
+                    "removeSensors": {
+                        "type": "array",
+                        "items": { "$ref": "/Definitions#/definitions/oid" }
+                    }
                 },
                 "additionalProperties": false,
-                "required": ["time"]    
+                "required": ["time", "uid"]    
             },
             "default": []
         }

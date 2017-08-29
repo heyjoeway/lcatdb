@@ -153,7 +153,7 @@ exports.getSensorList = function(configuration, success, failure, reqs) {
 
 exports.new = function(user, success, failure) {
     function fail(error) {
-
+        failure(error);
     }
 
     let configurations = Db.collection('configurations');
@@ -175,6 +175,7 @@ exports.new = function(user, success, failure) {
                 "newConfiguration": newConfiguration,
                 "errorInternal": err
             });
+            fail(err)
             return;
         }
         Winston.debug('Successfully registered new configuration.', {
@@ -201,7 +202,17 @@ exports.new = function(user, success, failure) {
  * @param {function} failure - Callback to be run upon failure.
  */
 
-exports.edit = function(user, cid, edit, success, failure) {
+/*
+    ctx requirements:
+    {
+        user: [user object],
+        cid: [configuration id],
+        edit: [edit data],
+        removeSensors: [array of sensor ids]
+    }
+*/
+
+exports.edit = function(ctx, success, failure) {
     function fail(error) {
         Winston.debug("Failed to edit configuration.", {
             "username": user.username,
@@ -213,9 +224,19 @@ exports.edit = function(user, cid, edit, success, failure) {
         failure(error);
     }
 
-    // ----
+    [
+        user,
+        cid,
+        edit,
+        removeSensors
+    ] = [
+        ctx.user,
+        Utils.testOid(ctx.cid, fail),
+        ctx.edit,
+        ctx.removeSensors
+    ];
 
-    cid = Utils.testOid(cid, fail);
+    if (!user) return;
     if (!cid) return;
 
     // ----
@@ -253,11 +274,26 @@ exports.edit = function(user, cid, edit, success, failure) {
             arrayMerge: (dest, src) => { return dest.concat(src) }
         });
 
-        configuration.edits.push({
+        let editLog = {
             "uid": ObjectId(user['_id']).toString(),
             "time": Date.now(),
             "changes": edit
-        });
+        };
+
+        if (removeSensors) {
+            editLog.removeSensors = removeSensors;
+            removeSensors.forEach((sid) => {
+                sid = Utils.testOid(sid);
+                if (sid) {
+                    let sidString = sid.toString();
+                    let sidIndex = configuration.sensors.indexOf(sidString);
+                    if (sidIndex > -1)
+                        configuration.sensors.splice(sidIndex, 1);
+                }
+            });
+        }
+
+        configuration.edits.push(editLog);
 
         let completeValidity = Schema.validate('/Configuration', configuration);
         

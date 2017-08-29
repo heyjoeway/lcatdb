@@ -36,6 +36,7 @@ function initData() {
     let queriesLeft = queries.length;
 
     queries.forEach((query, arr, i) => {
+
         $.post('/api/readings', query, function(dataSet, textStatus) {        
             if (textStatus == 'success') {
                 data.push(dataSet);
@@ -118,8 +119,7 @@ function init() {
     let queryObj = urlQueryObj(window.location.toString());
 
     if (queryObj.queries) {
-        queries = JSON.parse(queryObj.queries);
-        initData();
+        queries = JSURL.parse(queryObj.queries);
     } else {
         let query = {
             "fields": {

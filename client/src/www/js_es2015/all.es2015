@@ -31,7 +31,35 @@ $(() => {
 
         $('#map-time').attr('src', newUrl);
     });
+
+    let unitSystem = localStorage.unitSystem;
+    
+    if (!unitSystem) {
+        unitSystem = 'imperial';
+        localStorage.unitSystem = 'imperial';
+    }
+
+    changeUnitSystem(unitSystem);
+
+    $('#unit-system-picker').change(function() {
+        let system = $(this).val();
+        changeUnitSystem(system);
+    });
 });
+
+function changeUnitSystem(system) {
+    let $normalize = $('.normalize');
+    $normalize.unitnorm('deinit');
+    $normalize.each(function() {
+        let $this = $(this);
+        let currentSystem = $this.data('unitprefsystem');
+        if (currentSystem)
+            $this.attr('data-unitprefsystem', system);
+    });
+    $normalize.unitnorm();
+    localStorage.unitSystem = system;
+    $('#unit-system-picker').val(system);
+}
 
 function urlQueryObj(url) {
     let query = url.split('?')[1];

@@ -546,7 +546,48 @@ class Graph {
 
 }
 
+class GraphMap extends Graph {
+    static get typeName() { return "Map"; }
+
+    defaultProps() {
+        return { };
+    }
+
+    constructor(data) {
+        super(data);
+        this.type = "map";
+    }
+
+    propsToControls() {
+        super.propsToControls();
+        $('.graph_typeprefs#map').show();
+    }
+
+    getData(callback) {
+        this.data = [];
+
+        this.sets.forEach((set) => {
+            let query = set.propsToQuery();
+            this.data.push(query);
+        });
+
+        callback(this.data);
+    }
+
+    createGraph() {
+        let queries = JSURL.stringify(this.data);
+        let url ="/map?embed=true,queries=" + queries;
+        let $element = $('<iframe></iframe>', {
+            "class": "graph_map map-iframe",
+            "src": url
+        });
+        return $element;
+    }
+}
+
 class GraphQuery extends Graph {
+    static get typeName() { return "Query"; }
+
     defaultProps() {
         return { };
     }
@@ -582,6 +623,8 @@ class GraphQuery extends Graph {
 }
 
 class GraphRaw extends Graph {
+    static get typeName() { return "Raw"; }
+
     defaultProps() {
         return { };
     }
@@ -606,6 +649,8 @@ class GraphRaw extends Graph {
 }
 
 class Graph2d extends Graph {
+    static get typeName() { return "2-D Plot"; }
+
     defaultProps() {
         return {
             "x": {
@@ -737,6 +782,7 @@ class Graph2d extends Graph {
 
 const graphTypeDict = {
     "2d": Graph2d,
+    "map": GraphMap,
     "raw": GraphRaw,
     "query": GraphQuery
 }
@@ -809,7 +855,7 @@ class GraphManager {
         let graphType = graphTypeDict[type];
 
         this.graphs.push(new graphType(
-            "Graph " + (this.nameCounter++)
+            `Graph ${this.nameCounter++} (${graphType.typeName})`
         ));
         this.switchGraph(this.graphs.length - 1);
     }

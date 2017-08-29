@@ -124,7 +124,7 @@ config.htmlmin.views = {
 config.babel = {
     options: {
         sourceMap: true,
-        presets: ['babel-preset-es2015']
+        presets: ['env']
     }
 };
 config.babel.www = {

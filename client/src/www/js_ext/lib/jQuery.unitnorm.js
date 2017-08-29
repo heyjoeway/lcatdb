@@ -18,6 +18,10 @@
             "name": "Length",
             "suffix": "",
             "base": "meters",
+            "systems": {
+                "imperial": "feet",
+                "metric": "meters"
+            },
             "units": {
                 "meters": {
                     "name": "Meters",
@@ -37,6 +41,10 @@
             "name": "Temperature",
             "suffix": "°",
             "base": "celcius",
+            "systems": {
+                "imperial": "farenheit",
+                "metric": "celcius"
+            },
             "units": {
                 "celcius": {
                     "name": "Celcius",
@@ -283,9 +291,14 @@
         return types[type].units[unit].to(val)
     }
 
-    function convertUnit(type, unitIn, unitOut, val) {
+    function convertUnit(type, unitIn, unitOut, val, round) {
         var base = toBase(type, unitIn, val);
-        return toUnit(type, unitOut, base);
+        var result = toUnit(type, unitOut, base);
+        if (round) {
+            let roundMultiplier = Math.pow(10, round);
+            result = Math.round(result * roundMultiplier) / roundMultiplier;
+        }
+        return result;
     }
 
     var suppressErrors = 0;
@@ -346,7 +359,7 @@
         $clone.data('unitnorm-original', $original);
         // remvove name so that the clone doesn't get submitted
         $clone.removeAttr('name');
-        // also remove id to avoid confusion (!!!!)
+        // also remove id from clone to avoid confusion (!!!!)
         $clone.removeAttr('id');
         // also remove value
         $clone.removeAttr('value');
@@ -355,19 +368,30 @@
         $clone.removeAttr('data-unit');
 
         var cloneUnit = $clone.data('unitpref');
+        var cloneUnitSystem = $clone.data('unitprefsystem');
+
+        // if unit is specified via system, change unit to reflect that
+        if (cloneUnitSystem) {
+            cloneUnit = types[unitType].systems[cloneUnitSystem];
+            $clone.data('unitpref', cloneUnit);
+        }
+
         if (valMethod == 'val') {
             var newInputType = types[unitType].units[cloneUnit].inputType;
             if (newInputType) $clone.attr('type', newInputType);
         }
-
+        
         // -----
-
+ 
         // if the original field already has a value, make sure to convert it for the new field 
+        var unitRound = parseInt($original.data('unitround'));
+
         $clone[valMethod](convertUnit(
             unitType,
             originalUnit,
             cloneUnit,
-            $original[valMethod]()
+            $original[valMethod](),
+            unitRound
         ));
 
         // fix min and max values on clone
@@ -380,7 +404,8 @@
                 unitType,
                 originalUnit,
                 cloneUnit,
-                originalMin
+                originalMin,
+                unitRound
             ));
 
         if (typeof originalMax != 'undefined')
@@ -388,7 +413,8 @@
                 unitType,
                 originalUnit,
                 cloneUnit,
-                originalMax
+                originalMax,
+                unitRound
             ));
 
         // -----
@@ -419,6 +445,7 @@
 
             var unitType = $clone.data('unittype');
             var cloneUnit = $clone.data('unitpref');
+
             var originalUnit = $original.data('unit');
 
             $original[valMethod](convertUnit(
@@ -426,9 +453,7 @@
                 cloneUnit,
                 originalUnit,
                 $clone[valMethod]()
-            )).trigger('change', true);//{
-               // "originClone": true
-            //});
+            )).trigger('change', true);
         });
 
         $original.on('change.unitnorm', function(e, originClone) {
@@ -441,12 +466,14 @@
             var unitType = $clone.data('unittype');
             var cloneUnit = $clone.data('unitpref');
             var originalUnit = $original.data('unit');
+            var unitRound = parseInt($original.data('unitround'));
 
             $clone[valMethod](convertUnit(
                 unitType,
                 originalUnit,
                 cloneUnit,
-                $original[valMethod]()
+                $original[valMethod](),
+                unitRound
             )).trigger('change', true);
         });
 

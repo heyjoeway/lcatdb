@@ -9,7 +9,7 @@ exports.inputTemplate = function(user, configuration, sensor) {
     <input  name="values.${sid}.temperature" class="form-control normalize"
             type="number" step="any"
             aria-describedby="addon-values_${sid}_temperature"
-            data-unittype="temperature" data-unit="celcius" data-unitpref="farenheit">
+            data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
     <span class="input-group-addon" id="addon-values_${sid}_temperature">Meters</span>
     <br>
 </div>
@@ -20,7 +20,7 @@ exports.inputTemplate = function(user, configuration, sensor) {
         <input  name="values.${sid}.temperatureRange" class="form-control normalize"
                 type="number" step="any" 
                 aria-describedby="addon-values_${sid}_temperatureRange"
-                data-unittype="temperature" data-unit="celcius" data-unitpref="farenheit">
+                data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
         <span id="addon-values_${sid}_temperatureRange" class="input-group-addon">Meters</span>
         <br>
     </div>
@@ -34,7 +34,8 @@ exports.outputTemplate = function(value, user) {
     <span class="normalize"
         data-unittype="temperature"
         data-unit="celcius"
-        data-unitpref="farenheit"
+        data-unitround="2"
+        data-unitprefsystem="imperial"
         aria-describedby="${value.sensor}_temperatureLabel">
         ${value.data.temperature}
     </span>
@@ -50,7 +51,8 @@ exports.outputTemplate = function(value, user) {
     <span class="normalize"
         data-unittype="temperature"
         data-unit="celcius"
-        data-unitpref="farenheit"
+        data-unitround="2"
+        data-unitprefsystem="imperial"
         aria-describedby="${value.sensor}_temperatureRangeLabel">
         ${value.data.temperatureRange}
     </span>

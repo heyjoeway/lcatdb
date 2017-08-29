@@ -13,7 +13,7 @@
             <br>
             <h2 class="h-inline">Visualize</h2>
             &nbsp;&nbsp;
-            <button class="btn btn-lg btn-primary">Quick Setup</button>
+            <button class="btn btn-lg btn-primary hide">Quick Setup</button>
             <br>
             <hr>
             <div id="view_data" class="view row">
@@ -277,6 +277,7 @@
                                 <div class="dropdown-menu dropdown-menu-right"> 
                                     <p>Basic</p>                                    
                                     <!--<a class="dropdown-item" id="map">Geographical Map</a><br>-->
+                                    <a class="dropdown-item new_graph" data-type="map">Map</a><br>
                                     <a class="dropdown-item new_graph" data-type="2d">2-D Plot</a><br>
                                     <!--<a class="dropdown-item" id="3d">3-D Plot</a><br>-->
                                     <hr>
@@ -359,6 +360,11 @@
                                 <br>
                                 <p>No preferences are currently available for this type.</p>
                             </div>
+
+                            <div class="graph_typeprefs" id="map">
+                                <br>
+                                <p>No preferences are currently available for this type.</p>
+                            </div>
                         </div>
 
                     </div>
@@ -383,5 +389,6 @@
     <script src="/js/lib/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/lib/Chart.bundle.min.js"></script>
     <script src="/js/lib/modernizr-custom.js"></script>
+    <script src="/js/lib/jsurl.js"></script>
     <script src="/js/pages/visualize.js"></script>
 </body>

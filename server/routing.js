@@ -608,10 +608,15 @@ sessionGet('/configurations/new', (req, res, user) => {
 // ------------------------------------
 
 sessionPost(`/configurations/${configPattern}/editDo`, (req, res, user) => {
-    let id = req.originalUrl.split('/')[2];
+    let cid = req.originalUrl.split('/')[2];
 
-    Configurations.edit(user, id, req.body,
-        () => { res.redirect(`/configurations/${id}`); },
+    Configurations.edit(
+        {
+            "user": user,
+            "cid": cid,
+            "edit": req.body
+        },
+        () => { res.redirect(`/configurations/${cid}`); },
         (error) => { res.send(`Error processing request. (${error.type})`); }
     );
 });
