@@ -3,29 +3,52 @@
     <!--head-->
     <title><!--title--> - Remove Sensor</title>
 </head>
+{{#query.modal}}
+<body class="no-nav">
+    <div id="step-1">
+        <p>Are you sure you want to remove this sensor from this configuration? The sensor will still exist, and can be re-added at any time.</p>
+        <div class="text-right">
+            <button class="btn btn-danger" id="remove">Remove</button>
+            &nbsp;
+        </div>
+        <br>
+    </div>
+
+    <div id="loading" style="display:none">
+        Loading...
+    </div>
+
+    <!--scripts-->
+
+    <script src="/js/lib/iframeResizer.contentWindow.min.js"></script>
+    <script src="/js/modals/configurationRemoveSensor.js"></script>
+</body>
+{{/query.modal}}
+{{^query.modal}}
 <body>
     <!--nav-->
 
     <div class="container">
         <h2>Remove Sensor</h2>
+        <hr>
         {{#canEdit}}
-        <form action="./removeSensorDo" method="post" class="form-horizontal"><fieldset class="container">>
-            <div class="form-group">
-                <label class="col-xs-2 control-label" for="name">Configuration</label>
-                <div class="col-xs-10">{{configuration._id}}</div>
+        <form action="/configurations/{{configuration._id}}/removeSensorDo" method="post" class="container">
+            <div class="row">
+                <label class="col-xs-12 col-sm-2"><strong>Configuration</strong></label>
+                <div class="col-xs-12 col-sm-10">{{configuration._id}}</div>
             </div>
-            <div class="form-group">
-                <label class="col-xs-2 control-label" for="name">Sensor</label>
-                <div class="col-xs-10"><input class="form-control" type="text" name="sid" value="{{query.sid}}"></div>
+            <div class="row">
+                <label class="col-xs-12 col-sm-2"><strong>Sensor</strong></label>
+                <div class="col-xs-12 col-sm-10"><input class="form-control" type="text" name="sid" value="{{query.sid}}"></div>
             </div>
+            <br>
             <p>Are you sure you want to remove this sensor from this configuration? The sensor will still exist, and can be re-added at any time.</p>
-            <div class="form-group">
-                <div class="col-xs-10 col-xs-offset-2">
-                    <a href="./" class="btn btn-default">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
+            <div class="text-right">
+                <a href="./" class="btn btn-default">Cancel</a>
+                &nbsp;&nbsp;
+                <button type="submit" class="btn btn-danger">Remove</button>
             </div>
-        </fieldset></form>
+        </form>
         {{/canEdit}}
         {{^canEdit}}
         <p>Sorry, you do not have permission to edit this configuration.</p>
@@ -34,3 +57,4 @@
 
     <!--scripts-->
 </body>
+{{/query.modal}}

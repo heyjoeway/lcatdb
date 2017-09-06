@@ -253,6 +253,11 @@ exports.edit = function(ctx, success, failure) {
         if (!canEdit)
             return fail({ "type": "canEdit" });
 
+        if (typeof edit == 'undefined') {
+            edit = {};
+            return this.next(configuration);
+        }
+
         let editValidity = Schema.validate('/ConfigurationEdit', edit);
 
         if (!editValidity)
@@ -269,6 +274,7 @@ exports.edit = function(ctx, success, failure) {
         // >> let test2 = { "test": [ 4, 5, 6 ]}
         // >> deepmerge(test1, test2, { ... })
         // { "test": [ 1, 2, 3, 4, 5, 6 ] }
+        
         
         let newData = deepmerge(configuration, edit, {
             arrayMerge: (dest, src) => { return dest.concat(src) }
@@ -444,9 +450,14 @@ exports.addSensor = function(user, cid, sid, success, failure) {
     sid = Utils.testOid(sid, fail);
     if (!sid) return;
 
-    let data = { "sensors": [ sid.toString() ] };
-
-    exports.edit(user, cid, data, success, fail);
+    exports.edit(
+        {
+            "user": user,
+            "cid": cid,
+            "edit": { "sensors": [ sid.toString() ] }
+        },
+        success, fail
+    );
 };
 
 /**

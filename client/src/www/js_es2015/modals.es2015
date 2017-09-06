@@ -1,8 +1,9 @@
-$(function() {
+$(() => {
+    let configuration = $('#configuration').text();
+    
     $('#sensor-new').click(function(e) {
         e.preventDefault();
 
-        let configuration = $('#configuration').text();
         modal(
             'Add New Sensor',
             `/sensors/new?configuration=${configuration}&modal=true`,
@@ -13,10 +14,21 @@ $(function() {
     $('#sensor-existing').click(function(e) {
         e.preventDefault();
 
-        let configuration = $('#configuration').text();
         modal(
             'Add Existing Sensor',
             `/configurations/${configuration}/addSensor?modal=true`,
+            function() { window.location.reload(); }
+        );
+    });
+
+    $('.sensor-remove').click(function(e) {
+        e.preventDefault();
+
+        let sid = $(this).data('sid');
+
+        modal(
+            'Remove Sensor',
+            `/configurations/${configuration}/removeSensor?modal=true,sid=${sid}`,
             function() { window.location.reload(); }
         );
     });

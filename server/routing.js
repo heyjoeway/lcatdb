@@ -589,8 +589,9 @@ let configPattern = '([0-9a-f]{24})';
 configurationRender(`/configurations/${configPattern}`, 'configuration', ['sensors', 'sensors.typeData', 'edits.time', 'owner']);
 configurationRender(`/configurations/${configPattern}/tutorial`, 'configurationTutorial', ['sensors', 'sensors.typeData']);
 configurationRender(`/configurations/${configPattern}/edit`, 'configurationEdit');
-configurationRender(`/configurations/${configPattern}/addSensor`, 'addSensor', ['user.sensors', 'user.sensors.typeData']);
 configurationRender(`/configurations/${configPattern}/readings`, 'configurationReadingList', ['readings']);
+configurationRender(`/configurations/${configPattern}/removeSensor`, 'configurationRemoveSensor', []);
+configurationRender(`/configurations/${configPattern}/addSensor`, 'configurationAddSensor', ['user.sensors', 'user.sensors.typeData']);
 
 // ------------------------------------
 // New configuration (action)
@@ -621,6 +622,25 @@ sessionPost(`/configurations/${configPattern}/editDo`, (req, res, user) => {
     );
 });
 
+
+
+// ------------------------------------
+// Remove Sensor (action)
+// ------------------------------------
+
+sessionPost(`/configurations/${configPattern}/removeSensorDo`, (req, res, user) => {
+    let cid = req.originalUrl.split('/')[2];
+
+    Configurations.edit(
+        {
+            "user": user,
+            "cid": cid,
+            "removeSensors": [req.body.sid]
+        },
+        () => { res.redirect(`/configurations/${cid}`); },
+        (error) => { res.send(`Error processing request. (${error.type})`); }
+    );
+});
 
 // ------------------------------------
 // Add Sensor to Configuration (action)

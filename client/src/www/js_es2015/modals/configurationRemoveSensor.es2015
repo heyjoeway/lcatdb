@@ -1,0 +1,21 @@
+$(() => {
+    $('#remove').click(function() {
+        let queryObj = urlQueryObj(location.toString());
+
+        console.log(queryObj);
+
+        $('#step-1').hide();
+        $('#loading').show();
+
+        window.parent.postMessage('modal.lock', '*');
+
+        $.post('./removeSensorDo',
+            {
+                "sid": queryObj.sid
+            },
+            (data, success) => {
+                window.parent.postMessage('modal.done', '*');
+            }
+        );
+    });
+});
