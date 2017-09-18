@@ -7,6 +7,7 @@
     <!--nav_nouser-->
     
     <div class="container">
+        {{#query}}
         <h1>Register</h1>
         {{#username}}
         <div class="alert alert-warning">
@@ -38,6 +39,7 @@
             <p>Username or email taken.</p>
         </div>
         {{/taken}}
+        {{/query}}
 
         <form class="container" action="/registerdo" method="post">
             <div>

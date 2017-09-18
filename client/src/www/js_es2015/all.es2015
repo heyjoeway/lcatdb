@@ -8,7 +8,7 @@ $(() => {
         let newUrl = '/map?';
 
         Object.keys(queryObj).forEach((key) => {
-            newUrl += key + '=' + queryObj[key] + ',';
+            newUrl += key + '=' + queryObj[key] + '&';
         });
 
         newUrl = newUrl.substring(0, newUrl.length - 1);
@@ -24,7 +24,7 @@ $(() => {
         let newUrl = '/map?';
 
         Object.keys(queryObj).forEach((key) => {
-            newUrl += key + '=' + queryObj[key] + ',';
+            newUrl += key + '=' + queryObj[key] + '&';
         });
 
         newUrl = newUrl.substring(0, newUrl.length - 1);
@@ -65,7 +65,7 @@ function urlQueryObj(url) {
     let query = url.split('?')[1];
     let obj = {};
     if (query) {
-        let querySplit = query.split(',');
+        let querySplit = query.split('&');
         querySplit.forEach((item) => {
             let itemSplit = item.split('=');
             let key = itemSplit[0];

@@ -28,7 +28,7 @@ $(() => {
 
         modal(
             'Remove Sensor',
-            `/configurations/${configuration}/removeSensor?modal=true,sid=${sid}`,
+            `/configurations/${configuration}/removeSensor?modal=true&sid=${sid}`,
             function() { window.location.reload(); }
         );
     });

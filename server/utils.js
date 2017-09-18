@@ -76,7 +76,11 @@ class Chain {
     }
 
     pause(amt = 1) {
-        this.pauseAmt = amt;
+        this.pauseAmt += amt;
+    }
+
+    resume() {
+        this.pauseAmt = 0;
     }
 
     next() {

@@ -5,6 +5,7 @@
 </head>
 {{#query.modal}}
 <body class="no-nav">
+    {{#configuration.canEdit}}
     <div id="step-1">
         <p>Are you sure you want to remove this sensor from this configuration? The sensor will still exist, and can be re-added at any time.</p>
         <div class="text-right">
@@ -18,8 +19,12 @@
         Loading...
     </div>
 
-    <!--scripts-->
+    {{/configuration.canEdit}}
+    {{^configuration.canEdit}}
+    <p>Sorry, you do not have permission to edit this configuration.</p>
+    {{/configuration.canEdit}}
 
+    <!--scripts-->
     <script src="/js/lib/iframeResizer.contentWindow.min.js"></script>
     <script src="/js/modals/configurationRemoveSensor.js"></script>
 </body>
@@ -31,7 +36,7 @@
     <div class="container">
         <h2>Remove Sensor</h2>
         <hr>
-        {{#canEdit}}
+        {{#configuration.canEdit}}
         <form action="/configurations/{{configuration._id}}/removeSensorDo" method="post" class="container">
             <div class="row">
                 <label class="col-xs-12 col-sm-2"><strong>Configuration</strong></label>
@@ -49,10 +54,11 @@
                 <button type="submit" class="btn btn-danger">Remove</button>
             </div>
         </form>
-        {{/canEdit}}
-        {{^canEdit}}
+        {{/configuration.canEdit}}
+        {{^configuration.canEdit}}
         <p>Sorry, you do not have permission to edit this configuration.</p>
-        {{/canEdit}}
+        {{/configuration.canEdit}}
+
     </div>
 
     <!--scripts-->

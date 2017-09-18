@@ -8,11 +8,11 @@
 
     <div class="container" class="text-center">
         <h2>Login</h2>
-        {{#invalid}}
+        {{#query.invalid}}
         <div class="alert alert-warning">
             <p>Invaild username or password.</p>
         </div>
-        {{/invalid}}
+        {{/query.invalid}}
         <form action="/logindo" method="post">
             <input class="form-control" type="text" name="username" value="" placeholder="Username"><br>
             <input class="form-control" type="password" name="password" value="" placeholder="Password" data-toggle="password"><br>

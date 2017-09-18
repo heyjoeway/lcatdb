@@ -11,7 +11,7 @@ $(function() {
     if (hasTemperature && hasDepth) {
         $('#done').removeAttr('disabled').attr(
             'href',
-            './reading?quick'
+            './reading?quick=true'
         );
     }
 });

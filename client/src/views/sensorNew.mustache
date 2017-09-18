@@ -9,13 +9,13 @@
 
     <div id="step-1">
         <ul class="nav nav-tabs">
-            {{#types}}
+            {{#sensorTypes}}
             <li><a data-toggle="tab" href="#{{key}}">{{type.data.name}}</a></li>
-            {{/types}}
+            {{/sensorTypes}}
         </ul>
 
         <div class="tab-content">
-            {{#types}}
+            {{#sensorTypes}}
             <div id="{{key}}" class="tab-pane">
                 <ul id="modal-sensor-models" class="list-group">
                     {{#type.data.models}}
@@ -23,7 +23,7 @@
                     {{/type.data.models}}
                 </ul>
             </div>
-            {{/types}}
+            {{/sensorTypes}}
         </div>
     </div>
 
@@ -48,10 +48,10 @@
             <div class="form-group">
                 <label class="col-xs-2 control-label" for="sid">Type</label>
                 <div class="col-xs-10">
-                    <select class="form-control" name="type" value="{{typeFirst}}">
-                        {{#types}}
+                    <select class="form-control" name="type">
+                        {{#sensorTypes}}
                         <option value="{{key}}">{{type.data.name}}</option>
-                        {{/types}}
+                        {{/sensorTypes}}
                     </select><br>
                 </div>
             </div>

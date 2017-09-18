@@ -7,6 +7,7 @@
     <!--nav-->
 
     <div class="container">
+        {{#configuration}}
         <h2>Edit Configuration</h2>
         {{#canEdit}}
         <form action="./editDo" method="post" class="form-horizontal"><fieldset class="container">
@@ -25,6 +26,7 @@
         {{^canEdit}}
         <p>Sorry, you do not have permission to edit this configuration.</p>
         {{/canEdit}}
+        {{/configuration}}
     </div>
 
     <!--scripts-->

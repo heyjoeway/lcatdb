@@ -62,9 +62,7 @@ exports.getInputTemplate = function(type, user, configuration, sensor) {
 
 exports.getOutputTemplate = function(value, user) {
     let type = value.type;
-    return types[type].provider.outputTemplate(
-        value, user
-    );
+    return types[type].provider.outputTemplate(value);
 };
 
 exports.getSchemaId = function(type) {

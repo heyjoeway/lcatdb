@@ -26,7 +26,16 @@
         <hr>
         <ul class="list-group">
             {{#readings}}
-            <li class="list-group-item"><a href="/readings/{{_id}}">{{timeCreated}}</a></li>
+            <li class="list-group-item">
+                <a href="/readings/{{_id}}">
+                    <span class="normalize"
+                        data-unittype="time"
+                        data-unit="unix"
+                        data-unitpref="human12hr">
+                        {{timeCreated}}
+                    </span>
+                </a>
+            </li>
             {{/readings}}
             {{^readings.length}}
             <p>No readings found.</p>

@@ -63,6 +63,9 @@ exports.getList = function(user, success, failure, reqs) {
  */
 
 exports.canEdit = function(user, sensor) {
+    if ((typeof user == 'undefined') || (typeof sensor == 'undefined'))
+        return false;
+
     let ownerId = ObjectId(sensor.owner);
     let userId = ObjectId(user["_id"]);
     let result = ownerId.equals(userId);

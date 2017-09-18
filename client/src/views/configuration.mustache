@@ -35,7 +35,12 @@
         </div>
         <div class="row">
             <div class="col-xs-4 col-sm-2 text-right">Creation Time</div>
-            <div>{{creation}}</div>
+            <div class="normalize"
+                data-unittype="time"
+                data-unit="unix"
+                data-unitpref="human12hr">
+                {{creation}}
+            </div>
         </div>
         <br>
         <a role="button" class="btn btn-primary" href="/configurations/{{_id}}/readings">View Readings</a>
@@ -90,14 +95,19 @@
             <option value="31557600">Last 1 Year</option>
         </select>
         <br>
-        <iframe id="map-time" class="map-iframe" src="/map?embed=true,configuration={{_id}},timeAgo=604800"></iframe>
+        <iframe id="map-time" class="map-iframe" src="/map?embed=true&configuration={{_id}}&timeAgo=604800"></iframe>
 
         <hr>
 
         <h3>Edits</h3>
         <ul class="list-group">
             {{#edits}}
-            <li class="list-group-item">{{time}}</li>
+            <li class="list-group-item normalize"
+                data-unittype="time"
+                data-unit="unix"
+                data-unitpref="human12hr">
+                {{time}}
+            </li>
             {{/edits}}
             {{^edits}}
             <p>No edits found for this configuration.</p>

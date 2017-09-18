@@ -51,10 +51,21 @@ exports.find = function(username, email, success, failure, reqs) {
  */
 
 exports.findOid = function(oid, success, failure, reqs) {
+    function fail(error) {
+        Winston.debug('Could not find user by id.', {
+            "error": error,
+            "oid": oid
+        });
+        failure(error);
+    }
+
+    oid = Utils.testOid(oid, fail);
+    if (!oid) return;
+
     return exports.findQuery({
-       "filter": { "_id": ObjectId(oid) },
+       "filter": { "_id": oid },
        "fields": Utils.reqsToObj(reqs)
-    }, success, failure);
+    }, success, fail);
 };
 
 /* Finds a user by query.

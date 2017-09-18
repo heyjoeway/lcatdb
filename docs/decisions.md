@@ -189,3 +189,9 @@ Things each function needs:
 4. callback
 
 The callback should pass the first 3 things.
+
+Proposed functions:
+
+1. routeStepUser(req, res, ctx, callback, deps)
+    - Sets key "user" in ctx to user data
+    

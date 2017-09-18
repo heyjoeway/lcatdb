@@ -10,34 +10,54 @@
         <h2>Sensor</h2>
         {{#sensor}}
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Name</div>
+            <div class="col-xs-4 col-sm-2 text-right">
+                <strong>Name</strong>
+            </div>
             <div>{{name}}</div>
         </div>
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">ID</div>
+            <div class="col-xs-4 col-sm-2 text-right">
+                <strong>ID</strong>
+            </div>
             <div>{{_id}}</div>
         </div>
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Owner</div>
+            <div class="col-xs-4 col-sm-2 text-right">
+                <strong>Owner</strong>
+            </div>
             <div>
                 <!--<a href="/profile/{{owner._id}}">{{owner.username}}</a>-->
                 <span>{{owner.username}}</span>
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Creation Time</div>
-            <div>{{creation}}</div>
+            <div class="col-xs-4 col-sm-2 text-right">
+                <strong>Creation Time</strong>
+            </div>
+            <div class="normalize"
+                data-unittype="time"
+                data-unit="unix"
+                data-unitpref="human12hr">
+                {{creation}}
+            </div>
+            
         </div>
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Model</div>
+            <div class="col-xs-4 col-sm-2 text-right">
+                <strong>Model</strong>
+            </div>
             <div>{{model}}</div>
         </div>
         <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Type</div>
-            <div>{{type}}</div>
+            <div class="col-xs-4 col-sm-2 text-right">
+                <strong>Type</strong>
+            </div>
+            <div id="type" data-type="{{type}}">{{typeName}}</div>
         </div>
         <!--<div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">Creation Time</div>
+            <div class="col-xs-4 col-sm-2 text-right">
+                <strong>Creation Time</strong>
+            </div>
             <div>{{creation}}</div>
         </div>-->
         <br>
@@ -48,7 +68,12 @@
         <h3>Edits</h3>
         <ul class="list-group">
             {{#edits}}
-            <li class="list-group-item">{{time}}</li>
+            <li class="list-group-item normalize"
+                data-unittype="time"
+                data-unit="unix"
+                data-unitpref="human12hr">
+                {{time}}
+            </li>
             {{/edits}}
             {{^edits}}
             <p>No edits found for this sensor.</p>
