@@ -7,6 +7,7 @@
     <!--nav-->
 
     <div class="container">
+        {{#configuration}}
         {{#canEdit}}
         <form id="form" action="./readingDo" method="post">
             <div class="row">
@@ -87,7 +88,7 @@
                                 Time Created
                             </label>
                             <input  name="timeCreated" class="form-control normalize"
-                                    type="number" value="{{timeCurrent}}"
+                                    type="number" value="{{time}}"
                                     data-unittype="time" data-unit="unix" data-unitpref="iso">
                             <br>
                         </div>
@@ -144,12 +145,22 @@
                     <br>
                     <div id="sensors">
                         {{#sensors}}
-                        <div class="sensor" id="sensor_{{_id}}">
-                            <h4 class="h-inline"><a href="/sensors/{{_id}}">{{name}}</a></h4>
-                            &nbsp;&nbsp;&nbsp;
-                            <h6 class="h-inline">{{model}}</h6>
-                            <br>
-                            {{{html}}}
+                        <div class="sensor row" id="sensor_{{_id}}">
+                            <div class="col-xs-10">
+                                <h4 class="h-inline">{{model}}</h4>
+                                &nbsp;&nbsp;&nbsp;
+                                <h6 class="h-inline"><a href="/sensors/{{_id}}">{{name}}</a></h6>
+                            </div>
+                            <div class="col-xs-2 text-right extra-small text-muted">
+                                <a  href="/configurations/{{configuration._id}}/removeSensor?sid={{_id}}"
+                                    class="sensor-remove btn btn-secondary btn-sm"
+                                    data-sid="{{_id}}">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </a>
+                            </div>
+                            <div class="col-xs-12">
+                                {{{html}}}
+                            </div>
                             <br>
                         </div>
                         {{/sensors}}
@@ -177,6 +188,7 @@
         <br><br>
         <p>Sorry, you do not have permission to create a reading.
         {{/canEdit}}
+        {{/configuration}}
     </div>
 
     <!--scripts-->

@@ -95,7 +95,7 @@ function modalFinish($element) {
 }
 
 function initSensorBtns() {
-    $('#sensor-new').click(function(e) {
+    $('#sensor-new').off('click').click(function(e) {
         e.preventDefault();
 
         modal(
@@ -105,12 +105,24 @@ function initSensorBtns() {
         );
     });
 
-    $('#sensor-existing').click(function(e) {
+    $('#sensor-existing').off('click').click(function(e) {
         e.preventDefault();
 
         modal(
             'Add Existing Sensor',
             `/configurations/${configurationId}/addSensor?modal=true`,
+            modalFinish
+        );
+    });
+
+    $('.sensor-remove').off('click').click(function(e) {
+        e.preventDefault();
+
+        let sid = $(this).data('sid');
+
+        modal(
+            'Remove Sensor',
+            `/configurations/${configurationId}/removeSensor?modal=true&sid=${sid}`,
             modalFinish
         );
     });
@@ -121,8 +133,9 @@ function initSensorBtns() {
 function updateSensors(success) {
     $.get('./reading', (data, status) => {
         let sensorsNew = $(data).find(".sensor").toArray();
-        let sensorsCurrent = $('body').find('.sensor').toArray();
+        let sensorsNewIds = sensorsNew.map((x) => { return x.id; });
 
+        let sensorsCurrent = $('body').find('.sensor').toArray();
         let sensorsCurrentIds = sensorsCurrent.map((x) => { return x.id; });
 
         sensorsNew.forEach((sensor) => {
@@ -130,6 +143,14 @@ function updateSensors(success) {
                 $("#sensors").append(sensor);
                 $("#sensors-none").hide();
             }
+        });
+
+        $("#sensors").children().each(function() {
+            let $this = $(this);
+            let id = $this.attr('id');
+
+            if (sensorsNewIds.indexOf(id) == -1)
+                $this.remove();
         });
 
         $('.normalize').unitnorm();
@@ -213,6 +234,14 @@ function init() {
             "todayHighlight": true
         });
     }
+
+    // https://stackoverflow.com/a/895231
+    $(window).keydown(function(event){
+        if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
 }
 
 $(window).ready(init);

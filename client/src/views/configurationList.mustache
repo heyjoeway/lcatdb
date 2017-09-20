@@ -15,12 +15,12 @@
         <hr>
         <ul class="list-group">
             {{#configurations}}
-            {{#reading}}
+            {{#query.reading}}
             <li class="list-group-item"><a href="/configurations/{{_id}}/reading">{{name}}</a></li>
-            {{/reading}}
-            {{^reading}}
+            {{/query.reading}}
+            {{^query.reading}}
             <li class="list-group-item"><a href="/configurations/{{_id}}">{{name}}</a></li>
-            {{/reading}}
+            {{/query.reading}}
             {{/configurations}}
         </ul>
         {{^configurations.length}}

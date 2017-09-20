@@ -55,7 +55,7 @@ exports.getList = function(user, success, reqs) {
         });
 
         Winston.debug('Finished searching for configurations.', {
-            // "list": list
+            "list": list
         });
         success(list);
     });

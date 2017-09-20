@@ -41,7 +41,7 @@ app.get('/tutorial/standard', (req, res, user) => {
             Configurations.new(user, (cid) => {
                 res.redirect(`/configurations/${cid}/tutorial`);
             });
-        } else res.redirect('/configurations?reading');
+        } else res.redirect('/configurations?reading=true');
     });
 });
 
@@ -61,7 +61,7 @@ app.get('/configurations', (req, res, user) => {
     }, function() {
         let reading = typeof data.query.reading != 'undefined';
 
-        if (reading && list.length == 1)
+        if (reading && data.configurations && data.configurations.length == 1)
             res.redirect(`/configurations/${data.configurations[0]['_id']}/reading`);
         else
             res.render('configurationList', data);

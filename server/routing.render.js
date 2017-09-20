@@ -22,9 +22,11 @@ function testAllowAnon(data, options) {
 function mustachifyGeneral(data, options, callback) {
     let needs = options.mustacheDeps.general || [];
 
-    if (needs.includes('sensorTypes')) {
+    if (needs.includes('sensorTypes'))
         data.sensorTypes = SensorTypes.getTypesMustache();
-    }
+
+    if (needs.includes('time'))
+        data.time = (new Date()).getTime();
 
     callback();
 }
@@ -123,10 +125,10 @@ function mustachifyConfiguration(data, options, callback) {
                     if (needs.includes('sensors.htmlIn')) {
                         sensors.forEach((sensor, i) => {
                             sensor.html = SensorTypes.getInputTemplate(
-                                sensor.type, user, configuration, sensor
+                                sensor.type, data.user, configuration, sensor
                             );
+                            sensor.index = i;
                         });
-                        sensor.index = i;
                         this.next();
                     }
 
@@ -440,10 +442,11 @@ renderSensor({
 let configPattern = '([0-9a-f]{24})';
 
 renderConfiguration({
-    "url": `/configuration/${configPattern}/reading`,
+    "url": `/configurations/${configPattern}/reading`,
     "template": "configurationReading",
     "mustacheDeps": {
-        "configuration": ['sensors', 'sensors.typeData', 'sensors.htmlIn']
+        "configuration": ['sensors', 'sensors.typeData', 'sensors.htmlIn'],
+        "general": ["time"]
     }
 });
 
