@@ -371,6 +371,11 @@ function renderConfiguration(options) {
 }
 
 renderUser({
+    "url": '/user/edit',
+    "template": 'userEdit'
+});
+
+renderUser({
     "url": '/sensors/new',
     "template": "sensorNew",
     "mustacheDeps": {

@@ -26,13 +26,12 @@
     "client-sessions": "^0.8.0",
     "deepcopy": "^0.6.3",
     "express": "^4.15.3",
+    "hat": "0.0.3",
     "json-schema-defaults": "^0.3.0",
     "merge": "^1.2.0",
     "mongodb": "^2.2.26",
     "mustache-express": "^1.2.4",
-    "winston": "^2.3.1"
-  },
-  "devDependencies": {
+    "winston": "^2.3.1",
     "deepmerge": "^1.3.2"
   }
 }

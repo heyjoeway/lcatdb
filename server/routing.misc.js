@@ -26,26 +26,26 @@ app.get('/', (req, res) => {
 // If user has any configurations, pass them on to take a reading.
 // Otherwise, bring them to the tutorial with a new configuration.
 
-app.get('/tutorial/standard', (req, res, user) => {
+app.get('/tutorial/standard', (req, res) => {
     let data = {};
 
     new Chain(function() {
         RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
     }, function() {
         if (data.user)
-            Configurations.getList(user, this.next.bind(this));
+            Configurations.getList(data.user, this.next.bind(this));
         else
             res.redirect('/login');
     }, function(list) {
         if (!Utils.exists(list)) {
-            Configurations.new(user, (cid) => {
+            Configurations.new(data.user, (cid) => {
                 res.redirect(`/configurations/${cid}/tutorial`);
             });
         } else res.redirect('/configurations?reading=true');
     });
 });
 
-app.get('/configurations', (req, res, user) => {
+app.get('/configurations', (req, res) => {
     let data = {};
 
     new Chain(function() {
@@ -69,19 +69,5 @@ app.get('/configurations', (req, res, user) => {
 });
 
 
-app.get('/configurations/new', (req, res, user) => {
-    let data = {};
-
-    new Chain(function() {
-        RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
-    }, function() {
-        if (data.user)
-            Configurations.new(data.user, this.next.bind(this));
-        else
-            res.redirect('/login');
-    }, function(cid) {
-        res.redirect(`/configurations/${cid}/edit`);
-    });
-});
 
 }

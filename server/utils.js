@@ -93,3 +93,14 @@ class Chain {
 }
 
 exports.Chain = Chain;
+
+exports.setPath = function(obj, path, val) {
+    let pathArray = path.split('.');
+    let lastCrumb = pathArray.pop();
+    pathArray.forEach((crumb) => {
+        if (typeof obj[crumb] == 'undefined')
+            obj[crumb] = {};
+        obj = obj[crumb];
+    });
+    obj[lastCrumb] = val;
+}

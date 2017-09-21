@@ -1,0 +1,16 @@
+{
+    "id": "/UserEdit",
+    "type": "object",
+    "properties": {
+        "email": { "$ref": "/User#/properties/email" },
+        "first": { "$ref": "/User#/properties/first" },
+        "last": { "$ref": "/User#/properties/last" },
+        "organizations": { "$ref": "/User#/properties/organizations" },
+        "phone": { "$ref": "/User#/properties/phone" },
+        "descShort": { "$ref": "/User#/properties/descShort" },
+        "descLong": { "$ref": "/User#/properties/descLong" },
+        "timezone": { "$ref": "/User#/properties/timezone" },
+        "publicity": { "$ref": "/User#/properties/publicity" }
+    },
+    "additionalProperties": false
+}

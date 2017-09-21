@@ -100,7 +100,17 @@
                 "organizations"
             ]
         }
-	},
+    },
+    
+    "apiKey": {
+        "type": "string"
+    },
+
+    "denyApi": {
+        "type": "boolean",
+        "default": false
+    },
+
     "additionalProperties": false,
     "required": [
         "username",

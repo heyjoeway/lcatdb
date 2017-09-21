@@ -5,6 +5,7 @@
 const ObjectId = require('mongodb').ObjectId;
 const Winston = require('winston');
 const Bcrypt = require('bcrypt');
+const hat = require('hat');
 
 // ----------------------------------------------------------------------------
 // Champy-DB specific modules
@@ -14,6 +15,7 @@ const Schema = require('./schema.js');
 const Config = require('./config.json');
 const Db = require('./db.js');
 const Utils = require('./utils.js');
+const Chain = Utils.Chain;
 
 // ============================================================================
 // FIND
@@ -194,43 +196,85 @@ exports.register = function(data, success, failure) {
     }
 
     // Username/email conflict
-    exports.find(newUser.username, newUser.email,
-        () => { // User found
-            errors.push({ "type": "taken" });
+    new Chain(function() {
+        exports.find(newUser.username, newUser.email,
+            () => { // User found
+                errors.push({ "type": "taken" });
+                fail(errors);
+            },
+            this.next.bind(this)
+        );
+    }, function() { // User not found
+        Bcrypt.hash(
+            newUser.password,
+            Config.salt.rounds,
+            this.next.bind(this)
+        );
+    }, function(errHash, hash) {
+        if (errHash) {
+            errors.push({ "type": "hash", "errHash": errHash });
             fail(errors);
             return;
-        },
-        () => { // User not found
-            Bcrypt.hash(newUser.password, Config.salt.rounds, (errHash, hash) => {
-                if (errHash) {
-                    errors.push({ "type": "hash", "errHash": errHash });
-                    fail(errors);
-                    return;
-                }
-
-                newUser.password = hash;
-
-                // Saving to db
-                users.insertOne(newUser, (errSave, result) => {
-                    if (errSave) {
-                        errors.push({ "type": "save", "errSave": errSave });
-                        fail(errors);
-                        return;
-                    }
-
-                    let oid = result.insertedId;
-
-                    Winston.debug('Successfully registered new user.', {
-                        "username": newUser.username,
-                        "email": newUser.email,
-                        "oidString": oid.toString()
-                    });
-
-                    success(oid);
-                });
-            });
         }
-    );
+
+        newUser.password = hash;
+
+        users.insertOne(newUser,  this.next.bind(this));
+    }, function(errSave, result) {
+        if (errSave) {
+            errors.push({ "type": "save", "errSave": errSave });
+            fail(errors);
+            return;
+        }
+
+        let oid = result.insertedId;
+
+        Winston.debug('Successfully registered new user.', {
+            "username": newUser.username,
+            "email": newUser.email,
+            "oidString": oid.toString()
+        });
+
+        success(oid);
+    });
+
+    // exports.find(newUser.username, newUser.email,
+    //     () => { // User found
+    //         errors.push({ "type": "taken" });
+    //         fail(errors);
+    //         return;
+    //     },
+    //     () => { // User not found
+    //         Bcrypt.hash(newUser.password, Config.salt.rounds, (errHash, hash) => {
+    //             if (errHash) {
+    //                 errors.push({ "type": "hash", "errHash": errHash });
+    //                 fail(errors);
+    //                 return;
+    //             }
+
+    //             newUser.password = hash;
+
+    //             // Saving to db
+    //             users.insertOne(newUser, (errSave, result) => {
+    //                 if (errSave) {
+    //                     errors.push({ "type": "save", "errSave": errSave });
+    //                     fail(errors);
+    //                     return;
+    //                 }
+
+    //                 let oid = result.insertedId;
+
+    //                 Winston.debug('Successfully registered new user.', {
+    //                     "username": newUser.username,
+    //                     "email": newUser.email,
+    //                     "oidString": oid.toString()
+    //                 });
+
+    //                 success(oid);
+    //             });
+    //         });
+    //     }
+    // );
 };
 
 // ============================================================================
@@ -274,3 +318,89 @@ exports.login = function(username, password, success, failure) {
         }
     );
 };
+
+exports.edit = function(ctx, success, failure) {
+    function fail(error) {
+        Winston.debug("Failed to edit configuration.", {
+            "username": user.username,
+            "cid": (cid || "").toString(),
+            "edit": edit,
+            "error": error
+        });
+
+        failure(error);
+    }
+
+    [
+        user,
+        edit
+    ] = [
+        ctx.user,
+        ctx.edit
+    ];
+
+    if (!user) return;
+    if (!edit) return;
+
+    // ----
+
+    new Chain(function() {
+        if (typeof edit == 'undefined') {
+            edit = {};
+            this.next();
+        } else {
+            let editValidity = Schema.validate('/UserEdit', edit);
+
+            if (!editValidity)
+                return fail({ "type": "editValidity", "errors": Schema.errors() });
+
+            if (edit.email && (edit.email != user.email)) {
+                user.verified = false;
+                exports.find(undefined, edit.email,
+                    () => { // Email taken
+                        fail({ "type": "emailTaken" });
+                    },
+                    this.next.bind(this) // Email not found
+                );
+            } else this.next();
+        }
+    }, function() {
+        // Custom array merge function ensures all arrays are concatenated.
+        // e.g:
+        // >> let test1 = { "test": [ 1, 2, 3 ]}
+        // >> let test2 = { "test": [ 4, 5, 6 ]}
+        // >> deepmerge(test1, test2, { ... })
+        // { "test": [ 1, 2, 3, 4, 5, 6 ] }
+                
+        let newData = deepmerge(user, edit, {
+            arrayMerge: (dest, src) => { return dest.concat(src) }
+        });
+
+        let completeValidity = Schema.validate('/User', user);
+        
+        if (!completeValidity) return fail({
+            "type": "completeValidity",
+            "errors": Schema.errors()
+        });
+        
+        // -----
+
+        let users = Db.collection('users');
+
+        users.updateOne(
+            {'_id': ObjectId(user['_id']) },
+            newData,
+            this.next.bind(this)
+        );
+
+    }, function(errUpdate, writeResult) {
+        if (errUpdate || writeResult.result.ok != 1)
+            return fail({
+                "type": "write",
+                "result": (writeResult || "").toString(),
+                "error": errUpdate
+            });
+        
+        success();
+    });
+}
