@@ -329,6 +329,7 @@ function renderUser(options) {
         });
     });
 }
+
 function renderReading(options) {
     app.get(options.url, (req, res) => {
         let data = {};

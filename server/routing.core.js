@@ -89,7 +89,6 @@ exports.stepSensor = function(req, res, data, options, callback) {
     Sensor.find(sid,
         (sensor) => { // Success
             data.sensor = sensor;
-            console.log(sensor);
             data.sensor.canEdit = Sensor.canEdit(
                 data.user,
                 data.sensor

@@ -3,15 +3,18 @@ const Schema = require('./schema.js');
 const Reading = require('./reading.js');
 const Utils = require('./utils.js');
 const Chain = Utils.Chain;
+const Winston = require('winston');
 
 function fail(req, res, error) {
-    res.send({
+    Winston.debug("Error processing API request.", {
         "error": error
-    });
+    })
+    res.send({ "error": error });
 }
 
 exports.init = function(app) {
 
+// List all sensor types; model information included
 app.all('/api/sensorTypes', (req, res) => {
     res.send(SensorTypes.getTypes());
 });
@@ -28,6 +31,7 @@ Please provide your POST request in the following format:
 
 Please refer to the MongoDB documentation for the query format. (https://docs.mongodb.com/manual/tutorial/query-documents/)`;
 
+// Allow only post requests on API
 app.get('/api/readings', (req, res) => {
     fail(req, res, {
         "errorName": "instruction",
@@ -38,6 +42,8 @@ app.get('/api/readings', (req, res) => {
     });
 });
 
+// Get readings from request
+// TODO: Set timeout limit to prevent attacks
 app.post(`/api/readings`, (req, res) => {
     let query = req.body;
 

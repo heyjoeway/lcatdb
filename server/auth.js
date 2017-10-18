@@ -21,16 +21,19 @@ const Chain = Utils.Chain;
 // FIND
 // ============================================================================
 
-/* Finds a user by username and/or email.
- *
- * username: Undefined if wanting to search by email.
- * email: Undefined if wanting to search by username.
- * success: Callback to be run upon successful find. Parameters are:
- *      - user: User object.
- * failure: Callback to be run if no user is found. Parameters are:
- *      - err: mongoDB error object.
+/**
+ * Success callback for Auth.find and similar functions.
+ * @callback authFindSuccess
+ * @param {object} user See JSON schema /User.
  */
-
+/**
+ * Finds a user by username and/or email.
+ *
+ * @param {string} username Undefined if wanting to search by email.
+ * @param {string} email Undefined if wanting to search by username.
+ * @param {authFindSuccess} success Callback to be run upon successful find.
+ * @param {genericFailure} failure Callback to be run if no user is found.
+ */
 exports.find = function(username, email, success, failure, reqs) {
     let query = { "$or": [] }; 
 
@@ -43,15 +46,14 @@ exports.find = function(username, email, success, failure, reqs) {
     }, success, failure);
 };
 
-/* Finds a user by object ID.
+/**
+ * Finds a user by object ID.
  *
- * oid: ObjectId object or string.
- * success: Callback to be run upon successful find. Parameters are:
- *      - user: User object.
- * failure: Callback to be run if no user is found. Parameters are:
- *      - err: mongoDB error object.
+ * @param {ObjectId} uid Undefined if wanting to search by username.
+ * @param {authFindSuccess} success Callback to be run upon successful find.
+ * @param {genericFailure} failure Callback to be run if no user is found.
+ * @param {string[]} reqs Array of field names needed by query.
  */
-
 exports.findOid = function(uid, success, failure, reqs) {
     function fail(error) {
         Winston.debug('Could not find user by id.', {
@@ -70,15 +72,13 @@ exports.findOid = function(uid, success, failure, reqs) {
     }, success, fail);
 };
 
-/* Finds a user by query.
+/**
+ * Finds a user by query.
  *
- * query: mongoDB query object.
- * success: Callback to be run upon successful find. Parameters are:
- *      - user: User object.
- * failure: Callback to be run if no user is found. Parameters are:
- *      - err: mongoDB error object.
+ * @param {object} query MongoDB query object. See JSON schema /Query.
+ * @param {authFindSuccess} success Callback to be run upon successful find.
+ * @param {genericFailure} failure Callback to be run if no user is found.
  */
-
 exports.findQuery = function(query, success, failure) {
     function fail(error) {
         Winston.debug('Could not process query.', {
@@ -89,13 +89,14 @@ exports.findQuery = function(query, success, failure) {
 
     let queryValidity = Schema.validate('/Query', query);
     
-    if (!queryValidity) return fail({
-        "errorName": "queryValidity",
-        "errorNameFull": "Auth.findQuery.queryValidity",
-        "errorData": {
-            "schemaErrors": Schema.errors()
-        }
-    });
+    if (!queryValidity)
+        return fail({
+            "errorName": "queryValidity",
+            "errorNameFull": "Auth.findQuery.queryValidity",
+            "errorData": {
+                "schemaErrors": Schema.errors()
+            }
+        });
 
     let [
         filter,
@@ -107,13 +108,14 @@ exports.findQuery = function(query, success, failure) {
 
     try {
         Db.collection('users').findOne(filter, fields, (error, user) => {
-            if (user == null || error != null) return fail({
-                "errorName": "notFound",
-                "errorNameFull": "Auth.findQuery.notFound",
-                "errorData": {
-                    "errorFind": error
-                }
-            });
+            if (user == null || error != null)
+                return fail({
+                    "errorName": "notFound",
+                    "errorNameFull": "Auth.findQuery.notFound",
+                    "errorData": {
+                        "errorFind": error
+                    }
+                });
             
             Winston.debug("Found user.", {
                 "fields": fields,
@@ -133,21 +135,25 @@ exports.findQuery = function(query, success, failure) {
 // REGISTRATION
 // ============================================================================
 
-/* Registers a user.
+/**
+ * Success callback for Auth.register.
  * 
- * data: data used to create new user. Requires the following properties:
- *      - username
- *      - email
- *      - password
- *      - timezone
- * success: callback which is run on a successful registration. Parameters are:
- *      - oid: ObjectId of the new user.
- * failure: callback which is run on an unsuccessful registration. Parameters are:
- *      - errors: An array of errors, each with the following property:
- *          - type: String naming the type of error
- *      Other properties may be included depending on the error type.
+ * @callback authRegisterSuccess
+ * @param {ObjectId} oid ObjectId of the new user.
  */
-
+/**
+ * Failure callback for Auth.register.
+ * 
+ * @callback authRegisterFailure
+ * @param {error[]} error Array of error objects.
+ */
+/**
+ * Registers a user.
+ * 
+ * @param {object} data Data used to create new user. See JSON schema for /User.
+ * @param {authRegisterSuccess} success Callback which is run on a successful registration.
+ * @param {authRegisterFailure} failure Callback which is run on an unsuccessful registration.
+ */
 exports.register = function(data, success, failure) {
     function fail(errors) {
         Winston.debug("Failed to register user.", {
@@ -293,19 +299,20 @@ exports.register = function(data, success, failure) {
 // LOGIN
 // ============================================================================
 
-/* Validates a correct username and password combination.
+/**
+ * Success callback for Auth.login.
+ * @callback authLoginSuccess
+ * @param {ObjectId} oid
+ */
+/**
+ * Validates a correct username and password combination.
  * Does not affect session.
  * 
- * username: Username of user.
- * password: Password of user. (Not hash)
- * success: Callback to be run upon successful validation. Parameters are:
- *      - oid: ObjectId of resulting user.
- * failure: Callback to be run in case of error. Parameters are:
- *      - error: Object containing information about the error. Parameters are:
- *          - type: String describing type of error.
- *      Can also conatin additional properties depending on the type.
+ * @param {string} username Username of user.
+ * @param {string} password Password of user. (Not hash)
+ * @param {authLoginSuccess} success Callback to be run upon successful validation.
+ * @param {genericFailure} failure Callback to be run in case of error.
  */
-
 exports.login = function(username, password, success, failure) {
     let users = Db.collection('users');
 
@@ -340,6 +347,20 @@ exports.login = function(username, password, success, failure) {
     );
 };
 
+/**
+ * Context object for Auth.edit.
+ * @typedef {object} authEditCtx
+ * @property {object} user User object. (/User JSON schema.)
+ * @property {object} edit Edit object. (/UserEdit JSON schema.)
+ */
+/**
+ * Validates a correct username and password combination.
+ * Does not affect session.
+ * 
+ * @param {authEditCtx} ctx Context object.
+ * @param {function} success Callback to be run upon successful edit. (No parameters.)
+ * @param {genericFailure} failure Callback to be run in case of error.
+ */
 exports.edit = function(ctx, success, failure) {
     function fail(error) {
         Winston.debug("Failed to edit user.", {
@@ -436,16 +457,14 @@ exports.edit = function(ctx, success, failure) {
 
         let completeValidity = Schema.validate('/User', newData);
         
-        if (!completeValidity) {
-            let schemaErrors = Schema.errors();
+        if (!completeValidity)
             return fail({
                 "errorName": "completeValidity",
                 "errorNameFull": "Auth.edit.completeValidity",
                 "errorData": {
-                    "schemaErrors": schemaErrors
+                    "schemaErrors": Schema.errors()
                 }
             });
-        } 
         
         // -----
 
@@ -473,7 +492,15 @@ exports.edit = function(ctx, success, failure) {
     });
 }
 
-exports.editPassword = function(ctx, success, failure) {
+/**
+ * Edits password for user.
+ * 
+ * @param {(ObjectId|string)} uid User ID.
+ * @param {string} password New password for user.
+ * @param {function} success Success callback. (No parameters.)
+ * @param {genericFailure} failure
+ */
+exports.editPassword = function(uid, password, success, failure) {
     function fail(error) {
         Winston.debug("Failed to edit password.", {
             "error": error

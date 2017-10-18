@@ -37,8 +37,14 @@ exports.send = function(config, success, failure) {
     console.log(config);
 
     transporter.sendMail(config, (error, data) => {
-        console.log(error);
-        if (error) return fail(error);
+        if (error)
+            return fail({
+                "errorName": "sendMail",
+                "errorNameFull": "Email.send.sendMail",
+                "errorData": {
+                    "errorSend": error
+                }
+            });
         success(data.response);
     });
 }
