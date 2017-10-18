@@ -41,8 +41,14 @@ exports.testOid = function(oid, failure, success) {
             if (success) success(newOid);
             return newOid;
         } catch(e) {
-            if (failure)
-                failure({ "type": "Utils.testOid", "exception": e, "oid": oid });
+            if (failure) failure({
+                "errorName": "testOid",
+                "errorNameFull": "Utils.testOid",
+                "errorData": {
+                    "exception": e,
+                    "oid": oid
+                }
+            });
         }
     }
     return false;

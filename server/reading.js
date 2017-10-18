@@ -25,7 +25,6 @@ exports.find = function(oid, success, failure, reqs) {
             "oidString": oid.toString()
         });
         failure(error);
-        return error;
     }
     
     // ----
@@ -42,9 +41,15 @@ exports.find = function(oid, success, failure, reqs) {
     readings.findOne(
         { "_id": oid },
         fields,
-        (error, reading) => {
-            if (error || reading == null)
-                return fail({ "type": "notFound", "error": error });
+        (errorFind, reading) => {
+            if (errorFind || reading == null)
+                return fail({
+                    "errorName": "notFound",
+                    "errorNameFull": "Reading.find.notFound",
+                    "errorData": {
+                        "errorFind": errorFind
+                    }
+                });
 
             Winston.debug("Reading found successfully.", {
                 "oidString": oid.toString()
@@ -67,6 +72,7 @@ exports.findQuery = function(query, success, failure) {
     
     if (!queryValidity) return fail({
         "errorName": "queryValidity",
+        "errorNameFull": "Reading.findQuery.queryValidity",
         "errorData": {
             "schemaErrors": Schema.errors()
         }
@@ -88,11 +94,14 @@ exports.findQuery = function(query, success, failure) {
     cursor.toArray(function(error, list) {
         if (error) return fail({
             "errorName": "toArray",
-            "error": error
+            "errorNameFull": "Reading.findQuery.toArray",
+            "errorData": {
+                "errorToArray": error
+            }
         });
 
         Winston.debug('Finished searching for readings.', {
-            // "list": list
+            "list": list
         });
         success(list);
     });
@@ -127,7 +136,10 @@ exports.new = function(user, configuration, data, success, failure, publish) {
     }
 
     let canEdit = Configurations.canEdit(user, configuration);
-    if (!canEdit) return fail({ "type": "canEdit" });
+    if (!canEdit) return fail({
+        "errorName": "canEdit",
+        "errorNameFull": "Reading.new.canEdit"
+    });
 
     let newData = deepmerge(
         data,
@@ -150,7 +162,13 @@ exports.new = function(user, configuration, data, success, failure, publish) {
 
     let readingValidity = Schema.validate('/Reading', newData);
     if (!readingValidity)
-        return fail({ "type": "readingValidity", "errors": Schema.errors() });
+        return fail({
+            "errorName": "readingValidity",
+            "errorNameFull": "Reading.new.readingValidity",
+            "errorData": {
+                "schemaErrors": Schema.errors()
+            }
+        });
     
     if (Utils.exists(data.values)) {
         let valueValidity;
@@ -164,13 +182,25 @@ exports.new = function(user, configuration, data, success, failure, publish) {
         });
         
         if (!valueValidity)
-            return fail({ "type": "valueValidity", "errors": Schema.errors() });
+            return fail({
+                "errorName": "valueValidity",
+                "errorNameFull": "Reading.new.valueValidity",
+                "errorData": {
+                    "schemaErrors": Schema.errors()
+                }
+            });
     }
 
     let readings = Db.collection('readings');
 
     readings.save(newData, (error, result) => {
-        if (error) return fail({ "type": "readingSave", "error": error });
+        if (error) return fail({
+            "errorName": "readingSave",
+            "errorNameFull": "Reading.new.readingSave",
+            "errorData": {
+                "errorSave": error
+            }
+        });
 
         let rid = ObjectId(result.ops[0]["_id"]);
 

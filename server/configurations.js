@@ -50,13 +50,17 @@ exports.getList = function(user, success, reqs) {
 
     cursor.toArray(function(error, list) {
         if (error) return fail({
-            "type": "cursor",
-            "error": error
+            "errorName": 'cursor',
+            "errorName": 'Configurations.getList.cursor',
+            "errorData": {
+                "errorToArray": error
+            }
         });
 
         Winston.debug('Finished searching for configurations.', {
             "list": list
         });
+
         success(list);
     });
 };
@@ -91,7 +95,8 @@ exports.find = function(cid, success, failure, reqs) {
         function(error, configuration) {
             if ((error != null) || !Utils.exists(configuration)) {
                 return fail({
-                    "type": 'find',
+                    "errorName": "find",
+                    "errorNameFull": "Configruations.find.find",
                     "error": error
                 });
             }
@@ -143,7 +148,7 @@ exports.getSensorList = function(configuration, success, failure, reqs) {
 // ============================================================================
 
 /**
- * Creates a new Configuration in a collection and provides the new oid.
+ * Creates a new Configuration in a collection and provides the new cid.
  * 
  * @param {object} user - User object.
  * @param {object} configurations - mongoDB collection object.
@@ -153,11 +158,13 @@ exports.getSensorList = function(configuration, success, failure, reqs) {
 
 exports.new = function(user, success, failure) {
     function fail(error) {
+        Winston.error("Error saving new configuration to database.", {
+            "error": error
+        });
         failure(error);
     }
 
     let configurations = Db.collection('configurations');
-
     let newConfiguration = Schema.defaults('/Configuration');
     
     [
@@ -168,20 +175,17 @@ exports.new = function(user, success, failure) {
         Date.now()
     ];
 
-    configurations.save(newConfiguration, function(err, result) {
-        if (err) {
-            Winston.error("Error saving new configuration to database.", {
-                "username": user.username,
-                "newConfiguration": newConfiguration,
-                "errorInternal": err
+    configurations.save(newConfiguration, function(error, result) {
+        if (error)
+            return fail({
+                "errorName": "save",
+                "errorNameFull": "Configurations.new.save"
             });
-            fail(err)
-            return;
-        }
+
         Winston.debug('Successfully registered new configuration.', {
-            "username": user.username,
             "newConfiguration": newConfiguration
         });
+
         // Run success with the oid of the new configuration
         // as the parameter
         success(ObjectId(result.ops[0]["_id"]));
@@ -215,9 +219,6 @@ exports.new = function(user, success, failure) {
 exports.edit = function(ctx, success, failure) {
     function fail(error) {
         Winston.debug("Failed to edit configuration.", {
-            "username": user.username,
-            "cid": (cid || "").toString(),
-            "edit": edit,
             "error": error
         });
 
@@ -236,8 +237,13 @@ exports.edit = function(ctx, success, failure) {
         ctx.removeSensors
     ];
 
-    if (!user) return;
-    if (!cid) return;
+    if (!user)
+        return fail({
+            "errorName": "noUser",
+            "errorNameFull": "Configurations.edit.noUser"
+        });
+
+    if (!cid) return; // Utils.testOid will throw error message
 
     // ----
 
@@ -245,13 +251,22 @@ exports.edit = function(ctx, success, failure) {
         exports.find(cid,
             this.next.bind(this),
             (error) => {
-                fail({ "type": "find", "error": error });
+                fail({
+                    "errorName": "find",
+                    "errorNameFull": "Configurations.edit.find",
+                    "errorData": {
+                        "errorFind": error
+                    }
+                });
             }
         );
     }, function(configuration) {
         let canEdit = exports.canEdit(user, configuration);
         if (!canEdit)
-            return fail({ "type": "canEdit" });
+            return fail({
+                "errorName": "canEdit",
+                "errorNameFull": "Configurations.edit.canEdit"
+            });
 
         if (typeof edit == 'undefined') {
             edit = {};
@@ -261,7 +276,13 @@ exports.edit = function(ctx, success, failure) {
         let editValidity = Schema.validate('/ConfigurationEdit', edit);
 
         if (!editValidity)
-            return fail({ "type": "editValidity", "errors": Schema.errors() });
+            return fail({
+                "errorName": "editValidity",
+                "errorNameFull": "Configurations.edit.editValidity",
+                "errorData": {
+                    "schemaErrors": Schema.errors() 
+                }
+            });
 
         exports.canAddSensorMulti(user, configuration, edit.sensors,
             this.next.bind(this, configuration),
@@ -303,10 +324,14 @@ exports.edit = function(ctx, success, failure) {
 
         let completeValidity = Schema.validate('/Configuration', configuration);
         
-        if (!completeValidity) return fail({
-            "type": "completeValidity",
-            "errors": Schema.errors()
-        });
+        if (!completeValidity)
+            return fail({
+                "errorName": "completeValidity",
+                "errorNameFull": "Configurations.edit.completeValidity",
+                "errorData": {
+                    "schemaErrors": Schema.errors()
+                }
+            });
         
         // -----
 
@@ -318,12 +343,15 @@ exports.edit = function(ctx, success, failure) {
             this.next.bind(this)
         );
 
-    }, function(errUpdate, writeResult) {
-        if (errUpdate || writeResult.result.ok != 1)
+    }, function(errorUpdate, writeResult) {
+        if (errorUpdate || writeResult.result.ok != 1)
             return fail({
-                "type": "write",
-                "result": (writeResult || "").toString(),
-                "error": errUpdate
+                "errorName": "write",
+                "errorNameFull": "Configurations.edit.write",
+                "errorData": {
+                    "errorUpdate": errorUpdate,
+                    "result": (writeResult || "").toString(),
+                }
             });
         
         success();
@@ -344,22 +372,34 @@ exports.canAddSensor = function(user, configuration, sid, success, failure) {
 
     configuration.sensors.forEach((sensor) => {
         sensor = ObjectId(sensor);
-        if (sid.equals(sensor)) return fail({
-            "type": "duplicateSensor",
-        });
+        if (sid.equals(sensor))
+            return fail({
+                "errorName": "duplicateSensor",
+                "errorNameFull": "Configurations.canAddSensor.duplicateSensor"
+            });
     });
 
     Sensor.find(sid,
         (sensor) => {
             let ownerId = ObjectId(sensor.owner);
             let userId = ObjectId(user["_id"]);
-            let result = ownerId.equals(userId);
+            let idEquals = ownerId.equals(userId);
 
-            if (!result) return fail({ "type": "mismatch" });
+            if (!idEquals)
+                return fail({
+                    "errorName": "idMismatch",
+                    "errorNameFull": "Configurations.canAddSensor.idMismatch"
+                });
 
             success();
         },
-        (error) => { fail({ "type": "find", "error": error }) }
+        (errorFind) => {
+            fail({
+                "errorName": "find",
+                "errorNameFull": "Configurations.canAddSensor.find",
+                "errorFind": errorFind
+            });
+        }
     );
 }
 
@@ -409,22 +449,17 @@ exports.canAddSensorMulti = function(user, configuration, sidArray, success, fai
 exports.canEdit = function(user, configuration) {
     let ownerId = ObjectId(configuration.owner);
     let userId = ObjectId(user["_id"]);
-    let result = ownerId.equals(userId);
-
-    // if (!result) configuration.members.some((member) => {
-    //     result = userId.equals(ObjectId(member.uid));
-    //     return result;
-    // });
+    let idEquals = ownerId.equals(userId);
 
     Winston.debug("Testing if user can edit this configuration.", {
         "username": user.username,
-        "result": result,
+        "idEquals": idEquals,
         "ownerId": ownerId.toString(),
         "userId": userId.toString(),
         "configurationId": ObjectId(configuration['_id']).toString()
     });
 
-    return result;
+    return idEquals;
 };
 
 // ----------------------------------------------------------------------------
@@ -459,132 +494,3 @@ exports.addSensor = function(user, cid, sid, success, failure) {
         success, fail
     );
 };
-
-/**
- * @param {array} reqs
- */
-exports.mustachify = function(user, configuration, success, failure, needs = [], query) {
-    function fail(error) {
-        Winston.debug('Error preparing configuration for mustache.', {
-            "error": error
-        });
-        failure(error);
-    }
- 
-    // ----
-
-    let hasFailed = false;
-    let tasks = needs.length + 1;
-
-    function progress() {
-        Winston.debug('Progress made on Configurations.mustachify.');
-        tasks--;
-        if (tasks == 0) {
-            Winston.debug('Configurations.mustachify succeeded.');
-            success();
-        }
-    }
-
-    // ----
-
-    configuration.creation = Utils.prettyTime(
-        configuration.creation, user.timezone
-    );
-
-    progress();
-    
-    // ----
-
-    if (needs.includes('sensors')) {
-        exports.getSensorList(configuration,
-            (sensors) => {
-                configuration.sensors = sensors;
-                if (needs.includes('sensors.typeData')) {
-                    sensors.forEach((sensor) => {
-                        sensor.typeData = SensorTypes.getTypeData(sensor.type);
-                    });
-                    progress();
-                }
-                progress();
-            },
-            (error) => {
-                if (!hasFailed) {
-                    fail({ "type": "sensorList", "error": error });
-                    hasFailed = true;
-                }
-            }
-        );
-    }
-
-    // ----
-
-    if (needs.includes('edits.time')) {
-        configuration.edits.forEach((edit) => {
-            edit.time = Utils.prettyTime(
-                edit.time, user.timezone
-            );
-        });
-        progress();
-    }
-
-    // ---
-
-    if (needs.includes('user.sensors')) {
-        Sensor.getList(user, 
-            (docs) => { // Success
-                user.sensors = docs;
-                if (needs.includes('user.sensors.typeData')) {
-                    user.sensors.forEach((sensor) => {
-                        sensor.typeData = SensorTypes.getTypeData(sensor.type);
-                    });
-                    progress();
-                }
-                progress();
-            },
-            (error) => { // Failure
-                fail({ "type": "userSensorList", "error": error });
-            },
-            ['name', 'model', 'type'] // Requirements
-        );
-    }
-
-    // ----
-
-    if (needs.includes('owner')) {
-        Auth.findOid(configuration.owner,
-            (owner) => {
-                configuration.owner = owner;
-                progress();
-            },
-            (error) => {
-                fail({ "type": "configurationOwner", "error": error });
-            },
-            ['username']
-        );
-    }
-
-    // ----
-
-    if (needs.includes('readings')) {
-        Reading.findConfiguration(configuration['_id'],
-            (list) => {
-                list.sort((a, b) => {
-                    let timeA = parseInt(a.timeCreated);
-                    let timeB = parseInt(b.timeCreated);
-                    if (timeA < timeB) return -1;
-                    if (timeA > timeB) return 1;
-                    return 0;
-                });
-                list.forEach((obj, i) => {
-                    list[i].timeCreated = Utils.prettyTime(obj.timeCreated, user.timezone);
-                });
-                configuration.readings = list;
-                progress();
-            },
-            (error) => {
-                fail({ "type": "configurationOwner", "error": error });
-            },
-            ['timeCreated']
-        );
-    }
-}

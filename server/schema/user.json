@@ -4,12 +4,11 @@
 	"properties": {
 		"username": {
             "type": "string",
-            "pattern": "^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_]{1,15}$"
+            "pattern": "^[a-z0-9_]{1,15}$"
         },
 
 		"email": {
-            "type": "string",
-            "format": "email"
+            "$ref": "/Definitions#/definitions/emailLowercase"
         },
 
         "password": {

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Forgot Username or Password</title>
+</head>
+<body>
+    <!--nav-->
+    <br>
+    <div class="container"><div class="col-md-8 col-md-offset-2 col-xs-12">
+        <h2>Forgot Username or Password</h2>
+        <hr>
+        {{#query.invalid}}
+        <div class="alert alert-danger">
+            <p>Email not found. Check your spelling and try again.</p>
+        </div>
+        {{/query.invalid}}
+        <p>If you've forgotten your username or password, input your email in the box below. An email will be sent containing your username and a link to reset your password.</p>
+        <form action="./forgotDo" method="post" class="row">            
+            <label class="col-xs-2 col-xxs-12"><strong>Email</strong></label>
+            <div class="col-xs-10 col-xxs-12">
+                <input  class="form-control"
+                        type="email" name="email"
+                        value="{{email}}">
+                <br>
+            </div>
+
+            <div class="col-xs-10 col-xxs-12 col-xs-offset-2">
+                <a href="/login" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+</div>
+
+    <!--scripts-->
+</body>

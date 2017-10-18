@@ -20,6 +20,7 @@ exports.index = function() {
     // let configurations = db.collection('configurations');
     
     users.ensureIndex('username');
+    users.ensureIndex('email');
 }
 
 exports.connect = function(success, failure) {
@@ -33,11 +34,15 @@ exports.connect = function(success, failure) {
 
     MongoClient.connect(
         Config.db.uri,
-        (error, database) => {
-            if (error) {
-                fail({ "type": "connect", "error": errorv });
-                return;
-            }  
+        (errorConnect, database) => {
+            if (errorConnect)
+                return fail({
+                    "errorName": "connect",
+                    "errorNameFull": "Db.connect.connect",
+                    "errorData": {
+                        "errorConnect": errorConnect
+                    }
+                });
 
             db = database;
             exports.index();

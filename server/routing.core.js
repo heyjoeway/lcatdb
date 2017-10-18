@@ -29,13 +29,19 @@ exports.stepUser = function(req, res, data, options, callback) {
             },
             (error) => { // Failure
                 fail({
-                    "type": "notFound",
-                    "error": error,
-                    "oid": oid
+                    "errorName": "notFound",
+                    "errorNameFull": "Routing.core.stepUser.notFoundm",
+                    "errorData": {
+                        "errorFind": error,
+                        "oid": oid
+                    }
                 });
             }
         );
-    } else fail({ "type": "noSession" });
+    } else fail({
+        "errorName": "noSession",
+        "errorNameFull": "Routing.core.stepUser.noSession"
+    });
 }
 
 exports.stepConfiguration = function(req, res, data, options, callback) {
@@ -59,9 +65,12 @@ exports.stepConfiguration = function(req, res, data, options, callback) {
         },
         (error) => { // Failure
             fail({
-                "type": "notFound",
-                "error": error,
-                "cid": cid
+                "errorName": "notFound",
+                "errorNameFull": "Routing.core.stepConfiguration.notFound",
+                "errorData": {
+                    "errorFind": error,
+                    "cid": cid
+                }
             });
         }
     );   
@@ -89,9 +98,12 @@ exports.stepSensor = function(req, res, data, options, callback) {
         },
         (error) => { // Failure
             fail({
-                "type": "notFound",
-                "error": error,
-                "sid": sid
+                "errorName": "notFound",
+                "errorNameFull": "Routing.core.stepSensor.notFound",
+                "errorData": {
+                    "errorFind": error,
+                    "sid": sid
+                }
             });
         }
     );
@@ -105,18 +117,52 @@ exports.stepReading = function(req, res, data, options, callback) {
         callback(req, res, data, options);
     }
 
-    let id = req.originalUrl.split('/')[2].split('?')[0];
+    let rid = req.originalUrl.split('/')[2].split('?')[0];
 
-    Reading.find(id,
+    Reading.find(rid,
         (reading) => { // Success
             data.reading = reading;
             callback(req, res, data, options);
         },
         () => { // Failure
             fail({
-                "type": "notFound",
-                "error": error,
-                "cid": cid
+                "errorName": "notFound",
+                "errorNameFull": "Routing.core.stepReading.notFound",
+                "errorData": {
+                    "errorFind": error,
+                    "rid": rid
+                }
+            });
+        }
+    );
+}
+
+
+exports.stepForgot = function(req, res, data, options, callback) {
+    function fail(error) {
+        Winston.debug("Cannot find forgot password request.", {
+            "error": error
+        });
+        callback(req, res, data, options);
+    }
+
+    data.forgot = {};
+    let fid = req.originalUrl.split('/')[2].split('?')[0];
+    
+    Forgot.find(fid,
+        (forgot) => { // Success
+            data.forgot.exists = true;
+            callback(req, res, data, options);
+        },
+        () => { // Failure
+            data.forgot.exists = false;
+            fail({
+                "errorName": "notFound",
+                "errorNameFull": "Routing.core.stepForgot.notFound",
+                "errorData": {
+                    "errorFind": error,
+                    "rid": rid
+                }
             });
         }
     );

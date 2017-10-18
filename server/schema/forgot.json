@@ -1,0 +1,14 @@
+{
+    "id": "/Forgot",
+    "type": "object",
+    "properties": {
+        "randomId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9]$"
+        },
+        "uid": { "$ref": "/Definitions/oid" },
+        "expiration": { "$ref": "/Definitions/time" }
+    },
+    "required": ["randomId", "uid", "expiration"],
+    "additionalProperties": false
+}

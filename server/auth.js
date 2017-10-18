@@ -5,7 +5,7 @@
 const ObjectId = require('mongodb').ObjectId;
 const Winston = require('winston');
 const Bcrypt = require('bcrypt');
-const hat = require('hat');
+const deepmerge = require('deepmerge');
 
 // ----------------------------------------------------------------------------
 // Champy-DB specific modules
@@ -34,8 +34,8 @@ const Chain = Utils.Chain;
 exports.find = function(username, email, success, failure, reqs) {
     let query = { "$or": [] }; 
 
-    if (username) query["$or"].push({ "username": username });
-    if (email) query["$or"].push({ "email": email });
+    if (username) query["$or"].push({ "username": username.toLowerCase() });
+    if (email) query["$or"].push({ "email": email.toLowerCase() });
 
     return exports.findQuery({
        "filter": query,
@@ -52,7 +52,7 @@ exports.find = function(username, email, success, failure, reqs) {
  *      - err: mongoDB error object.
  */
 
-exports.findOid = function(oid, success, failure, reqs) {
+exports.findOid = function(uid, success, failure, reqs) {
     function fail(error) {
         Winston.debug('Could not find user by id.', {
             "error": error,
@@ -61,11 +61,11 @@ exports.findOid = function(oid, success, failure, reqs) {
         failure(error);
     }
 
-    oid = Utils.testOid(oid, fail);
-    if (!oid) return;
+    uid = Utils.testOid(uid, fail);
+    if (!uid) return;
 
     return exports.findQuery({
-       "filter": { "_id": oid },
+       "filter": { "_id": uid },
        "fields": Utils.reqsToObj(reqs)
     }, success, fail);
 };
@@ -91,6 +91,7 @@ exports.findQuery = function(query, success, failure) {
     
     if (!queryValidity) return fail({
         "errorName": "queryValidity",
+        "errorNameFull": "Auth.findQuery.queryValidity",
         "errorData": {
             "schemaErrors": Schema.errors()
         }
@@ -108,7 +109,10 @@ exports.findQuery = function(query, success, failure) {
         Db.collection('users').findOne(filter, fields, (error, user) => {
             if (user == null || error != null) return fail({
                 "errorName": "notFound",
-                "error": error                 
+                "errorNameFull": "Auth.findQuery.notFound",
+                "errorData": {
+                    "errorFind": error
+                }
             });
             
             Winston.debug("Found user.", {
@@ -119,7 +123,8 @@ exports.findQuery = function(query, success, failure) {
         });
     } catch(e) {
         fail({
-            "errorName": "exception"
+            "errorName": "exception",
+            "errorNameFull": "Auth.findQuery.exception"
         });
     }
 }
@@ -144,7 +149,6 @@ exports.findQuery = function(query, success, failure) {
  */
 
 exports.register = function(data, success, failure) {
-
     function fail(errors) {
         Winston.debug("Failed to register user.", {
             "data": data,
@@ -154,8 +158,23 @@ exports.register = function(data, success, failure) {
     }
 
     let users = Db.collection('users');
-
     let newUser = Schema.defaults('/User');
+
+    // Email and username are converted to lowercase in order to prevent
+    // conflicts when searching. For example:
+    //
+    //   fooBar
+    //   Foobar
+    //   FooBar
+    //
+    // Despite being spelled the same, these would actually all be considered
+    // 3 separate usernames.
+    //
+    // Don't bother validating this client side; that would only make another
+    // use case to test.
+
+    if (data.email) data.email = data.email.toLowerCase();
+    if (data.username) data.username = data.username.toLowerCase();
 
     [
         newUser.username,
@@ -171,11 +190,20 @@ exports.register = function(data, success, failure) {
         Date.now()
     ];
 
+    // Have an array of errors so that the user doesn't have to play "request
+    // tag" to figure out what input is valid.
+
     let errors = [];
+
+    // ---- JSON SCHEMA VALIDITY
+
     let validity = Schema.validate('/User', newUser);
 
     let passwordMismatch = data.password != data.passwordRetype;
-    if (passwordMismatch) errors.push({ "type": "passwordMismatch" });
+    if (passwordMismatch) errors.push({
+        "errorName": "passwordMismatch",
+        "errorNameFull": "Auth.register.passwordMismatch",
+    });
 
     // Schema Validity/Password Mismatch
     if (!validity || passwordMismatch) {
@@ -185,44 +213,65 @@ exports.register = function(data, success, failure) {
             // Grab the actual property name instead of ".<property>"
             properties.push(value.dataPath.split('.')[1]);
         });
+
         errors.push({
-            "type": "validity",
-            "properties": properties,
-            "validityErrors": validityErrors
+            "errorName": "validity",
+            "errorNameFull": "Auth.register.validity",
+            "errorData": {
+                "validityErrors": validityErrors,
+                "properties": properties
+            },
         });
 
-        fail(errors);
-        return;
+        return fail(errors);
     }
 
-    // Username/email conflict
-    new Chain(function() {
+    // ---- USERNAME/EMAIL COLLISION
+
+    new Chain(function() { // Try to find preexisting user
+
         exports.find(newUser.username, newUser.email,
             () => { // User found
-                errors.push({ "type": "taken" });
+                errors.push({
+                    "errorName": "taken",
+                    "errorNameFull": "Auth.register.taken"
+                });
                 fail(errors);
             },
             this.next.bind(this)
         );
-    }, function() { // User not found
+
+    }, function() { // User not found -> Encrypt password
+        
         Bcrypt.hash(
             newUser.password,
             Config.salt.rounds,
             this.next.bind(this)
         );
-    }, function(errHash, hash) {
+
+    }, function(errHash, hash) { // Password encryption done -> Store user in DB
+
         if (errHash) {
-            errors.push({ "type": "hash", "errHash": errHash });
-            fail(errors);
-            return;
+            errors.push({
+                "errorName": "hash",
+                "errorNameFull": "Auth.register.hash",
+                "errorData": {
+                    "errorHash": errorHash
+                } 
+            });
+            return fail(errors);
         }
 
         newUser.password = hash;
-
         users.insertOne(newUser,  this.next.bind(this));
-    }, function(errSave, result) {
+
+    }, function(errSave, result) { // User saved -> Success
+
         if (errSave) {
-            errors.push({ "type": "save", "errSave": errSave });
+            errors.push({
+                "errorName": "save",
+                "errorNameFull": "Auth.register.save",
+            });
             fail(errors);
             return;
         }
@@ -236,45 +285,8 @@ exports.register = function(data, success, failure) {
         });
 
         success(oid);
+
     });
-
-    // exports.find(newUser.username, newUser.email,
-    //     () => { // User found
-    //         errors.push({ "type": "taken" });
-    //         fail(errors);
-    //         return;
-    //     },
-    //     () => { // User not found
-    //         Bcrypt.hash(newUser.password, Config.salt.rounds, (errHash, hash) => {
-    //             if (errHash) {
-    //                 errors.push({ "type": "hash", "errHash": errHash });
-    //                 fail(errors);
-    //                 return;
-    //             }
-
-    //             newUser.password = hash;
-
-    //             // Saving to db
-    //             users.insertOne(newUser, (errSave, result) => {
-    //                 if (errSave) {
-    //                     errors.push({ "type": "save", "errSave": errSave });
-    //                     fail(errors);
-    //                     return;
-    //                 }
-
-    //                 let oid = result.insertedId;
-
-    //                 Winston.debug('Successfully registered new user.', {
-    //                     "username": newUser.username,
-    //                     "email": newUser.email,
-    //                     "oidString": oid.toString()
-    //                 });
-
-    //                 success(oid);
-    //             });
-    //         });
-    //     }
-    // );
 };
 
 // ============================================================================
@@ -298,73 +310,119 @@ exports.login = function(username, password, success, failure) {
     let users = Db.collection('users');
 
     function fail(error) {
-        failure(error)
+        failure(error);
     }
 
-    exports.find(username, undefined,
+    exports.find(username, undefined, // Leave email undefined
         (user) => { // User found
             Bcrypt.compare(password, user.password, function(err, result) {
                 if (result) { // Pasword valid
-                    let oid = ObjectId(user["_id"]);
-                    success(oid);
-                    return;
+                    let uid = ObjectId(user["_id"]);
+                    return success(uid);
                 }
 
-                fail({ "type": "password" }); // Password invalid
+                // Password invalid
+                fail({
+                    "errorName": "password",
+                    "errorNameFull": "Auth.login.password"
+                }); 
             });
         },
-        (error) => { // User not found
-            fail({ "type": "username", "error": error });
+        (errorFind) => { // User not found
+            fail({
+                "errorName": "username",
+                "errorNameFull": "Auth.login.username",
+                "errorData": {
+                    "errorFind": errorFind
+                }
+            });
         }
     );
 };
 
 exports.edit = function(ctx, success, failure) {
     function fail(error) {
-        Winston.debug("Failed to edit configuration.", {
-            "username": user.username,
-            "cid": (cid || "").toString(),
-            "edit": edit,
+        Winston.debug("Failed to edit user.", {
+            "ctx": ctx,
             "error": error
         });
 
         failure(error);
     }
 
-    [
-        user,
-        edit
-    ] = [
-        ctx.user,
-        ctx.edit
-    ];
+    [user, edit] = [ctx.user, ctx.edit];
 
-    if (!user) return;
-    if (!edit) return;
+    if (!user) 
+        return fail({
+            "errorName": "noUser",
+            "errorNameFull": "Auth.edit.noUser"
+        });
+
+    if (!edit) 
+        return fail({
+            "errorName": "noEdit",
+            "errorNameFull": "Auth.edit.noEdit"
+        });
 
     // ----
 
     new Chain(function() {
+
+        // Skip if edit is blank
         if (typeof edit == 'undefined') {
             edit = {};
-            this.next();
-        } else {
-            let editValidity = Schema.validate('/UserEdit', edit);
-
-            if (!editValidity)
-                return fail({ "type": "editValidity", "errors": Schema.errors() });
-
-            if (edit.email && (edit.email != user.email)) {
-                user.verified = false;
-                exports.find(undefined, edit.email,
-                    () => { // Email taken
-                        fail({ "type": "emailTaken" });
-                    },
-                    this.next.bind(this) // Email not found
-                );
-            } else this.next();
+            return this.next();
         }
-    }, function() {
+    
+        // Convert username and email to lowercase
+        // (Check Auth.register for explanation)
+
+        if (edit.email) edit.email = edit.email.toLowerCase();
+        else edit.email = undefined;
+
+        if (edit.username) edit.username = edit.username.toLowerCase();            
+
+        let editValidity = Schema.validate('/UserEdit', edit);
+        
+        if (!editValidity)
+            return fail({
+                "errorName": "editValidity",
+                "errorNameFull": "Auth.edit.editValidity",
+                "errorData": {
+                    "schemaErrors": Schema.errors()
+                }
+            });
+
+        this.pause();
+
+        // TODO: Revise this to only use one request.
+
+        if (edit.email && (edit.email != user.email)) {
+            user.verified = false;
+            exports.find(undefined, edit.email,
+                () => { // Email taken
+                    fail({
+                        "errorName": "emailTaken",
+                        "errorNameFull": "Auth.edit.emailTaken"
+                    });
+                },
+                this.next.bind(this)
+            );
+        } else this.next();
+
+        if (edit.username && (edit.username != user.username)) {
+            exports.find(edit.username, undefined,
+                () => { // Username taken
+                    fail({
+                        "errorName": "usernameTaken",
+                        "errorNameFull": "Auth.edit.usernameTaken"
+                    });
+                },
+                this.next.bind(this) // Username not found
+            );
+        } else this.next();
+
+    }, function() { // Merge, re-check, and save data
         // Custom array merge function ensures all arrays are concatenated.
         // e.g:
         // >> let test1 = { "test": [ 1, 2, 3 ]}
@@ -376,12 +434,18 @@ exports.edit = function(ctx, success, failure) {
             arrayMerge: (dest, src) => { return dest.concat(src) }
         });
 
-        let completeValidity = Schema.validate('/User', user);
+        let completeValidity = Schema.validate('/User', newData);
         
-        if (!completeValidity) return fail({
-            "type": "completeValidity",
-            "errors": Schema.errors()
-        });
+        if (!completeValidity) {
+            let schemaErrors = Schema.errors();
+            return fail({
+                "errorName": "completeValidity",
+                "errorNameFull": "Auth.edit.completeValidity",
+                "errorData": {
+                    "schemaErrors": schemaErrors
+                }
+            });
+        } 
         
         // -----
 
@@ -394,13 +458,27 @@ exports.edit = function(ctx, success, failure) {
         );
 
     }, function(errUpdate, writeResult) {
+
         if (errUpdate || writeResult.result.ok != 1)
             return fail({
-                "type": "write",
-                "result": (writeResult || "").toString(),
-                "error": errUpdate
+                "errorName": "write",
+                "errorNameFull": "Auth.edit.write",
+                "errorData": {
+                    "result": (writeResult || "").toString(),
+                    "errorUpdate": errUpdate
+                }
             });
         
         success();
     });
+}
+
+exports.editPassword = function(ctx, success, failure) {
+    function fail(error) {
+        Winston.debug("Failed to edit password.", {
+            "error": error
+        });
+
+        failure(error);
+    }
 }

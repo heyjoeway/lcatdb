@@ -42,8 +42,11 @@ exports.getList = function(user, success, failure, reqs) {
     cursor.toArray(function(error, list) {
         if (error)
             return fail({
-                "type": "cursor",
-                "error": error
+                "errorName": "cursor",
+                "errorNameFull": "Sensor.getList.cursor",
+                "errorData": {
+                    "errorToArray": error
+                }
             });
 
         Winston.debug('Finished searching for sensors.', {
@@ -69,11 +72,6 @@ exports.canEdit = function(user, sensor) {
     let ownerId = ObjectId(sensor.owner);
     let userId = ObjectId(user["_id"]);
     let result = ownerId.equals(userId);
-
-    // if (!result) configuration.members.some((member) => {
-    //     result = userId.equals(ObjectId(member.uid));
-    //     return result;
-    // });
 
     Winston.debug("Testing if user can edit this sensor.", {
         "username": user.username,
@@ -121,9 +119,13 @@ exports.find = function(oid, success, failure, reqs) {
         { "_id": oid },
         fields,
         (error, sensor) => {
-            if (error || sensor == null)
-                return fail({ "type": "notFound", "error": error });
-
+            if (error || sensor == null) return fail({
+                "errorName": "notFound",
+                "errorNameFull": "Sensor.find.notFound",
+                "errorData": {
+                    "errorFind": error
+                }
+            });
 
             Winston.debug("Sensor found successfully.", {
                 "oidString": oid.toString()
@@ -155,7 +157,10 @@ exports.new = function(user, data, cid, success, failure) {
 
     let type = data.type;
     if (!SensorTypes.isValidType(type))
-        return fail({ "type": "invalidType" });
+        return fail({
+            "errorName": "invalidType",
+            "errorNameFull": "Sensor.new.invalidType"
+        });
 
     // ---
 
@@ -188,13 +193,15 @@ exports.new = function(user, data, cid, success, failure) {
             properties.push(value.dataPath.split('.')[1]);
         });
         errors.push({
-            "type": "sensorValidity",
-            "properties": properties,
-            "validityErrors": validityErrors
+            "errorName": "sensorValidity",
+            "errorNameFull": "Sensor.new.sensorValidity",
+            "errorData": {
+                "properties": properties,
+                "validityErrors": validityErrors
+            }
         });
 
-        fail(errors);
-        return;
+        return fail(errors);
     }
 
     // ---    
@@ -202,7 +209,13 @@ exports.new = function(user, data, cid, success, failure) {
     let sensors = Db.collection('sensors');
     sensors.insertOne(newSensor, (errSave, result) => {
         if (errSave) {
-            errors.push({ "type": "sensorSave", "errSave": errSave });
+            errors.push({
+                "errorName": "sensorSave",
+                "errorNameFull": "Sensor.new.sensorSave",
+                "errorData": {
+                    "errorSave": errSave
+                }
+            });
             fail(errors);
             return;
         }
@@ -223,7 +236,8 @@ exports.new = function(user, data, cid, success, failure) {
             },
             () => {
                 success(oid);
-            }, failure
+            },
+            failure
         );
     });
 };
@@ -243,8 +257,7 @@ exports.new = function(user, data, cid, success, failure) {
 exports.edit = function(user, oid, edit, success, failure) {
     function fail(error) {
         Winston.debug("Failed to edit sensor.", {
-            "username": user.username,
-            "oid": (oid || "").toString(),
+            "oid": oid,
             "edit": edit,
             "error": error
         });
@@ -264,19 +277,22 @@ exports.edit = function(user, oid, edit, success, failure) {
     exports.find(oid,
         (sensor) => {
             let canEdit = exports.canEdit(user, sensor);
-            if (!canEdit) {
-                fail({ "type": "canEdit" });
-                return;
-            }
+            if (!canEdit) return fail({
+                "errorName": "canEdit",
+                "errorNameFull": "Sensor.edit.canEdit"
+            });
 
             // -----
 
             let editValidity = Schema.validate('/SensorEdit', edit);
             
-            if (!editValidity) {
-                fail({ "type": "editValidity", "errors": Schema.errors() });
-                return;
-            }
+            if (!editValidity) return fail({
+                "errorName": "editValidity",
+                "errorNameFull": "Sensor.edit.editValidity",
+                "errorData": {
+                    "schemaErrors": Schema.errors()
+                }
+            });
 
             // -----
 
@@ -294,10 +310,13 @@ exports.edit = function(user, oid, edit, success, failure) {
 
             let completeValidity = Schema.validate('/Sensor', sensor);
             
-            if (!completeValidity) {
-                fail({ "type": "completeValidity", "errors": Schema.errors() });
-                return;
-            }
+            if (!completeValidity) return fail({
+                "errorName": "completeValidity",
+                "errorName": "Sensor.edit.completeValidity",
+                "errorData": {
+                    "schemaErrors": Schema.errors()
+                }
+            });
             
             // -----
 
@@ -305,9 +324,12 @@ exports.edit = function(user, oid, edit, success, failure) {
                 (errUpdate, writeResult) => {
                     if (errUpdate || writeResult.result.ok != 1) {
                         return fail({
-                            "type": "write",
-                            "result": (writeResult || "").toString(),
-                            "error": errUpdate
+                            "errorName": "write",
+                            "errorNameFull": "Sensor.edit.write",
+                            "errorData": {
+                                "result": (writeResult || "").toString(),
+                                "errorUpdate": errUpdate
+                            }
                         });
                     }
                     
@@ -315,78 +337,12 @@ exports.edit = function(user, oid, edit, success, failure) {
                 }
             );
         },
-        (error) => { fail({ "type": "find", "error": error }) }
+        (error) => { fail({
+            "errorName": "find",
+            "errorNameFull": "Sensor.edit.find",
+            "errorData": {
+                "errorFind": error
+            }
+        }); }
     );
-}
-
-exports.mustachify = function(user, sensor, success, failure, needs = []) {
-    function fail(error) {
-        Winston.debug('Error preparing sensor for mustache.', {
-            "error": error
-        });
-        failure(error);
-    }
- 
-    // ----
-
-    let hasFailed = false;
-    let tasks = needs.length + 1;
-    let data = {};
-
-    function progress() {
-        Winston.debug('Progress made on Sensor.mustachify.');
-        tasks--;
-        if (tasks == 0) {
-            Winston.debug('Sensor.mustachify succeeded.');
-            success(data);
-        }
-    }
-
-    // ----
-
-    sensor.creation = Utils.prettyTime(
-        sensor.creation, user.timezone
-    );
-
-    progress();
-    
-    // ----
-
-    if (needs.includes('edits.time')) {
-        sensor.edits.forEach((edit) => {
-            edit.time = Utils.prettyTime(
-                edit.time, user.timezone
-            );
-        });
-        progress();
-    }
-
-    // ----
-
-    if (needs.includes('models')) {
-        data.models = SensorTypes.getTypeData(sensor.type).models;
-        progress();
-    }
-
-    // ----
-
-    if (needs.includes('type')) {
-        sensor.type = SensorTypes.getTypeName(sensor.type);
-        progress();
-    }
-
-    // ----
-
-    if (needs.includes('owner')) {
-        Auth.findOid(sensor.owner,
-            (owner) => {
-                sensor.owner = owner;
-                progress();
-            },
-            (error) => {
-                fail({ "type": "sensorOwner", "error": error });
-            },
-            ['username']
-        );
-    }
 }

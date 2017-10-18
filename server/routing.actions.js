@@ -8,7 +8,7 @@ const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js');
 const Reading = require('./reading.js');
 const Chain = Utils.Chain;
-
+const Forgot = require('./forgot.js');
 const RoutingCore = require('./routing.core.js');
 
 exports.init = function(app) {
@@ -25,6 +25,15 @@ app.get('/configurations/new', (req, res, user) => {
             res.redirect('/login');
     }, function(cid) {
         res.redirect(`/configurations/${cid}/edit`);
+    });
+});
+
+
+app.post('/forgotDo', (req, res, user) => {
+    let email = ('' || req.body.email).toLowerCase();
+    Forgot.createRequest(email, function(succeeded) {
+        if (succeeded) res.redirect('/login?forgotSent=true');
+        else res.redirect('/forgot?invalid=true');
     });
 });
 
@@ -61,13 +70,13 @@ app.post('/registerdo', (req, res) => {
         (errors) => {
             let errorString = '/register?'; 
             errors.forEach((error) => {
-                if (error.type == 'validity')
-                    errorString += (error.properties
+                if (error.errorName == 'validity')
+                    errorString += (error.errorData.properties
                         .toString()
                         .split(',')
                         .join('=true&')) + '=true&';
                 else
-                    errorString += error.type + '=true&';
+                    errorString += error.errorName + '=true&';
             });
 
             errorString = errorString.substr(0, errorString.length - 1);
@@ -107,10 +116,31 @@ app.post(`/configurations/${configPattern}/editDo`, (req, res) => {
                 "edit": req.body
             },
             () => { res.redirect(`/configurations/${cid}`); },
-            (error) => { res.send(`Error processing request. (${error.type})`); }
+            (error) => { res.send(`Error processing request. (${error.errorName})`); }
         );
     });
 });
+
+app.post(`/user/editDo`, (req, res) => {
+    let data = {};
+
+    new Chain(function() {
+        RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
+    }, function() {
+        if (typeof data.user == 'undefined')
+            return res.redirect('/login');
+
+        Auth.edit(
+            {
+                "user": data.user,
+                "edit": req.body
+            },
+            () => { res.redirect(`/dashboard`); },
+            (error) => { res.send(`Error processing request. (${error.errorName})`); }
+        );
+    });
+});
+
 
 // ------------------------------------
 // Remove Sensor (action)
@@ -130,7 +160,7 @@ app.post(`/configurations/${configPattern}/removeSensorDo`, (req, res) => {
                 "removeSensors": [req.body.sid]
             },
             () => { res.redirect(`/configurations/${cid}`); },
-            (error) => { res.send(`Error processing request. (${error.type})`); }
+            (error) => { res.send(`Error processing request. (${error.errorName})`); }
         );
     });
 });
@@ -150,7 +180,7 @@ app.post(`/configurations/${configPattern}/addSensorDo`, (req, res) => {
     }, function() {
         Configurations.addSensor(data.user, cid, sid,
             () => { res.redirect(`/configurations/${cid}`); },
-            (error) => { res.send(`Error processing request. (${error.type})`); }
+            (error) => { res.send(`Error processing request. (${error.errorName})`); }
         );
     });
 });
@@ -175,7 +205,7 @@ app.post(`/sensors/${sensorPattern}/editDo`, (req, res) => {
                     url = `/configurations/${req.query.configuration}`
                 res.redirect(url);
             },
-            (error) => { res.send(`Error processing request. (${error.type})`); }
+            (error) => { res.send(`Error processing request. (${error.errorName})`); }
         );
     });
 });
@@ -214,7 +244,7 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
         Winston.debug('Error creating new reading', {
             "error": error
         });
-        res.send(`Error creating new reading. (${error.type})`);
+        res.send(`Error creating new reading. (${error.errorName})`);
     }
 
     function success(rid) {
@@ -246,11 +276,17 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
         RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
     }, function() {
         if (typeof data.user == 'undefined')
-            return fail({ "type": "noUser"});
+            return fail({
+                "errorName": "noUser",
+                "errorNameFull": "Routing.actions.readingDo.noUser"
+            });
         RoutingCore.stepConfiguration(req, res, data, {}, this.next.bind(this));
     }, function() {
         if (typeof data.configuration == 'undefined')
-            return fail({ "type": "noConfiguration"});
+            return fail({
+                "errorName": "noConfiguration",
+                "errorNameFull": "Routing.actions.readingDo.noConfiguration"
+            });
 
         this.pause(valueKeys.length);
         this.next();
@@ -270,7 +306,13 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
                 },
                 (error) => {
                     if (hasFailed) return;
-                    fail({ "type": "sensorFind", "error": error });
+                    fail({
+                        "errorName": "sensorFind",
+                        "errorNameFull": "Routing.actions.readingDo.sensorFind",
+                        "errorData": {
+                            "errorFind": error
+                        }
+                    });
                     hasFailed = true;
                 }
             );

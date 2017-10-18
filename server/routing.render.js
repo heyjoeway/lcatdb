@@ -48,8 +48,11 @@ function mustachifyReading(data, options, callback) {
             } catch(e) {
                 value.html = '<span class="error">ERROR: Could not retrieve template for value.</span>';
                 fail({
-                    "type": "noTemplate",
-                    "exception": e
+                    "errorName": "noTemplate",
+                    "errorNameFull": "Routing.render.mustachifyReading.noTemplate",
+                    "errorData": {
+                        "exception": e
+                    }
                 });
             }
         });
@@ -84,7 +87,13 @@ function mustachifyUser(data, options, callback) {
                     this.next();
                 },
                 (error) => { // Failure
-                    fail({ "type": "userSensorList", "error": error });
+                    fail({
+                        "errorName": "userSensorList",
+                        "errorNameFull": "Routing.render.mustachifyUser.userSensorList",
+                        "errorData": {
+                            "errorGetList": error
+                        }
+                    });
                     this.next();
                     if (needs.includes('sensors.typeData'))
                         this.next();
@@ -136,7 +145,13 @@ function mustachifyConfiguration(data, options, callback) {
                 },
                 (error) => {
                     if (!hasFailed) {
-                        fail({ "type": "sensorList", "error": error });
+                        fail({
+                            "errorName": "sensorList",
+                            "errorNameFull": "Routing.render.mustachifyConfiguration.sensorList",
+                            "errorData": {
+                                "errorFind": error
+                            }
+                        });
                         this.next();
                     }
                 }
@@ -152,7 +167,13 @@ function mustachifyConfiguration(data, options, callback) {
                     this.next();
                 },
                 (error) => {
-                    fail({ "type": "configurationOwner", "error": error });
+                    fail({
+                        "errorName": "configurationOwner",
+                        "errorNameFull": "Routing.render.mustachifyConfiguration.configurationOwner",
+                        "errorData": {
+                            "errorFind": error
+                        }
+                    });
                 },
                 ['username']
             );
@@ -174,7 +195,13 @@ function mustachifyConfiguration(data, options, callback) {
                     this.next();
                 },
                 (error) => {
-                    fail({ "type": "configurationOwner", "error": error });
+                    fail({
+                        "errorName": "readings",
+                        "errorNameFull": "Routing.render.mustachifyConfiguration.readings",
+                        "errorData": {
+                            "errorFind": error
+                        }
+                    });
                     this.next();
                 },
                 ['timeCreated']
@@ -220,7 +247,13 @@ function mustachifySensor(data, options, callback) {
                     this.next();
                 },
                 (error) => {
-                    fail({ "type": "sensorOwner", "error": error });
+                    fail({
+                        "errorName": "sensorOwner",
+                        "errorNameFull": "Routing.render.mustachifySensor.sensorOwner",
+                        "errorData": {
+                            "errorFind": error
+                        }
+                    });
                     this.next();
                 },
                 ['username']
@@ -261,8 +294,6 @@ function stepMustachify(req, res, data, options, callback) {
                 data, options,
                 this.next.bind(this)
             );
-
-
 
         if (mustacheDeps.general)
             mustachifyGeneral(
@@ -370,6 +401,30 @@ function renderConfiguration(options) {
     });
 }
 
+function renderForgot(options) {
+    app.get(options.url, (req, res) => {
+        let data = {};
+        
+        new Chain(function() {
+            RoutingCore.stepForgot(req, res, data, options, this.next.bind(this));
+        }, function() {
+            if (data.forgot.exists)
+                RoutingCore.stepQuery(req, res, data, options, this.next.bind(this));
+            else
+                res.render('forgotNF', data);
+        }, function() {
+            stepMustachify(req, res, data, options, this.next.bind(this));
+        }, function() {
+            res.render(options.template, data);
+        });
+    });
+}
+
+renderForgot({
+    "url": '/forgot/*',
+    "template": 'forgotReq'
+});
+
 renderUser({
     "url": '/user/edit',
     "template": 'userEdit'
@@ -389,6 +444,12 @@ renderUser({
     "mustacheDeps": {
         "user": ['sensors', 'sensors.typeData']
     }
+});
+
+renderUser({
+    "url": '/forgot',
+    "template": 'forgot',
+    "allowAnon": "only"
 });
 
 renderUser({

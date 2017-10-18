@@ -24,6 +24,10 @@ const VIEWS_SRC = SRC_DIR + "views/";
 const VIEWS_BUILD = BUILD_DIR + "views/";
 const VIEWS_TMP = TMP_DIR + "views/";
 
+const EMAILS_SRC = SRC_DIR + "emails/";
+const EMAILS_BUILD = BUILD_DIR + "emails/";
+const EMAILS_TMP = TMP_DIR + "emails/";
+
 var config = {};
 
 config.clean = {};
@@ -34,6 +38,10 @@ config.clean.www = [
 config.clean.views = [
     "./build/views/**/*.*",
     "./tmp/views/**/*.*"
+];
+config.clean.emails = [
+    "./build/emails/**/*.*",
+    "./tmp/emails/**/*.*"
 ];
 
 config.sass = {};
@@ -88,6 +96,12 @@ config.replace.views = {
     dest: VIEWS_TMP,
     replacements: replacements
 };
+config.replace.emails = {
+    expand: true,
+    src: [EMAILS_SRC + "*.mustache"],
+    dest: EMAILS_TMP,
+    replacements: replacements
+};
 
 config.htmlmin = {};
 config.htmlmin.www = {
@@ -117,6 +131,21 @@ config.htmlmin.views = {
         "cwd": VIEWS_TMP,
         "src": ["**/*.mustache"],
         "dest": VIEWS_BUILD,
+        "ext": ".mustache"
+    }]
+};
+config.htmlmin.emails = {
+    options: {
+        removeComments: true,
+        collapseWhitespace: true,
+        conservativeCollapse: true,
+        removeEmptyAttributes: true
+    },
+    files: [{
+        "expand": true,
+        "cwd": EMAILS_TMP,
+        "src": ["**/*.mustache"],
+        "dest": EMAILS_BUILD,
         "ext": ".mustache"
     }]
 };
@@ -200,7 +229,8 @@ require('load-grunt-tasks')(grunt); // Automatically loads all grunt tasks.
 
 grunt.registerTask('default', [
     "www-clean",
-    "views-clean"
+    "views-clean",
+    "emails-clean"
 ]);
 
 grunt.registerTask('www-clean', [
@@ -225,6 +255,16 @@ grunt.registerTask('views-clean', [
 grunt.registerTask('views', [
     'replace:views',
     'htmlmin:views'
+]);
+
+grunt.registerTask('emails-clean', [
+    'clean:emails',
+    'emails'
+]);
+
+grunt.registerTask('emails', [
+    'replace:emails',
+    'htmlmin:emails'
 ]);
 
 };

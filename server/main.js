@@ -71,6 +71,9 @@ const Reading = require('./reading.js');
 const Routing = require('./routing.js');
 const Api = require('./api.js');
 
+const Email = require('./email.js');
+Email.init(Config.email);
+
 // ============================================================================
 // SCHEMA INIT
 // ============================================================================

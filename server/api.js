@@ -31,6 +31,7 @@ Please refer to the MongoDB documentation for the query format. (https://docs.mo
 app.get('/api/readings', (req, res) => {
     fail(req, res, {
         "errorName": "instruction",
+        "errorNameFull": "Api.readings.instruction",
         "errorData": {
             "instructions": readingsInstructions
         }
@@ -44,6 +45,7 @@ app.post(`/api/readings`, (req, res) => {
     
     if (!queryValidity) return fail(req, res, {
         "errorName": "queryValidity",
+        "errorNameFull": "Api.readings.queryValidity",
         "errorData": {
             "schemaErrors": Schema.errors()
         }
@@ -66,17 +68,5 @@ app.post(`/api/readings`, (req, res) => {
     }
 
 });
-
-// app.get('/api/sensorTypes/*', (req, res) => {
-//     let type = req.originalUrl.split('/')[3];
-//     let typeData = SensorTypes.getTypeData(type);
-//     if (typeData) res.send(typeData);
-//     else exports.error(req, res, {
-//         "errorName": "unknown",
-//         "errorData": {
-//             "type": type
-//         }
-//     });
-// });
 
 };

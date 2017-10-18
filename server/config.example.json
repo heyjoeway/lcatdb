@@ -10,6 +10,13 @@
     "salt": {
         "rounds": 5
     },
+    "email": {
+        "service": "gmail",
+        "auth": {
+          "user": "example@gmail.com",
+          "pass": "password"
+        }
+    },
     "port": 3000,
     "log": {
         "level": "debug"

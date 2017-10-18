@@ -9,18 +9,116 @@
     <div class="container">
         {{#user}}
         <h2>Edit User Info</h2>
-        <form action="./editDo" method="post" class="form-horizontal"><fieldset class="container">
-            <div class="form-group">
-                <label class="col-xs-2 control-label" for="name">Email</label>
-                <div class="col-xs-10"><input class="form-control" type="email" name="email" value="{{email}}"></div>
+        <hr>
+        <form action="./editDo" method="post" class="row">
+
+            <label class="col-xs-2 col-xxs-12"><strong>Email</strong></label>
+            <div class="col-xs-10 col-xxs-12">
+                <input  class="form-control"
+                        type="email" name="email"
+                        value="{{email}}">
+                <br>
             </div>
-            <div class="form-group">
-                <div class="col-xs-10 col-xs-offset-2">
-                    <a href="/dashboard" class="btn btn-default">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
+
+            <div class="col-xs-12">
+                {{^email}}
+                <h6 class="text-danger">There is no email currently set.</h6>
+                <p>If you lose your username or password, you will no longer be able to recover your account.</p>
+                {{/email}}
+                {{#email}}
+                {{#verified}}
+                <p><strong class="text-success">&#10004;</strong>  This email has been verified.</p>
+                {{/verified}}
+                {{^verified}}
+                <p><strong class="text-danger">X</strong>  This email has not been verified.</p>
+                <p>Your readings may be filtered from others' results, and you may be required to prove you are not a robot for certain actions. Check your email for a verification message. If you cannot find one, check your spam folder for an email from "verify@lcatdb.org".</p>
+                <p>If you still cannot find the email, use the button below to send a new verification email.</p>
+                <a href="./verify" class="btn btn-primary btn-lg" id="verify-do">Verify Email</a>
+                <p id="verify-sent" style="display:none"><strong>Verification email sent. Check your inbox to finish the process.</strong></p>
+                {{/verified}}
+                <br>
             </div>
-        </fieldset></form>
+            {{/email}}
+
+            <label class="col-xs-2 col-xxs-12"><strong>First Name</strong></label>
+            <div class="col-xs-10 col-xxs-12">
+                <input  class="form-control"
+                        type="text" name="first"
+                        value="{{first}}">
+                <br>
+            </div>
+
+            <label class="col-xs-2 col-xxs-12"><strong>Last Name</strong></label>
+            <div class="col-xs-10 col-xxs-12">
+                <input  class="form-control"
+                        type="text" name="last"
+                        value="{{last}}">
+                <br>
+            </div>
+
+            <label class="col-xs-2 col-xxs-12"><strong>Short Description</strong></label>
+            <div class="col-xs-10 col-xxs-12">
+                <input  class="form-control"
+                        type="text" name="descShort"
+                        value="{{descShort}}">
+                <br>
+            </div>
+
+            <label class="col-xs-2 col-xxs-12"><strong>Long Description</strong></label>
+            <div class="col-xs-10 col-xxs-12">
+                <textarea   class="form-control"
+                            type="text" name="descLong">
+                    {{descLong}}
+                </textarea>
+                <br>
+            </div>
+
+            <label class="col-xs-2 col-xxs-12">
+                <strong>Timezone</strong>
+            </label>
+            <div class="col-xs-10 col-xxs-12">
+                <select class="form-control" value="{{timezone}}" name="timezone">
+                    <option value="-5">EST - Eastern Standard Time (GMT-5:00)</option>
+                    <option value="-5">IET - Indiana Eastern Standard Time (GMT-5:00)</option>
+                    <option value="-4">PRT - Puerto Rico and US Virgin Islands Time (GMT-4:00)</option>
+                    <option value="-3.5">CNT - Canada Newfoundland Time (GMT-3:30)</option>
+                    <option value="-3">AGT - Argentina Standard Time (GMT-3:00)</option>
+                    <option value="-3">BET - Brazil Eastern Time (GMT-3:00)</option>
+                    <option value="-1">CAT - Central African Time (GMT-1:00)</option>
+                    <option value="0">GMT - Greenwich Mean Time (GMT)</option>
+                    <option value="0">UTC - Universal Coordinated Time (GMT)</option>
+                    <option value="1">ECT - European Central Time (GMT+1:00)</option>
+                    <option value="2">EET - Eastern European Time (GMT+2:00)</option>
+                    <option value="2">ART - (Arabic) Egypt Standard Time (GMT+2:00)</option>
+                    <option value="3">EAT - Eastern African Time (GMT+3:00)</option>
+                    <option value="3.5">MET - Middle East Time (GMT+3:30)</option>
+                    <option value="4">NET - Near East Time (GMT+4:00)</option>
+                    <option value="5">PLT - Pakistan Lahore Time (GMT+5:00)</option>
+                    <option value="5.5">IST - India Standard Time (GMT+5:30)</option>
+                    <option value="6">BST - Bangladesh Standard Time (GMT+6:00)</option>
+                    <option value="7">VST - Vietnam Standard Time (GMT+7:00)</option>
+                    <option value="8">CTT - China Taiwan Time (GMT+8:00)</option>
+                    <option value="9">JST - Japan Standard Time (GMT+9:00)</option>
+                    <option value="9.5">ACT - Australia Central Time (GMT+9:30)</option>
+                    <option value="10">AET - Australia Eastern Time (GMT+10:00)</option>
+                    <option value="11">SST - Solomon Standard Time (GMT+11:00)</option>
+                    <option value="12">NST - New Zealand Standard Time (GMT+12:00)</option>
+                    <option value="-11">MIT - Midway Islands Time (GMT-11:00)</option>
+                    <option value="-10">HST - Hawaii Standard Time (GMT-10:00)</option>
+                    <option value="-9">AST - Alaska Standard Time (GMT-9:00)</option>
+                    <option value="-8">PST - Pacific Standard Time (GMT-8:00)</option>
+                    <option value="-7">PNT - Phoenix Standard Time (GMT-7:00)</option>
+                    <option value="-7">MST - Mountain Standard Time (GMT-7:00)</option>
+                    <option value="-6">CST - Central Standard Time (GMT-6:00)</option>
+                </select>
+                <br>
+            </div>
+
+            <div class="col-xs-10 col-xxs-12 col-xs-offset-2">
+                <a href="/dashboard" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
         {{/user}}
     </div>
 
