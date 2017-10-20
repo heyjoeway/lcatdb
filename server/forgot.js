@@ -1,17 +1,21 @@
 const hat = require('hat');
 const Db = require('./db.js');
-const Auth = require('./auth.js');
+const Bcrypt = require('bcrypt');
 const Winston = require('winston');
+
+const Auth = require('./auth.js');
 const Email = require('./email.js');
 const Config = require('./config.json');
-
+const Utils = require('./utils.js');
+const Chain = Utils.Chain;
 
 exports.emailRequest = function(user, randomId, callback) {
     Email.sendTemplate(
         {
             "template": "forgot",
             "data": {
-                "url": Config.domain + "/forgot/" + randomId
+                "url": Config.domain + "/forgot/" + randomId,
+                "user": user
             },
             "to": user.email,
             "subject": "Password Reset"
@@ -31,19 +35,50 @@ exports.createRequest = function(email, callback) {
 
     let randomId = hat();
     let expiration = (new Date()).getTime() + (24 * 60 * 60 * 1000);
+    let data = {};
 
-    Auth.find(undefined, email, (user) => {
+    new Chain(function() {
+        Auth.find(
+            undefined,
+            email, // Find by email only
+            this.next.bind(this),
+            fail,
+            ["_id", "username", "email"]
+        );
+    }, function(user) {
+        data.user = user;
+
         Db.collection('forgot').insertOne(
             {
                 "expiration": expiration,
                 "randomId": randomId,
                 "uid": user["_id"].toString()
             },
-            () => {
-                exports.emailRequest(user, randomId, callback);
-            }
+            this.next.bind(this)
         );
-    }, fail, ["_id", "email"]);
+    }, function(errSave, result) {
+        if (errSave)
+            return fail({
+                "errorName": "save",
+                "errorNameFull": "Forgot.createRequest.save",
+            });
+
+        // Let user go before sending email;
+        // it could take a little while to send.
+        callback(true);
+        
+        exports.emailRequest(data.user, randomId, (succeeded) => {
+            if (succeeded) return;
+
+            // Don't call fail since the callback has already been fired
+            Winston.warn('Email could not be sent.', {
+                "error": {
+                    "errorName": "emailSend",
+                    "errorNameFull": "Forgot.createRequest.emailSend"
+                }
+            });
+        });
+    });
 };
 
 exports.removeRequest = function(fid, success, failure) {
@@ -98,4 +133,57 @@ exports.find = function(fid, success, failure) {
         });
         success(forgot);
     });
+}
+
+exports.useRequest = function(fid, password, success, failure) {
+    function fail(error) {
+        Winston.debug('Error using forgot password request.', {
+            "error": error
+        });
+        failure(error);
+    }
+
+    let data = {};
+
+    new Chain(function() {
+        exports.find(
+            fid,
+            this.next.bind(this),
+            (error) => {
+                fail(error);
+            }
+        );
+    }, function(forgot) {
+        Auth.editPassword(
+            forgot.uid,
+            password,
+            this.next.bind(this),
+            (error) => {
+                fail(error);
+            }
+        );
+    }, function() {
+        // Let the user go at this point; deleting the request can be
+        // handled separately
+        success();
+
+        exports.removeRequest(
+            fid,
+            () => { // success
+                Winston.debug('Forgot request removed successfully.', {
+                    "fid": fid
+                });
+            },
+            (error) => {
+                Winston.warn('Failed to remove forgot password request.', {
+                    "errorName": "requestRemove",
+                    "errorNameFull": "Forgot.useRequest.requestRemove",
+                    "errorData": {
+                        "fid": fid
+                    }
+                });
+            }
+        );
+    });
+
 }

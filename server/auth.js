@@ -49,7 +49,7 @@ exports.find = function(username, email, success, failure, reqs) {
 /**
  * Finds a user by object ID.
  *
- * @param {ObjectId} uid Undefined if wanting to search by username.
+ * @param {(ObjectId|string)} uid Undefined if wanting to search by username.
  * @param {authFindSuccess} success Callback to be run upon successful find.
  * @param {genericFailure} failure Callback to be run if no user is found.
  * @param {string[]} reqs Array of field names needed by query.
@@ -255,9 +255,9 @@ exports.register = function(data, success, failure) {
             this.next.bind(this)
         );
 
-    }, function(errHash, hash) { // Password encryption done -> Store user in DB
+    }, function(errorHash, hash) { // Password encryption done -> Store user in DB
 
-        if (errHash) {
+        if (errorHash) {
             errors.push({
                 "errorName": "hash",
                 "errorNameFull": "Auth.register.hash",
@@ -269,7 +269,7 @@ exports.register = function(data, success, failure) {
         }
 
         newUser.password = hash;
-        users.insertOne(newUser,  this.next.bind(this));
+        users.insertOne(newUser, this.next.bind(this));
 
     }, function(errSave, result) { // User saved -> Success
 
@@ -278,8 +278,7 @@ exports.register = function(data, success, failure) {
                 "errorName": "save",
                 "errorNameFull": "Auth.register.save",
             });
-            fail(errors);
-            return;
+            return fail(errors);
         }
 
         let oid = result.insertedId;
@@ -508,4 +507,74 @@ exports.editPassword = function(uid, password, success, failure) {
 
         failure(error);
     }
+
+    uid = Utils.testOid(uid, fail);
+    if (!uid) return;
+
+    let passwordValidity = Schema.validate('/UserPasswordEdit', {
+        "password": password
+    });
+
+    if (!passwordValidity) {
+        let validityErrors = Schema.errors() || [];
+        let properties = [];
+        validityErrors.forEach(function(value) {
+            // Grab the actual property name instead of ".<property>"
+            properties.push(value.dataPath.split('.')[1]);
+        });
+
+        return fail({
+            "errorName": "validity",
+            "errorNameFull": "Auth.editPassword.validity",
+            "errorData": {
+                "validityErrors": validityErrors,
+                "properties": properties
+            }
+        });
+    }
+
+    new Chain(function() {
+        Bcrypt.hash(
+            password,
+            Config.salt.rounds,
+            this.next.bind(this)
+        );
+    }, function(errorHash, hash) {
+        if (errorHash)
+            return fail({
+                "errorName": "hash",
+                "errorNameFull": "Forgot.useRequest.hash",
+                "errorData": {
+                    "errorHash": errorHash
+                } 
+            });
+
+        // $set MUST BE USED OR ELSE ALL OTHER PROPERTIES OF DOCUMENT ARE ERASED
+
+        let edit = { 
+            "$set": {
+                "password": hash
+            }
+        };
+        let users = Db.collection('users');
+
+        users.update(
+            {'_id': uid },
+            edit,
+            this.next.bind(this)
+        );
+    }, function(errUpdate, writeResult) {
+        if (errUpdate || writeResult.result.ok != 1)
+            return fail({
+                "errorName": "write",
+                "errorNameFull": "Auth.edit.write",
+                "errorData": {
+                    "result": (writeResult || "").toString(),
+                    "errorUpdate": errUpdate
+                }
+            });
+        
+        success();
+    });
+
 }

@@ -4,6 +4,7 @@ const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
 const Sensor = require('./sensor.js');
 const Reading = require('./reading.js');
+const Forgot = require('./forgot.js');
 
 exports.stepQuery = function(req, res, data, options, callback) {
     data.query = req.query;
@@ -150,17 +151,17 @@ exports.stepForgot = function(req, res, data, options, callback) {
     
     Forgot.find(fid,
         (forgot) => { // Success
-            data.forgot.exists = true;
+            data.forgot.fid = fid;
             callback(req, res, data, options);
         },
-        () => { // Failure
+        (error) => { // Failure
             data.forgot.exists = false;
             fail({
                 "errorName": "notFound",
                 "errorNameFull": "Routing.core.stepForgot.notFound",
                 "errorData": {
                     "errorFind": error,
-                    "rid": rid
+                    "fid": fid
                 }
             });
         }

@@ -48,7 +48,7 @@ app.post('/logindo', (req, res) => {
             res.redirect('/dashboard');
         },
         (error) => { // Failure
-            res.redirect('/login?invalid');
+            res.redirect('/login?invalid=true');
         }
     );
 });
@@ -234,6 +234,53 @@ app.post('/sensors/newDo', (req, res) => {
     });
 });
 
+// ------------------------------------
+// Reset Password (action)
+// ------------------------------------
+let forgotPattern = '([0-9a-f]{32})';
+
+app.post(`/forgot/${forgotPattern}/resetDo`, (req, res) => {
+    let fid = req.originalUrl.split('/')[2];    
+
+    function fail(error) {
+        let errorString = `/forgot/${fid}?`;
+
+        if (error.errorName == 'validity')
+            errorString += (error.errorData.properties
+                .toString()
+                .split(',')
+                .join('=true&')) + '=true&';
+        else
+            errorString += error.errorName + '=true&';
+
+        errorString = errorString.substr(0, errorString.length - 1);
+
+        Winston.debug('Failed to edit password.', {
+            "error": error,
+            "errorString": errorString
+        });
+                   
+        res.redirect(errorString);
+    }
+
+    let [password, passwordRetype] =
+        [req.body.password, req.body.passwordRetype];
+
+    if (password != passwordRetype)
+        return fail({
+            "errorName": "passwordMismatch",
+            "errorNameFull": "Routing.actions.forgot.resetDo.passwordMismatch"
+        });
+        
+    Forgot.useRequest(
+        fid,
+        password,
+        () => {
+            res.redirect("/login?reset=true");
+        },
+        fail
+    );
+});
 
 // ------------------------------------
 // Submit a Reading (Action)

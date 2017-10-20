@@ -409,7 +409,7 @@ function renderForgot(options) {
         new Chain(function() {
             RoutingCore.stepForgot(req, res, data, options, this.next.bind(this));
         }, function() {
-            if (data.forgot.exists)
+            if (data.forgot.fid)
                 RoutingCore.stepQuery(req, res, data, options, this.next.bind(this));
             else
                 res.render('forgotNF', data);
@@ -421,8 +421,10 @@ function renderForgot(options) {
     });
 }
 
+let forgotPattern = '([0-9a-f]{32})';
+
 renderForgot({
-    "url": '/forgot/*',
+    "url": `/forgot/${forgotPattern}`,
     "template": 'forgotReq'
 });
 

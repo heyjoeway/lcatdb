@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <head>
     <!--head-->
-    <title><!--title--> - Register</title>
+    <title><!--title--> - Reset Password</title>
 </head>
 <body>
     <!--nav_nouser-->
     
     <div class="container">
+        <h2>Reset Password</h2>
+        <hr>
         {{#query}}
-        <h1>Register</h1>
-        {{#username}}
-        <div class="alert alert-warning">
-            <p>Invalid username. Usernames can only contain characters a-z and A-Z, numbers 0-9, and underscores ( _ ).</p>
-        </div>
-        {{/username}}
         {{#password}}
         <div class="alert alert-warning">
             <p>Invalid password. Passwords must be at least 6 characters long.</p>
@@ -24,31 +20,14 @@
             <p>Passwords do not match.</p>
         </div>
         {{/passwordMismatch}}
-        {{#email}}
-        <div class="alert alert-warning">
-            <p>Invalid e-mail address.</p>
+        {{#write}}
+        <div class="alert alert-error">
+            <p>An internal error has occurred. Please contact the administrator of this site to report the issue.</p>
         </div>
-        {{/email}}
-        {{#timezone}}
-        <div class="alert alert-warning">
-            <p>Invalid... time zone? Hmmm...</p>
-        </div>
-        {{/timezone}}
-        {{#taken}}
-        <div class="alert alert-warning">
-            <p>Username or email taken.</p>
-        </div>
-        {{/taken}}
+        {{/write}}
         {{/query}}
 
-        <form class="container" action="/registerdo" method="post">
-            <div>
-                <label class="control-label" for="username">
-                    Username
-                </label>
-                <input class="form-control" type="text" name="username" autofocus>
-            </div>
-            <br>
+        <form class="container" action="/forgot/{{forgot.fid}}/resetDo" method="post">
             <div>
                 <label class="control-label" for="password">
                     Password
@@ -63,56 +42,9 @@
                 <input class="form-control" type="password" name="passwordRetype">
             </div>
             <br>
-            <div>
-                <label class="control-label" for="email">
-                    E-mail
-                </label>
-                <input class="form-control" type="email" name="email">
-            </div>
-            <br>
-            <div>
-                <label class="control-label" for="timezone">
-                    Timezone
-                </label>
-                <select class="form-control" value="-5" name="timezone">
-                    <option value="-5">EST - Eastern Standard Time (GMT-5:00)</option>
-                    <option value="-5">IET - Indiana Eastern Standard Time (GMT-5:00)</option>
-                    <option value="-4">PRT - Puerto Rico and US Virgin Islands Time (GMT-4:00)</option>
-                    <option value="-3.5">CNT - Canada Newfoundland Time (GMT-3:30)</option>
-                    <option value="-3">AGT - Argentina Standard Time (GMT-3:00)</option>
-                    <option value="-3">BET - Brazil Eastern Time (GMT-3:00)</option>
-                    <option value="-1">CAT - Central African Time (GMT-1:00)</option>
-                    <option value="0">GMT - Greenwich Mean Time (GMT)</option>
-                    <option value="0">UTC - Universal Coordinated Time (GMT)</option>
-                    <option value="1">ECT - European Central Time (GMT+1:00)</option>
-                    <option value="2">EET - Eastern European Time (GMT+2:00)</option>
-                    <option value="2">ART - (Arabic) Egypt Standard Time (GMT+2:00)</option>
-                    <option value="3">EAT - Eastern African Time (GMT+3:00)</option>
-                    <option value="3.5">MET - Middle East Time (GMT+3:30)</option>
-                    <option value="4">NET - Near East Time (GMT+4:00)</option>
-                    <option value="5">PLT - Pakistan Lahore Time (GMT+5:00)</option>
-                    <option value="5.5">IST - India Standard Time (GMT+5:30)</option>
-                    <option value="6">BST - Bangladesh Standard Time (GMT+6:00)</option>
-                    <option value="7">VST - Vietnam Standard Time (GMT+7:00)</option>
-                    <option value="8">CTT - China Taiwan Time (GMT+8:00)</option>
-                    <option value="9">JST - Japan Standard Time (GMT+9:00)</option>
-                    <option value="9.5">ACT - Australia Central Time (GMT+9:30)</option>
-                    <option value="10">AET - Australia Eastern Time (GMT+10:00)</option>
-                    <option value="11">SST - Solomon Standard Time (GMT+11:00)</option>
-                    <option value="12">NST - New Zealand Standard Time (GMT+12:00)</option>
-                    <option value="-11">MIT - Midway Islands Time (GMT-11:00)</option>
-                    <option value="-10">HST - Hawaii Standard Time (GMT-10:00)</option>
-                    <option value="-9">AST - Alaska Standard Time (GMT-9:00)</option>
-                    <option value="-8">PST - Pacific Standard Time (GMT-8:00)</option>
-                    <option value="-7">PNT - Phoenix Standard Time (GMT-7:00)</option>
-                    <option value="-7">MST - Mountain Standard Time (GMT-7:00)</option>
-                    <option value="-6">CST - Central Standard Time (GMT-6:00)</option>
-                </select>
-            </div>
-            <br>
             <div class="form-group">
                 <a href="/" class="btn btn-default">Cancel</a>
-                <button type="submit" name="publish" class="btn btn-primary">Submit</button>
+                <button type="submit" name="submit" class="btn btn-primary">Submit</button>
             </div>
 
         </form>
