@@ -141,6 +141,22 @@ app.post(`/user/editDo`, (req, res) => {
     });
 });
 
+app.post(`/user/verifyDo`, (req, res) => {
+    let data = {};
+    
+    new Chain(function() {
+        RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
+    }, function() {
+        if (typeof data.user == 'undefined')
+            return res.redirect('/login');
+
+        Verify.createRequest(email, function(succeeded) {
+            if (succeeded) res.redirect('/user/edit?verifySent=true');
+            else res.redirect('/user/edit?verifyError=true');
+        });
+    });
+});
+
 
 // ------------------------------------
 // Remove Sensor (action)
@@ -277,6 +293,32 @@ app.post(`/forgot/${forgotPattern}/resetDo`, (req, res) => {
         password,
         () => {
             res.redirect("/login?reset=true");
+        },
+        fail
+    );
+});
+
+
+// ------------------------------------
+// Verify user (action)
+// ------------------------------------
+let verifyPattern = '([0-9a-f]{32})';
+
+app.get(`/verify/${verifyPattern}`, (req, res) => {
+    let vid = req.originalUrl.split('/')[2];    
+
+    function fail(error) {
+        Winston.debug('Failed to verify user.', {
+            "error": error
+        });
+                   
+        res.redirect("/dashboard?verifyFailure=true");
+    }
+        
+    Verify.useRequest(
+        vid,
+        () => {
+            res.redirect("/dashboard?verifySuccess=true");
         },
         fail
     );

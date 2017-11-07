@@ -578,3 +578,48 @@ exports.editPassword = function(uid, password, success, failure) {
     });
 
 }
+
+/**
+ * Sets a user as verified or not.
+ * 
+ * @param {(ObjectId|string)} uid User ID.
+ * @param {boolean} verified New verified status for user.
+ * @param {function} success Success callback. (No parameters.)
+ * @param {genericFailure} failure
+ */
+exports.setVerified = function(uid, verified, success, failure) {
+    function fail(error) {
+        Winston.debug("Failed to set user as verified or not.", {
+            "error": error
+        });
+
+        failure(error);
+    }
+
+    uid = Utils.testOid(uid, fail);
+    if (!uid) return;
+
+    let users = Db.collection('users');
+    
+    users.update(
+        {'_id': uid },
+        { 
+            "$set": {
+                "verified": verified
+            }
+        },
+        function(errUpdate, writeResult) {
+            if (errUpdate || writeResult.result.ok != 1)
+                return fail({
+                    "errorName": "write",
+                    "errorNameFull": "Auth.setVerified.write",
+                    "errorData": {
+                        "result": (writeResult || "").toString(),
+                        "errorUpdate": errUpdate
+                    }
+                });
+            
+            success();
+        }
+    );
+}

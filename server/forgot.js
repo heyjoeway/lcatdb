@@ -95,6 +95,7 @@ exports.removeRequest = function(fid, success, failure) {
     Db.collection('forgot').deleteOne(filter, function(error) {
         if (error) return fail({
             "errorName": "deleteRequest",
+            "errorNameFull": "Forgot.removeRequest.deleteRequest",
             "error": error
         });
 
@@ -117,12 +118,14 @@ exports.find = function(fid, success, failure) {
         if (forgot == null || error != null) 
             return fail({
                 "errorName": "notFound",
-                "error": error                 
+                "errorNameFull": "Forgot.find.notFound",
+                "error": error
             });
 
         if (forgot.expiration < (new Date()).getTime()) {
             fail({
                 "errorName": "expired",
+                "errorNameFull": "Forgot.find.expired",
                 "error": error                 
             });
             return exports.removeRequest(fid);
