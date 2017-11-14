@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - API Key</title>
+</head>
+<body>
+    <!--nav-->
+
+    <div class="container">
+        {{#user}}
+        <h2>API Key</h2>
+        <hr>
+        <form action="./apiKeyDo" method="post" class="row">
+
+            <label class="col-xs-2 col-xxs-12"><strong>Current Key</strong></label>
+            <div class="col-xs-10 col-xxs-12">
+                <input  class="form-control"
+                        type="text" readonly
+                        value="{{apiKey}}">
+                <br>
+            </div>
+
+            <div class="col-xs-10 col-xxs-12 col-xs-offset-2">
+                <a href="/user/edit" class="btn btn-default">Back</a>
+                <button type="submit" class="btn btn-primary">Generate New Key</button>
+            </div>
+        </form>
+        {{/user}}
+    </div>
+
+    <!--scripts-->
+</body>

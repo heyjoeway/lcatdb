@@ -7,6 +7,18 @@
     <!--nav-->
 
     <div class="container">
+        {{#query}}
+        {{#verifySuccess}}
+        <div class="alert alert-success">
+            <p>User successfully verified!</p>
+        </div>
+        {{/verifySuccess}}
+        {{#verifyFailure}}
+        <div class="alert alert-warning">
+            <p>User unsuccessfully verified. Requests expire after 24 hours.</p>
+        </div>
+        {{/verifyFailure}}
+        {{/query}}
         <div class="row">
             {{#user}}
              <div class="col-xs-12 col-sm-6 col-md-5"> 

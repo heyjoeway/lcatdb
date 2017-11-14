@@ -33,6 +33,12 @@ exports.createRequest = function(user, callback) {
         callback(false);
     }
 
+    if (user.verified)
+        return fail({
+            "errorName": "verified",
+            "errorNameFull": "Verify.createRequest.verified",
+        });
+
     let randomId = hat();
     let expiration = (new Date()).getTime() + (24 * 60 * 60 * 1000);
     let data = {};
@@ -57,7 +63,7 @@ exports.createRequest = function(user, callback) {
         // it could take a little while to send.
         callback(true);
         
-        exports.emailRequest(data.user, randomId, (succeeded) => {
+        exports.emailRequest(user, randomId, (succeeded) => {
             if (succeeded) return;
 
             // Don't call fail since the callback has already been fired

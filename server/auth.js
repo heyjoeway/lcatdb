@@ -6,6 +6,8 @@ const ObjectId = require('mongodb').ObjectId;
 const Winston = require('winston');
 const Bcrypt = require('bcrypt');
 const deepmerge = require('deepmerge');
+const hat = require('hat');
+
 
 // ----------------------------------------------------------------------------
 // Champy-DB specific modules
@@ -580,16 +582,20 @@ exports.editPassword = function(uid, password, success, failure) {
 }
 
 /**
- * Sets a user as verified or not.
+ * Success callback for Auth.login.
+ * @callback authGenApiKeySuccess
+ * @param {string} apiKey
+ */
+/**
+ * Generates new API key for user.
  * 
  * @param {(ObjectId|string)} uid User ID.
- * @param {boolean} verified New verified status for user.
- * @param {function} success Success callback. (No parameters.)
+ * @param {authGenApiKeySuccess} success Success callback.
  * @param {genericFailure} failure
  */
-exports.setVerified = function(uid, verified, success, failure) {
+exports.genApiKey = function(uid, success, failure) {
     function fail(error) {
-        Winston.debug("Failed to set user as verified or not.", {
+        Winston.debug("Failed to generate API key.", {
             "error": error
         });
 
@@ -605,10 +611,55 @@ exports.setVerified = function(uid, verified, success, failure) {
         {'_id': uid },
         { 
             "$set": {
-                "verified": verified
+                "apiKey": hat()
             }
         },
         function(errUpdate, writeResult) {
+            if (errUpdate || writeResult.result.ok != 1)
+                return fail({
+                    "errorName": "write",
+                    "errorNameFull": "Auth.genApiKey.write",
+                    "errorData": {
+                        "result": (writeResult || "").toString(),
+                        "errorUpdate": errUpdate
+                    }
+                });
+            
+            success();
+        }
+    );
+}
+
+/**
+ * Sets a user as verified or not.
+ * 
+ * @param {(ObjectId|string)} uid User ID.
+ * @param {boolean} verified New verified status for user.
+ * @param {function} success Success callback. (No parameters.)
+ * @param {genericFailure} failure
+ */
+exports.setVerified = function (uid, verified, success, failure) {
+    function fail(error) {
+        Winston.debug("Failed to set user as verified or not.", {
+            "error": error
+        });
+
+        failure(error);
+    }
+
+    uid = Utils.testOid(uid, fail);
+    if (!uid) return;
+
+    let users = Db.collection('users');
+
+    users.update(
+        { '_id': uid },
+        {
+            "$set": {
+                "verified": verified
+            }
+        },
+        function (errUpdate, writeResult) {
             if (errUpdate || writeResult.result.ok != 1)
                 return fail({
                     "errorName": "write",
@@ -618,7 +669,7 @@ exports.setVerified = function(uid, verified, success, failure) {
                         "errorUpdate": errUpdate
                     }
                 });
-            
+
             success();
         }
     );

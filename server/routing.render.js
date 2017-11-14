@@ -429,6 +429,11 @@ renderForgot({
 });
 
 renderUser({
+    "url": '/user/apiKey',
+    "template": 'userApiKey'
+});
+
+renderUser({
     "url": '/user/edit',
     "template": 'userEdit'
 });

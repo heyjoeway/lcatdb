@@ -3,6 +3,7 @@
 /server/config.json
 /server/www
 /server/views
+/server/emails
 /client/node_modules
 /client/tmp
 /client/build

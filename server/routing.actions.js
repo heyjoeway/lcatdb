@@ -9,6 +9,7 @@ const SensorTypes = require('./sensorTypes.js');
 const Reading = require('./reading.js');
 const Chain = Utils.Chain;
 const Forgot = require('./forgot.js');
+const Verify = require('./verify.js');
 const RoutingCore = require('./routing.core.js');
 
 exports.init = function(app) {
@@ -141,22 +142,35 @@ app.post(`/user/editDo`, (req, res) => {
     });
 });
 
-app.post(`/user/verifyDo`, (req, res) => {
+app.get(`/user/verifyDo`, (req, res) => {
     let data = {};
-    
-    new Chain(function() {
+
+    new Chain(function () {
         RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
-    }, function() {
+    }, function () {
         if (typeof data.user == 'undefined')
             return res.redirect('/login');
 
-        Verify.createRequest(email, function(succeeded) {
+        Verify.createRequest(data.user, function (succeeded) {
             if (succeeded) res.redirect('/user/edit?verifySent=true');
             else res.redirect('/user/edit?verifyError=true');
         });
     });
 });
 
+app.post(`/user/apiKeyDo`, (req, res) => {
+    if (req.session && req.session.oid) {
+        Auth.genApiKey(
+            req.session.oid,
+            () => { // Success
+                res.redirect('/user/apiKey');
+            },
+            () => { // Failure
+                res.redirect('/user/apiKey?error=true');
+            }
+        );
+    } else res.redirect('/login');
+});
 
 // ------------------------------------
 // Remove Sensor (action)
