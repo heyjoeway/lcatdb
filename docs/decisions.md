@@ -190,8 +190,69 @@ Things each function needs:
 
 The callback should pass the first 3 things.
 
-Proposed functions:
+## Offline Stuff
 
-1. routeStepUser(req, res, ctx, callback, deps)
-    - Sets key "user" in ctx to user data
-    
+So. Offline stuff. Let's talk that.
+
+What should the user NEED to be online to do?
+
+- Creating an account (+ anonymous)
+    - Issues with offline: Invalid/conflicting username/email/password
+- Signing in (+ anonymous)
+    - Issues with offline: Can't auth without server
+    - Once logged in, cache UID and allow normal function
+
+What MIGHT be able to be done offline?
+
+- Creating configuration (?)
+    - Issues with offline: Tying readings to non-existant configurations
+- Creating/adding sensors
+    - Issues with offline: Same as configurations
+
+What NEEDS to be able to be done offline?
+
+- Taking readings
+- Managing cached readings
+- Viewing cached readings
+- Dashboard
+- Signing out
+- Logging submission errors
+
+HOW should this be done?
+
+With an offline event queue. (FIFO)
+
+### Types of Events
+
+- Readings
+- Configurations
+- Sensors
+
+If one event has an error being submitted, pause the entire queue.
+
+How to prevent duplicate submissions?
+- Set up a UID system (sorta overcomplicated and possibly slow, very safe)
+- Do it by time created (horrible)
+- Allow duplicates (safe, but not great)
+- Delete events as they're sent (BAD)
+
+Probably option 1, despite it complicating things a bit further.
+
+So, here's the current order of operations with taking readings:
+
+1. Test if user can edit
+2. Deep merge data with defaults
+3. Set internal values
+    - Configuration
+    - Creator
+    - Publisher
+    - Published
+    - Time Published
+4. Test validity
+5. Test validity for each value
+6. Save reading
+7. Run callback with rid
+
+Under this new system, a new step would be added between 1 and 2 which checks if there is an event ID specified. If there is, the database is scanned for the ID. If the ID exists, an error is thrown specifying that. If it doesn't, the request goes through successfully.
+
+How should the Id be generated? By using hat on client side. It doesn't really matter if people exploit the ID, as it's only for internal use anyway. Just place a character amount requirement on it.
