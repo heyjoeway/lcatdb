@@ -1,0 +1,11 @@
+{
+    "id": "/ApiReading",
+    "type": "object",
+    "properties": {
+        "reading": { "type": "object" },
+        "eventId": { "$ref": "/Definitions#/eventId" },
+        "apiKey": { "$ref": "/Definitions#/apiKey" }
+    },
+    "required": ["reading"],
+    "additionalProperties": false
+}

@@ -75,4 +75,21 @@ app.post(`/api/readings`, (req, res) => {
 
 });
 
+app.post(`/api/readings/submit`, function(req, res) {
+    let query = req.body;
+
+    let apiReadingValidity = Schema.validate('/ApiReading', query);
+    if (!apiReadingValidity) return fail(req, res, {
+        "errorName": "apiReadingValidity",
+        "errorNameFull": "Api.readings.submit.apiReadingValidity",
+        "errorData": {
+            "schemaErrors": Schema.errors()
+        }
+    });
+
+    let reading = query.reading;
+    
+
+});
+
 };

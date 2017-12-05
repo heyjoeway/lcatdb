@@ -421,13 +421,11 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
             );
         });
     }, function() {
-        Reading.new(
-            data.user,
-            data.configuration,
-            newData,
-            success,
-            fail
-        );
+        Reading.new({
+            "user": data.user,
+            "configuration": data.configuration,
+            "data": newData
+        }, success, fail);
     });
 });
 

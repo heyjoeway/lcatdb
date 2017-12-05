@@ -101,9 +101,7 @@
         }
     },
     
-    "apiKey": {
-        "type": "string"
-    },
+    "apiKey": { "$ref": "/Definitions#/apiKey"},    
 
     "denyApi": {
         "type": "boolean",

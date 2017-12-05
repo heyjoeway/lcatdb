@@ -127,7 +127,104 @@ exports.findConfiguration = function(cid, success, failure, reqs) {
 
 // ----------------------------------------------------------------------------
 
-exports.new = function(user, configuration, data, success, failure, publish) {
+exports.validate = function(reading) {
+    function fail(error) {
+        Winston.debug("Failed to validate reading.", {
+            "error": error
+        });
+        return error;
+    }
+
+    let readingValidity = Schema.validate('/Reading', reading);
+    if (!readingValidity)
+        return fail({
+            "errorName": "readingValidity",
+            "errorNameFull": "Reading.validate.readingValidity",
+            "errorData": {
+                "schemaErrors": Schema.errors()
+            }
+        });
+    
+    if (Utils.exists(reading.values)) {
+        let valueValidity;
+        reading.values.some((val) => {
+            valueValidity = Schema.validate(
+                SensorTypes.getSchemaId(val.type),
+                val.data            
+            );
+
+            return valueValidity;
+        });
+        
+        if (!valueValidity)
+            return fail({
+                "errorName": "valueValidity",
+                "errorNameFull": "Reading.validate.valueValidity",
+                "errorData": {
+                    "schemaErrors": Schema.errors()
+                }
+            });
+    }
+}
+
+// exports.new = function(user, configuration, data, success, failure, publish) {
+//     function fail(error) {
+//         Winston.debug("Could not create new reading.", {
+//             "error": error
+//         });
+//         failure(error);
+//     }
+
+//     let canEdit = Configurations.canEdit(user, configuration);
+//     if (!canEdit) return fail({
+//         "errorName": "canEdit",
+//         "errorNameFull": "Reading.new.canEdit"
+//     });
+
+//     let newData = deepmerge(
+//         data,
+//         Schema.defaults('/Reading')
+//     );
+
+//     [
+//         newData.configuration,
+//         newData.creator,
+//         newData.publisher,
+//         newData.published,
+//         newData.timePublished
+//     ] = [
+//         ObjectId(configuration["_id"]).toString(),
+//         ObjectId(user["_id"]).toString(),
+//         ObjectId(user["_id"]).toString(),
+//         true,
+//         Date.now()
+//     ];
+
+//     let validityError = exports.validate(newData);
+//     if (validityError) return fail(validityError);
+
+//     let readings = Db.collection('readings');
+
+//     readings.save(newData, (error, result) => {
+//         if (error) return fail({
+//             "errorName": "readingSave",
+//             "errorNameFull": "Reading.new.readingSave",
+//             "errorData": {
+//                 "errorSave": error
+//             }
+//         });
+
+//         let rid = ObjectId(result.ops[0]["_id"]);
+
+//         Winston.debug('Successfully created new reading.', {
+//             "ridString": rid.toString()
+//         });
+
+//         success(rid);
+//     });
+// }
+
+exports.new = function(ctx, success, failure) {
     function fail(error) {
         Winston.debug("Could not create new reading.", {
             "error": error
@@ -135,12 +232,51 @@ exports.new = function(user, configuration, data, success, failure, publish) {
         failure(error);
     }
 
-    let canEdit = Configurations.canEdit(user, configuration);
-    if (!canEdit) return fail({
-        "errorName": "canEdit",
-        "errorNameFull": "Reading.new.canEdit"
-    });
+    // ----
 
+    [
+        user,
+        configuration,
+        cid,
+        data
+    ] = [
+        ctx.user,
+        ctx.configuration,
+        ctx.cid,
+        ctx.data
+    ];
+
+    // ----
+
+    if (typeof user != "object")
+        return fail({
+            "errorName": "noUser",
+            "errorNameFull": "Reading.new.noUser"
+        });
+
+    // ----
+    
+    if (configuration && configuration["_id"])
+    cid = configuration["_id"];
+    
+    cid = Utils.testOid(cid, fail);
+    if (!cid) return;
+    
+    // ----
+
+    if (!Configurations.canEdit(user, configuration))
+        return fail({
+            "errorName": "canEdit",
+            "errorNameFull": "Reading.new.canEdit"
+        });
+
+    // ----
+    
+    let creatorId = Utils.testOid(user["_id"], fail);
+    if (!creatorId) return;    
+    
+    // ----
+    
     let newData = deepmerge(
         data,
         Schema.defaults('/Reading')
@@ -153,47 +289,17 @@ exports.new = function(user, configuration, data, success, failure, publish) {
         newData.published,
         newData.timePublished
     ] = [
-        ObjectId(configuration["_id"]).toString(),
-        ObjectId(user["_id"]).toString(),
-        ObjectId(user["_id"]).toString(),
+        cid.toString(),
+        creatorId,
+        creatorId,
         true,
         Date.now()
     ];
 
-    let readingValidity = Schema.validate('/Reading', newData);
-    if (!readingValidity)
-        return fail({
-            "errorName": "readingValidity",
-            "errorNameFull": "Reading.new.readingValidity",
-            "errorData": {
-                "schemaErrors": Schema.errors()
-            }
-        });
-    
-    if (Utils.exists(data.values)) {
-        let valueValidity;
-        data.values.some((val) => {
-            valueValidity = Schema.validate(
-                SensorTypes.getSchemaId(val.type),
-                val.data            
-            );
+    let validityError = exports.validate(newData);
+    if (validityError) return fail(validityError);
 
-            return valueValidity;
-        });
-        
-        if (!valueValidity)
-            return fail({
-                "errorName": "valueValidity",
-                "errorNameFull": "Reading.new.valueValidity",
-                "errorData": {
-                    "schemaErrors": Schema.errors()
-                }
-            });
-    }
-
-    let readings = Db.collection('readings');
-
-    readings.save(newData, (error, result) => {
+    Db.collection('readings').save(newData, (error, result) => {
         if (error) return fail({
             "errorName": "readingSave",
             "errorNameFull": "Reading.new.readingSave",

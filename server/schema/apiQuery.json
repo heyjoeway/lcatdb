@@ -51,7 +51,8 @@
         "page": {
             "type": "integer",
             "minimum": 1
-        }
+        },
+        "apiKey": { "$ref": "/Definitions#/apiKey" }        
     },
     "dependencies": {
         "pageSize": ["page"],
