@@ -44,7 +44,7 @@ function mustachifyReading(data, options, callback) {
     if (needs.includes('htmlOut')) {
         reading.values.forEach((value) => {
             try {
-                value.html = SensorTypes.getOutputTemplate(value);
+                value.html = SensorTypes.renderOutputTemplate(value);
             } catch(e) {
                 value.html = '<span class="error">ERROR: Could not retrieve template for value.</span>';
                 fail({
@@ -133,7 +133,7 @@ function mustachifyConfiguration(data, options, callback) {
 
                     if (needs.includes('sensors.htmlIn')) {
                         sensors.forEach((sensor, i) => {
-                            sensor.html = SensorTypes.getInputTemplate(
+                            sensor.html = SensorTypes.renderInputTemplate(
                                 sensor.type, data.user, configuration, sensor
                             );
                             sensor.index = i;

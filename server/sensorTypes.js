@@ -11,7 +11,6 @@ exports.init = function() {
 
         let type = {
             "schemaId": schema.id,
-            "provider": require("./sensors/" + path + "/provider.js"),
             "data": require("./sensors/" + path + "/data.json"),
             "inputTemplate": fs.readFileSync("./sensors/" + path + "/input.mustache", "utf8"),
             "outputTemplate": fs.readFileSync("./sensors/" + path + "/output.mustache", "utf8")
@@ -57,19 +56,39 @@ exports.getTypeData = function(type) {
     return undefined;
 }
 
-exports.getInputTemplate = function(type, user, configuration, sensor) {
-    return mustache.render(types[type].inputTemplate, {
-        "user": user,
-        "configuration": configuration,
-        "sensor": sensor
-    });
+
+
+exports.getInputTemplate = function(type) {
+    return types[type].inputTemplate;
+}
+
+exports.renderInputTemplate = function(type, user, configuration, sensor) {
+    return mustache.render(
+        exports.getInputTemplate(type),
+        {
+            "user": user,
+            "configuration": configuration,
+            "sensor": sensor
+        }
+    );
 };
 
-exports.getOutputTemplate = function(value, user) {
-    return mustache.render(types[value.type].outputTemplate, {
-        "value": value
-    });
+
+
+exports.getOutputTemplate = function(type) {
+    return types[type].outputTemplate;
+}
+
+exports.renderOutputTemplate = function(value, user) {
+    return mustache.render(
+        exports.getOutputTemplate(value.type),
+        {
+            "value": value
+        }
+    );
 };
+
+
 
 exports.getSchemaId = function(type) {
     return types[type].schemaId;
