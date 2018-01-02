@@ -1,0 +1,21 @@
+<label class="control-label">Depth</label>
+<div class="input-group">
+    <input  name="values.{{sensor._id}}.depth" class="form-control normalize"
+            type="number" step="any"
+            aria-describedby="addon-values_{{sensor._id}}_depth"
+            data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
+    <br>
+    <span class="input-group-addon" id="addon-values_{{sensor._id}}_depth">Meters</span>
+</div>
+<div class="spoiler reading-more" data-spoiler-link="{{sensor._id}}"></div>
+<div class="spoiler-content" data-spoiler-link="{{sensor._id}}">
+    <label class="control-label">Depth Range (Optional)</label>
+    <div class="input-group">
+        <input  name="values.{{sensor._id}}.depthRange" class="form-control normalize"
+                type="number" step="any" 
+                aria-describedby="addon-values_{{sensor._id}}_depthRange"
+                data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
+        <br>
+        <span id="addon-values_{{sensor._id}}_depthRange" class="input-group-addon">Meters</span>
+    </div>
+</div>

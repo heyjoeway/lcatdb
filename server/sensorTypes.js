@@ -1,5 +1,6 @@
 const Schema = require('./schema.js');
 const fs = require('fs');
+const mustache = require('mustache');
 
 const types = {};
 
@@ -11,7 +12,9 @@ exports.init = function() {
         let type = {
             "schemaId": schema.id,
             "provider": require("./sensors/" + path + "/provider.js"),
-            "data": require("./sensors/" + path + "/data.json")
+            "data": require("./sensors/" + path + "/data.json"),
+            "inputTemplate": fs.readFileSync("./sensors/" + path + "/input.mustache", "utf8"),
+            "outputTemplate": fs.readFileSync("./sensors/" + path + "/output.mustache", "utf8")
         }
 
         types[path] = type;
@@ -55,14 +58,17 @@ exports.getTypeData = function(type) {
 }
 
 exports.getInputTemplate = function(type, user, configuration, sensor) {
-    return types[type].provider.inputTemplate(
-        user, configuration, sensor
-    );
+    return mustache.render(types[type].inputTemplate, {
+        "user": user,
+        "configuration": configuration,
+        "sensor": sensor
+    });
 };
 
 exports.getOutputTemplate = function(value, user) {
-    let type = value.type;
-    return types[type].provider.outputTemplate(value);
+    return mustache.render(types[value.type].outputTemplate, {
+        "value": value
+    });
 };
 
 exports.getSchemaId = function(type) {

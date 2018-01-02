@@ -9,6 +9,14 @@ const Forgot = require('./forgot.js');
 exports.stepQuery = function(req, res, data, options, callback) {
     data.query = req.query;
     data.body = req.body;
+
+    data.queryString = "";
+    if (data.query && data.query.length != 0) {
+        Object.keys(data.query).forEach(function(key) {
+            data.queryString += key + '=' + data.query[key] + ',';
+        });
+        data.queryString = data.queryString.substring(0, data.queryString.length - 1);
+    }
     callback();    
 }
 
@@ -31,7 +39,7 @@ exports.stepUser = function(req, res, data, options, callback) {
             (error) => { // Failure
                 fail({
                     "errorName": "notFound",
-                    "errorNameFull": "Routing.core.stepUser.notFoundm",
+                    "errorNameFull": "Routing.core.stepUser.notFound",
                     "errorData": {
                         "errorFind": error,
                         "oid": oid

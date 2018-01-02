@@ -10,6 +10,10 @@
         <h2>Quick Submit</h2>
         <hr>
 
+        <div id="connect" class="alert alert-warning offline_only_hide" style="display:none">
+            <p>You are currently offline. Please connect to the internet in order to register. (You can use this app offline after the first login.)</p>
+        </div>
+
         <p>Quick Submit allows you to join <!--title--> with an automatically generated user ID and password. This identity will be saved in your browser until:</p>
 
         <ul>
@@ -81,7 +85,7 @@
                         </select>
                     </div>
                     <br>
-                    <button type="button" id="register" class="btn btn-primary">Register Anonymously</button>
+                    <button type="button" id="register" class="btn btn-primary online_only_disable">Register Anonymously</button>
                     <br>
                 </form>
             </div>
@@ -104,7 +108,7 @@
                         <input class="form-control" type="password" id="passwordExists" name="password" readonly="readonly" data-toggle="password">
                     </div>
                     <br>
-                    <input type="submit" class="btn btn-primary" value="Log In"></input>
+                    <input type="submit" class="btn btn-primary online_only_disable" value="Log In"></input>
                 </form>
             </div>
         </div>
@@ -113,7 +117,7 @@
             You must enable Javascript in order to sign up anonymously.
         </div><br>
 
-        <a role="button" class="btn btn-secondary" href="/register">Register Normally</a>
+        <a role="button" class="btn btn-secondary online_only_disable" href="/register">Register Normally</a>
 
     </div>
 

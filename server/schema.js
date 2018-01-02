@@ -45,7 +45,12 @@ exports.defaultsGen = function(schema) {
     schemaDefaults[key] = defaults(schema);
 }
 
+exports.fieldsSafePrivate = function(key) {
+    return schemas[key].safePrivate;
+}
+
 exports.addSchema = function(schema) {
+    schemas[schema['id']] = schema;
     validator.addSchema(schema);
     exports.defaultsGen(schema);
 }

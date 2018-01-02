@@ -1,0 +1,21 @@
+<label class="control-label">Temperature</label>
+<div class="input-group">
+    <input  name="values.{{sensor._id}}.temperature" class="form-control normalize"
+            type="number" step="any"
+            aria-describedby="addon-values_{{sensor._id}}_temperature"
+            data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
+    <span class="input-group-addon" id="addon-values_{{sensor._id}}_temperature">Meters</span>
+    <br>
+</div>
+<div class="spoiler reading-more" data-spoiler-link="{{sensor._id}}"></div>
+<div class="spoiler-content" data-spoiler-link="{{sensor._id}}">
+    <label class="control-label">Temperature Range (Optional)</label>
+    <div class="input-group">
+        <input  name="values.{{sensor._id}}.temperatureRange" class="form-control normalize"
+                type="number" step="any" 
+                aria-describedby="addon-values_{{sensor._id}}_temperatureRange"
+                data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
+        <span id="addon-values_{{sensor._id}}_temperatureRange" class="input-group-addon">Meters</span>
+        <br>
+    </div>
+</div>

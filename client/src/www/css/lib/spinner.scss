@@ -1,0 +1,149 @@
+// https://www.uplabs.com/posts/material-design-spinner-css
+
+.mds-spinner {
+	display: block;
+	margin-top: 2em;
+	margin-right: auto;
+	margin-left: auto;
+	width: 4em;
+	height: 4em;
+	padding: 7px;
+	border-radius: 50%;
+	-webkit-transform: scale(.7);
+	        transform: scale(.7);
+}
+
+.mds-medium {
+  -webkit-transform: scale(1);
+          transform: scale(1)
+}
+
+.mds-large {
+  margin-top: 4em;
+  -webkit-transform: scale(1.5);
+          transform: scale(1.5)
+}
+
+.mds-spinner-wrapper {
+	position: relative;
+	width: 4em;
+	height: 4em;
+	border-radius: 100%;
+	left: calc(50% - 2em);
+}
+
+.mds-spinner-wrapper::after {
+	content: "";
+	background: #333;
+	border-radius: 50%;
+	width: 3em;
+	height: 3em;
+	position: absolute;
+	top: 0.5em;
+	left: 0.5em;
+} 
+
+.mds-rotator {
+	position: relative;
+	width: 4em;
+	border-radius: 4em;
+	overflow: hidden;
+	-webkit-animation: mds-rotate 2000ms infinite linear;
+	        animation: mds-rotate 2000ms infinite linear;
+}
+
+.mds-rotator:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: #3F51B5;
+	border: 3px solid #333;
+	border-radius: 100%;
+}
+
+.mds-inner-spin {
+	background: #333;
+	height: 4em;
+	width: 2em;
+}
+
+.mds-inner-spin {
+	-webkit-animation: mds-rotate-left 2500ms infinite cubic-bezier(0.445, 0.050, 0.550, 0.950);
+	        animation: mds-rotate-left 2500ms infinite cubic-bezier(0.445, 0.050, 0.550, 0.950);
+	border-radius: 2em 0 0 2em;
+	-webkit-transform-origin: 2em 2em;
+	        transform-origin: 2em 2em;
+}
+
+.mds-inner-spin:last-child {
+	-webkit-animation: mds-rotate-right 2500ms infinite cubic-bezier(0.445, 0.050, 0.550, 0.950);
+	        animation: mds-rotate-right 2500ms infinite cubic-bezier(0.445, 0.050, 0.550, 0.950);
+	margin-top: -4em;
+	border-radius: 0 2em 2em 0;
+	float: right;
+	-webkit-transform-origin: 0 50%;
+	        transform-origin: 0 50%;
+}
+
+@-webkit-keyframes mds-rotate-left {
+	60%, 75%, 100% {
+    	-webkit-transform: rotate(360deg);
+    	        transform: rotate(360deg);
+  	}
+}
+
+@keyframes mds-rotate-left {
+	60%, 75%, 100% {
+    	-webkit-transform: rotate(360deg);
+    	        transform: rotate(360deg);
+  	}
+}
+
+@-webkit-keyframes mds-rotate {
+	0% {
+    	-webkit-transform: rotate(0);
+    	        transform: rotate(0);
+  	}
+  	100% {
+    	-webkit-transform: rotate(360deg);
+    	        transform: rotate(360deg);
+  	}
+}
+
+@keyframes rotate {
+	0% {
+    	-webkit-transform: rotate(0);
+    	        transform: rotate(0);
+  	}
+  	100% {
+    	-webkit-transform: rotate(360deg);
+    	        transform: rotate(360deg);
+  	}
+}
+
+@-webkit-keyframes mds-rotate-right {
+	0%, 25%, 45% {
+    	-webkit-transform: rotate(0);
+    	        transform: rotate(0);
+  	}
+
+  	100% {
+    	-webkit-transform: rotate(360deg);
+    	        transform: rotate(360deg);
+  	}
+}
+
+@keyframes mds-rotate-right {
+	0%, 25%, 45% {
+    	-webkit-transform: rotate(0);
+    	        transform: rotate(0);
+  	}
+
+  	100% {
+    	-webkit-transform: rotate(360deg);
+    	        transform: rotate(360deg);
+  	}
+}

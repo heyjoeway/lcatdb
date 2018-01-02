@@ -52,7 +52,7 @@
             "type": "integer",
             "minimum": 1
         },
-        "apiKey": { "$ref": "/Definitions#/apiKey" }        
+        "apiKey": { "$ref": "/Definitions#/definitions/apiKey" }        
     },
     "dependencies": {
         "pageSize": ["page"],

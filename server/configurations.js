@@ -34,11 +34,12 @@ const Chain = Utils.Chain;
  *      - list: Array of configuration objects associated with user.
  */
 
-exports.getList = function(user, success, reqs) {
+exports.getList = function(user, success, failure, reqs) {
     function fail(error) {
         Winston.debug('Could not find configuration list for user.', {
             "error": error
         });
+        if (failure) failure(error);
     }
 
     let configurations = Db.collection('configurations');

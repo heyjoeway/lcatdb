@@ -290,8 +290,8 @@ exports.new = function(ctx, success, failure) {
         newData.timePublished
     ] = [
         cid.toString(),
-        creatorId,
-        creatorId,
+        creatorId.toString(),
+        creatorId.toString(),
         true,
         Date.now()
     ];

@@ -68,6 +68,23 @@ app.get('/configurations', (req, res) => {
     });
 });
 
+app.get('/login', (req, res) => {
+    let data = {};
 
+    new Chain(function() {
+        RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
+    }, function() {
+        if (data.user)
+            return res.redirect('/dashboard');
+
+        RoutingCore.stepQuery(req, res, data, {}, this.next.bind(this));
+    }, function(list) {
+        res.redirect('/login.html?' + data.queryString);
+    });
+
+    RoutingCore.stepUser(req, res, data, {}, function() {
+
+    });
+});
 
 }

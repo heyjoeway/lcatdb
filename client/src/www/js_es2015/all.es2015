@@ -45,7 +45,22 @@ $(() => {
         let system = $(this).val();
         changeUnitSystem(system);
     });
+
+    testOnline();
+    setInterval(testOnline, 5000);
 });
+
+function testOnline() {
+    $(".online_only_hide")[navigator.onLine ? 'show' : 'hide']();
+    $(".online_only_disable")
+        .prop('disabled', !navigator.onLine)
+        [navigator.onLine ? 'removeClass' : 'addClass']('disabled');
+
+    $(".offline_only_hide")[navigator.onLine ? 'hide' : 'show']();
+    $(".offline_only_disable")
+        .prop('disabled', navigator.onLine)
+        [navigator.onLine ? 'addClass' : 'removeClass']('disabled');
+}
 
 function changeUnitSystem(system) {
     let $normalize = $('.normalize');

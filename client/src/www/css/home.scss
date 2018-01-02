@@ -9,6 +9,11 @@
     align-items: center;
     justify-content: center;
     text-align: center;
+
+    & .btn.disabled {
+        background-color: #DDDDDDAA;
+        color: #444;
+    }
 }
 
 .home-description {

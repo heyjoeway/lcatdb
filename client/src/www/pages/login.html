@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Login</title>
+</head>
+<body>
+    <!--nav_nouser-->
+
+    <div class="container" class="text-center">
+        <div class="row">
+        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-4">
+        <h2>Login</h2>
+        <hr>
+
+        <div id="forgotSent" class="alert alert-success" style="display:none">
+            <p>Email sent. Check your inbox for an email from "donotreply@lcatdb.org" with the subject "Password Reset".</p>
+        </div>
+
+        <div id="invalid" class="alert alert-warning" style="display:none">
+            <p>Invaild username or password.</p>
+        </div>
+
+        <div id="reset" class="alert alert-success" style="display:none">
+            <p>Password reset successfully. Please login.</p>
+        </div>
+
+        <div id="connect" class="alert alert-warning offline_only_hide" style="display:none">
+            <p>You are currently offline. Please connect to the internet in order to login. (You can use this app offline after the first login.)</p>
+        </div>
+
+        <form action="/logindo" method="post">
+            <input class="form-control" type="text" name="username" value="" placeholder="Username"><br>
+            <input class="form-control" type="password" name="password" value="" placeholder="Password" data-toggle="password"><br>
+            <input class="btn btn-primary online_only_disable" type="submit" value="Log In">
+            &nbsp;&nbsp;&nbsp;
+            <a href="/forgot" class="btn btn-secondary btn-sm online_only_disable">Forgot Password</a>
+        </form>
+        <br>
+        <p>Joined anonymously? Check here for your auto-generated identity.</p>
+        <a href="/anonymous.html" class="btn btn-secondary">Quick Join</a>
+        </div>
+        </div>
+    </div>
+
+    <!--scripts-->
+
+    <script src="/js/lib/bootstrap-show-password.min.js"></script>
+    <script src="/js/pages/login.js"></script>
+</body>

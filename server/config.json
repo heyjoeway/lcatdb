@@ -5,8 +5,8 @@
     "domain": "http://localhost:3000",
     "session": {
         "secret": "T5RyO3Hvih0O4gWO",
-        "duration": 3600000,
-        "activeDuration": 1800000
+        "duration": 253402300000000,
+        "activeDuration": 253402300000000
     },
     "salt": {
         "rounds": 5

@@ -467,12 +467,6 @@ renderUser({
 });
 
 renderUser({
-    "url": '/login',
-    "template": 'login',
-    "allowAnon": "only"
-});
-
-renderUser({
     "url": '/dashboard',
     "template": 'dashboard'
 });

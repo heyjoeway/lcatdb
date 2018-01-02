@@ -91,11 +91,9 @@
             "default": [
                 "first",
                 "last",
-                "email",
                 "description",
                 "creation",
                 "timezone",
-                "phone",
                 "organizations"
             ]
         }
@@ -122,5 +120,19 @@
         "verified",
         "timezone",
         "publicity"
+    ],
+    "safePrivate": [
+        "_id",
+        "username",
+        "email",
+        "first",
+        "last",
+        "organizations",
+        "phone",
+        "descShort",
+        "descLong",
+        "creation",
+        "verified",
+        "timezone"
     ]
 }

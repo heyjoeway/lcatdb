@@ -1,3 +1,9 @@
 $(function() {
     window.parent.postMessage('modal.reload', '*');
+
+    let queryObj = urlQueryObj(window.location.href);
+
+    ["forgotSent", "invalid", "reset"].forEach(function(key) {
+        if (queryObj[key]) $('#' + key).show();
+    });
 });

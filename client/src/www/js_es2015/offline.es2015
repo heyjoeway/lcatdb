@@ -40,10 +40,11 @@ class OfflineEvent {
     }
 }
 
-class OfflineReading extends OfflineEvent {
+// Generic post request
+class OfflinePost extends OfflineEvent {
     constructor(obj) {
         obj = obj || { };
-        obj.type = "reading";
+        obj.type = "post";
         obj.priority = 0;
         super(obj);
     }
