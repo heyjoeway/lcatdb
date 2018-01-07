@@ -8,10 +8,13 @@ $(function() {
         hasDepth |= type == "depth";
     });
 
+
     if (hasTemperature && hasDepth) {
+        let configurationId = location.pathname.split('/')[2];
+
         $('#done').removeAttr('disabled').attr(
             'href',
-            './reading?quick=true'
+            `/newReading.html?configuration=${configurationId},quick=true`
         );
     }
 });

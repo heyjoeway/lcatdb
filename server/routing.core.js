@@ -159,6 +159,7 @@ exports.stepForgot = function(req, res, data, options, callback) {
     
     Forgot.find(fid,
         (forgot) => { // Success
+            data.forgot.exists = true;
             data.forgot.fid = fid;
             callback(req, res, data, options);
         },

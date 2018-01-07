@@ -10,16 +10,10 @@
     <div class="container">
         <br>
         <h2 class="h-inline">Readings</h2>
-        <!-- <div style="display:inline" class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Export All...
-            <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a href="./readingsExport?format=json">JSON</a></li>
-            </ul>
-        </div> -->
+
         {{#canEdit}}
-        &nbsp;&nbsp;
-        <a class="btn btn-sm btn-primary" href="./readingsExport">Export All</a>
+        <!-- &nbsp;&nbsp; -->
+        <!-- <a class="btn btn-sm btn-primary" href="/configurations/{{_id}}/readingsExport">Export All</a> -->
         &nbsp;&nbsp;        
         <a class="btn btn-sm btn-secondary" href="/newReading.html?configuration={{_id}}">Submit Reading</a>
         {{/canEdit}}

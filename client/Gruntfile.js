@@ -29,9 +29,19 @@ const EMAILS_SRC = SRC_DIR + "emails/";
 const EMAILS_BUILD = BUILD_DIR + "emails/";
 const EMAILS_TMP = TMP_DIR + "emails/";
 
+const CORDOVA_SRC = SRC_DIR + "www_cordova/";
+const CORDOVA_BUILD = BUILD_DIR + "www_cordova/";
+const CORDOVA_TMP = TMP_DIR + "www_cordova/";
+const CORDOVA_FINAL = "./cordova/www";
+
 var config = {};
 
 config.clean = {};
+config.clean.cordova = [
+    "./build/www_cordova/**/*.*",
+    "./tmp/www_cordova/**/*.*",
+    "./cordova/www/**/*.*"
+];
 config.clean.www = [
     "./build/www/**/*.*",
     "./tmp/www/**/*.*"
@@ -112,6 +122,14 @@ config.replace.www = {
         dest: WWW_TMP + "js_es2015"
     }]
 };
+config.replace.cordova = {
+    files: [{
+        expand: true,
+        cwd: CORDOVA_SRC + "js_es2015",
+        src: ["**/*.es2015"],
+        dest: CORDOVA_TMP + "js_es2015"
+    }]
+};
 config.replace.views = {
     files: [{
         expand: true,
@@ -184,6 +202,15 @@ config.babel.www = {
         "ext": ".js"
     }]
 };
+config.babel.cordova = {
+    files: [{
+        "expand": true,
+        "cwd": CORDOVA_TMP + "js_es2015/",
+        "src": ["**/*.es2015"],
+        "dest": CORDOVA_TMP + "js/",
+        "ext": ".js"
+    }]
+};
 
 config.uglify = {
     options: {
@@ -192,13 +219,19 @@ config.uglify = {
     }
 };
 config.uglify.www = {
-    // src: [WWW_SRC + 'js/**/*.js', WWW_TMP + 'js/**/*.js'],
-    // dest: WWW_BUILD + "js/script.min.js"
     files: [{
         expand: true,
         cwd: WWW_TMP + 'js/',
         src: '**/*.js',
         dest: WWW_BUILD + "js/"
+    }]
+};
+config.uglify.cordova = {
+    files: [{
+        expand: true,
+        cwd: CORDOVA_TMP + 'js/',
+        src: '**/*.js',
+        dest: CORDOVA_BUILD + "js/"
     }]
 };
 
@@ -226,6 +259,22 @@ config.copy.www = {
         dest: WWW_BUILD + "favicon/"
     }]
 };
+config.copy.cordova = {
+    files: [{
+        expand: true,
+        cwd: WWW_BUILD,
+        src: '**/*',
+        dest: CORDOVA_BUILD
+    }]
+};
+config.copy.cordova_final = {
+    files: [{
+        expand: true,
+        cwd: CORDOVA_BUILD,
+        src: '**/*',
+        dest: CORDOVA_FINAL
+    }]
+};
 
 // config['string-replace'] = {};
 // config['string-replace'].www = {
@@ -250,6 +299,24 @@ grunt.registerTask('default', [
     "www-clean",
     "views-clean",
     "emails-clean"
+]);
+
+grunt.registerTask('cordova-www', [
+    'www',
+    'copy:cordova',
+    'replace:cordova',
+    'babel:cordova',
+    'uglify:cordova',
+    'copy:cordova_final'
+]);
+
+grunt.registerTask('cordova', [
+    'cordova-www'
+]);
+
+grunt.registerTask('cordova-clean', [
+    'clean:cordova',
+    'cordova-www'
 ]);
 
 grunt.registerTask('www-clean', [

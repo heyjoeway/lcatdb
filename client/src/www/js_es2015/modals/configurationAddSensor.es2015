@@ -1,5 +1,7 @@
 $(() => {
-    $('.sensor').click(function() {
+    $('.sensor').click(function(e) {
+        e.preventDefault();
+
         $('#step-1').hide();
         $('#loading').show();
 
@@ -7,7 +9,9 @@ $(() => {
 
         window.parent.postMessage('modal.lock', '*');
 
-        $.post('./addSensorDo',
+        let configurationId = location.pathname.split('/')[2];
+
+        $.post(`/configurations/${configurationId}/addSensorDo`,
             {
                 "sid": $this.attr('id')
             },

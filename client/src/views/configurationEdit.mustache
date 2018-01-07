@@ -10,14 +10,14 @@
         {{#configuration}}
         <h2>Edit Configuration</h2>
         {{#canEdit}}
-        <form action="./editDo" method="post" class="form-horizontal"><fieldset class="container">
+        <form action="/configurations/{{_id}}/editDo" method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
                 <label class="col-xs-2 control-label" for="name">Name</label>
                 <div class="col-xs-10"><input class="form-control" type="text" name="name" value="{{configuration.name}}"></div>
             </div>
             <div class="form-group">
                 <div class="col-xs-10 col-xs-offset-2">
-                    <a href="./" class="btn btn-default">Cancel</a>
+                    <a href="/configurations/{{_id}}" class="btn btn-default">Cancel</a>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>

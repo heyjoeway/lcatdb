@@ -1,5 +1,7 @@
 $(function() {
     $('.model').click(function(e) {
+        e.preventDefault();
+
         $('#step-1').hide();
         $('#loading').show();
 

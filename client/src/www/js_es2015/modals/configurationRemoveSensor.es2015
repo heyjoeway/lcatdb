@@ -1,12 +1,17 @@
 $(() => {
-    let queryObj = urlQueryObj(location.toString());
-    $('#remove').click(function() {
+    $('#remove').click(function(e) {
+        e.preventDefault();
+
         $('#step-1').hide();
         $('#loading').show();
-
+        
         window.parent.postMessage('modal.lock', '*');
 
-        $.post('./removeSensorDo',
+        let queryObj = urlQueryObj(location.toString());
+
+        let configurationId = location.pathname.split('/')[2];
+
+        $.post(`/configurations/${configurationId}/removeSensorDo`,
             {
                 "sid": queryObj.sid
             },
