@@ -5,7 +5,7 @@
     <title><!--title--> - Reading</title>
 </head>
 <body>
-    <!--nav-->
+    <!--nav_auto-->
 
     <div class="container">
         {{#reading}}
@@ -15,11 +15,11 @@
                 <h2 class="h-inline">Reading</h2>
                 {{#user}}
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="/configurations/{{configuration}}/reading" class="btn btn-primary">
+                <a href="/newReading.html?configuration={{configuration}}" class="btn btn-primary">
                     Submit New Reading
                 </a>
                 &nbsp;&nbsp;
-                <a href="/configurations/{{configuration}}" class="btn btn-sm btn-secondary">
+                <a href="/configurations/{{configuration}}" class="online_only_disable btn btn-sm btn-secondary">
                     View Configuration
                 </a>
                 {{/user}}
@@ -152,7 +152,7 @@
             </div>
             <div class="col-xs-12 col-sm-6">
                 <h3>Map</h3>
-                <iframe class="map-iframe" src="/map?embed=true&id={{_id}}"></iframe>
+                <iframe class="map-iframe" src="/embed/map.html?embed=true&id={{_id}}"></iframe>
                 <br><br>
             </div>
         {{/reading}}

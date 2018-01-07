@@ -1,7 +1,7 @@
 class OfflineEvent {
     constructor(obj) {
         obj = obj || {};
-        this.type = obj.type || "none";
+        this.type = obj.type || "post";
         this.data = obj.data || {};
         this.id = obj.id || this.randomId();
         this.autoSubmit = obj.autoSubmit || true;
@@ -40,19 +40,6 @@ class OfflineEvent {
     }
 }
 
-// Generic post request
-class OfflinePost extends OfflineEvent {
-    constructor(obj) {
-        obj = obj || { };
-        obj.type = "post";
-        obj.priority = 0;
-        super(obj);
-    }
-
-    submit(callback) {
-        // TODO
-    }
-}
 
 
 

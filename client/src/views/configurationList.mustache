@@ -4,7 +4,7 @@
     <title><!--title--> - Configurations</title>
 </head>
 <body>
-    <!--nav-->
+    <!--nav_auto-->
     <br>
     <div class="container"><div class="col-md-8 col-md-offset-2 col-xs-12">
         <h2 class="h-inline">Configurations</h2>
@@ -16,7 +16,7 @@
         <ul class="list-group">
             {{#configurations}}
             {{#query.reading}}
-            <li class="list-group-item"><a href="/configurations/{{_id}}/reading">{{name}}</a></li>
+            <li class="list-group-item"><a href="/newReading.html?configuration={{_id}}">{{name}}</a></li>
             {{/query.reading}}
             {{^query.reading}}
             <li class="list-group-item"><a href="/configurations/{{_id}}">{{name}}</a></li>

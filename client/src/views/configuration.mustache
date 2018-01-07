@@ -4,7 +4,7 @@
     <title><!--title--> - Configuration</title>
 </head>
 <body>
-    <!--nav-->
+    <!--nav_auto-->
 
     <div class="container">
     {{#configuration}}
@@ -13,7 +13,7 @@
         <h2 class="h-inline">Configuration</h2>
         {{#canEdit}}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a role="button" class="btn btn-primary btn-lg" href="/configurations/{{_id}}/reading">Submit Reading</a>
+        <a role="button" class="btn btn-primary btn-lg" href="/newReading.html?configuration={{_id}}">Submit Reading</a>
         <br class="visible-xxs">
         {{/canEdit}}
         <br>
@@ -95,7 +95,7 @@
             <option value="31557600">Last 1 Year</option>
         </select>
         <br>
-        <iframe id="map-time" class="map-iframe" src="/map?embed=true&configuration={{_id}}&timeAgo=604800"></iframe>
+        <iframe id="map-time" class="map-iframe" src="/embed/map.html?embed=true&configuration={{_id}}&timeAgo=604800"></iframe>
 
         <hr>
 

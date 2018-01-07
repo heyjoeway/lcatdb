@@ -130,3 +130,7 @@ body:not(.no-nav) {
     margin-top: -2em;
     margin-left: -2em;
 }
+
+a.disabled {
+    pointer-events: none;
+}

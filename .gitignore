@@ -9,5 +9,11 @@
 /client/build
 /client/.sass-cache
 
+/client/cordova/platforms/**
+/client/cordova/node_modules/**
+/client/cordova/plugins/**
+/client/cordova/www/**
+/client/cordova/config.xml
+
 .eslintrc.json
 package-lock.json

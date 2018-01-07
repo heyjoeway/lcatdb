@@ -1,0 +1,43 @@
+{{#configuration}}
+<br>
+<h3 class="h-inline">Sensors</h3>
+&nbsp;&nbsp;
+<a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-sm btn-primary online_only_disable">Add New</a>
+&nbsp;&nbsp;
+<a id="sensor-existing" href="/configurations/{{_id}}/addSensor" class="btn btn-sm btn-secondary online_only_disable">Add Existing</a>
+<br>
+<div id="sensors">
+    {{#sensors}}
+    <div class="sensor row" id="sensor_{{_id}}">
+        <div class="col-xs-10">
+            <h4 class="h-inline">{{model}}</h4>
+            &nbsp;&nbsp;&nbsp;
+            <h6 class="h-inline"><a href="/sensors/{{_id}}" class="online_only_disable">{{name}}</a></h6>
+        </div>
+        <div class="col-xs-2 text-right extra-small text-muted">
+            <a  href="/configurations/{{configuration._id}}/removeSensor?sid={{_id}}"
+                class="sensor-remove btn btn-secondary btn-sm online_only_disable"
+                data-sid="{{_id}}">
+                <span class="glyphicon glyphicon-trash"></span>
+            </a>
+        </div>
+        <div class="col-xs-12">
+            {{{html}}}
+        </div>
+        <br>
+    </div>
+    {{/sensors}}
+    {{^sensors}}
+    <p id="sensors-none">No sensors found for this configuration.</p>
+    <p class="offline_only_hide">Please connect to the internet in order to add sensors.</p>
+    {{/sensors}}
+</div>
+
+<div class="form-group">
+    <div>
+        <a href="/dashboard.html" class="btn btn-default">Cancel</a>
+        &nbsp;&nbsp;
+        <input type="submit" name="publish" class="btn btn-primary" formaction="/configurations/{{_id}}/readingDo" value="Save and Publish" />
+    </div>
+</div>
+{{/configuration}}

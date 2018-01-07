@@ -1,0 +1,298 @@
+let configurationId, map, marker, mobileDetect;
+
+function initConfigList() {
+    updateConfigList(true);
+
+    $("#configuration-picker").change(changeConfig);
+}
+
+function updateConfigList(init) {
+    offlineInfo.get(true, function(gotNewInfo) {
+        let html = '';
+
+        let configurationIndex = $('#configuration-picker').val() || 0;
+
+        offlineInfo.info().configurations.forEach(function(configuration, i) {
+            html += `<option value="${i}">${configuration.name}</option>`;
+
+            if (init && configuration['_id'] == configurationId)
+                configurationIndex = i;
+        });
+
+        $('#configuration-picker')
+            .html(html)
+            .selectpicker('refresh')
+            .val(configurationIndex);
+
+        changeConfig();
+    });
+}
+
+function changeConfig() {
+    $.get('/templates/configurationSensors.mustache', function(template, status) {
+        if (status != 'success') return;
+
+        let configurationIndex = $("#configuration-picker").val();
+
+        let data = offlineInfo.info();
+        let configuration = data.configurations[configurationIndex]; 
+
+        configuration.sensors.forEach(function(sensor) {
+            sensor.html = Mustache.render(
+                data.sensorTypes[sensor.type].inputTemplate,
+                sensor
+            );
+        });
+
+        $('#configuration-sensors').html(
+            Mustache.render(template, {
+                "configuration": configuration
+            })
+        );
+        $('#configuration-link').prop(
+            'href',
+            '/configurations/' + configuration['_id']
+        );
+        $('.configuration-chosen').show();
+        $('.configuration-notchosen').hide();
+
+        changeUnitSystem();
+        initSensorBtns();
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+function updateMap() {
+    let lat = $('input[name="location.lat"]').val();
+    let long = $('input[name="location.long"]').val();
+
+    if ((lat == 0) && (long == 0)) {
+        lat = 44.57670853058025;
+        long = -73.32539651979982;
+    }
+    
+    let pos = new google.maps.LatLng(lat, long);
+
+    marker.setPosition(pos);
+    map.setCenter(pos);
+}
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        "zoom": 11,
+        "center": {
+            "lat": 44.57670853058025,
+            "lng": -73.32539651979982
+        },
+        "streetViewControl": false,
+        "mapTypeId": "terrain",
+        "scrollwheel": false
+    });
+    
+    marker = new google.maps.Marker({
+        map: map,
+        draggable: true,
+        animation: google.maps.Animation.DROP
+    });
+
+    google.maps.event.addListener(marker, 'dragend', () => {
+        var pos = marker.getPosition();
+        $('input[name="location.lat"]').val(pos.lat()).change();
+        $('input[name="location.long"]').val(pos.lng()).change();
+        updateMap();
+    });
+
+    $('input[name="location.lat"]').change(updateMap);
+    $('input[name="location.long"]').change(updateMap);
+
+    updateMap();
+}
+
+// ----------------------------------------------------------------------------
+
+function modalFinish($element) {
+    updateConfigList();
+    $element.modal('hide');
+}
+
+function initSensorBtns() {
+    $('#sensor-new').off('click').click(function(e) {
+        e.preventDefault();
+
+        modal(
+            'Add New Sensor',
+            `/sensors/new?configuration=${configurationId}&modal=true`,
+            modalFinish
+        );
+    });
+
+    $('#sensor-existing').off('click').click(function(e) {
+        e.preventDefault();
+
+        modal(
+            'Add Existing Sensor',
+            `/configurations/${configurationId}/addSensor?modal=true`,
+            modalFinish
+        );
+    });
+
+    $('.sensor-remove').off('click').click(function(e) {
+        e.preventDefault();
+
+        let sid = $(this).data('sid');
+
+        modal(
+            'Remove Sensor',
+            `/configurations/${configurationId}/removeSensor?modal=true&sid=${sid}`,
+            modalFinish
+        );
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+function getLocation() {
+    if (!mobileDetect.phone()) return;
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => { // Success
+                $('input[name="location.lat"]').val(
+                    pos.coords.latitude).change();
+                $('input[name="location.long"]').val(
+                    pos.coords.longitude).change();
+                $('input[name="location.range"]').val(
+                    pos.coords.accuracy).change();
+                $('input[name="location.alt"]').val(
+                    pos.coords.altitude).change();
+                $('input[name="location.altRange"]').val(
+                    pos.coords.altitudeAccuracy).change();
+                updateMap();
+            },
+            (error) => { // Failure
+                $.notify({
+                    "message": 'Could not retrieve location. Please allow location on your device.'
+                }, {
+                    "type": 'warning'
+                });
+            },
+            { // Options
+                "enableHighAccuracy": true,
+                "maximumAge": 3 * 60 * 1000, // 3 minutes
+                "timeout": 15 * 1000 // 15 sec (may increase)
+            }
+        );
+    } else {
+        $.notify({
+            "message": 'Could not retrieve location. Geolocation is not supported by this browser.'
+        }, {
+            "type": 'warning'
+        });
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+function initMobile() {
+    mobileDetect = new MobileDetect(window.navigator.userAgent);
+    
+    if (mobileDetect.phone())
+        $('#location_mobile').show();
+    else
+        $('#location_desktop').show();
+}
+
+// ----------------------------------------------------------------------------
+
+function preventEnterKey() {
+    // https://stackoverflow.com/a/895231
+    $(window).keydown(function(event){
+        if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+function initDatetime() {
+    if(!Modernizr.inputtypes['datetime-local']) {
+        $('input[type=datetime-local]').datetimepicker({
+            "showMeridian": true,
+            "format": "yyyy-mm-ddThh:ii",
+            "startView": 2,
+            "minView": 0,
+            "todayBtn": true,
+            "todayHighlight": true
+        });
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+function init() {
+    let queryObj = urlQueryObj(location.href);
+    configurationId = queryObj.configuration;    
+
+    initConfigList();
+    initMobile();
+    initDatetime();
+    preventEnterKey();
+    updateNavbar();
+
+    $('.normalize').unitnorm();
+    $('.spoiler').spoiler();
+
+    $("input[name=timeCreated]")
+        .val((new Date).getTime())
+        .change();
+}
+
+$(window).ready(init);
+
+
+// function prefValue(key, val) {
+//     if (val) localStorage[`configurations.${configurationId}.${key}`] = val;
+//     return localStorage[`configurations.${configurationId}.${key}`];
+// }
+
+// let prefHandlers = [
+//     {
+//         "name": 'locationalways',
+//         "load": function() {
+//             let queryObj = urlQueryObj(location.href);
+
+//             if ('quick' in queryObj) prefValue(this.name, true)
+
+//             let isSet = prefValue(this.name) == 'true';
+
+//             $('#' + this.name).prop('checked', isSet);
+//             if (isSet) getLocation();
+//         },
+//         "save": function() {
+//             prefValue(this.name, $('#' + this.name).prop('checked').toString());
+//         },
+//         "listen": function() {
+//             $('#' + this.name).change(() => { this.save() });
+//         }
+//     }
+// ];
+
+// function loadPrefs() {
+//     prefHandlers.forEach((handler) => {
+//         handler.load();
+//     });
+// }
+
+// function savePrefs() {
+//     prefHandlers.forEach((handler) => {
+//         handler.save();
+//     });
+// }
+
+// function listenPrefs() {
+//     prefHandlers.forEach((handler) => {
+//         handler.listen();
+//     });
+// }

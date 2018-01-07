@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - New Reading</title>
+</head>
+<body>
+    <!--nav_blank-->
+
+    <div class="container">
+        <form id="form" method="post">
+            <div class="row">
+
+                <div class="col-xs-12 col-md-7">
+
+                    <h2 class="h-inline">New Reading</h2>
+                    &nbsp;&nbsp;&nbsp;
+                    <select id="unit-system-picker" class="selectpicker">
+                        <option value="imperial" selected="selected">Imperial Units</option>
+                        <option value="metric">Metric Units</option>
+                    </select>
+                    <br>
+
+                    <select id="configuration-picker" class="selectpicker"></select>
+
+                    <div class="configuration-notchosen">
+                        Please choose a configuration from the list above.
+                    </div>
+
+                    <div class="configuration-chosen" style="display:none">
+
+                        <a id="configuration-link" class="online_only_hide">View Configuration</a>
+
+                        <!-- Location + Time -->
+                        <div id="location_mobile" style="display:none">
+                            <p>Choose a location by using GPS, dragging the marker to the desired spot, or by inputting coordinates in the boxes below.</p>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <label class="custom-control custom-checkbox">
+                                <input type="checkbox" id="locationalways" class="custom-control-input">
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">Get Location Automatically</span>
+                            </label>
+                            <br><br>
+                        </div>
+                        <div id="location_desktop" style="display:none">
+                            <p>Choose a location by either dragging the marker to the desired spot or by inputting coordinates in the boxes below.</p>
+                        </div>
+                        <div class="map" id="map"></div>
+
+                        <br>
+
+                        <!-- Lat/Long -->
+                        <div class="row">
+
+                            <!-- Latitude -->
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label">Latitude</label>
+                                <div class="input-group">
+                                    <input  name="location.lat" class="form-control normalize"
+                                            type="number" step="any"
+                                            min="-90" max="90"
+                                            data-unittype="location" data-unit="degrees" data-unitpref="degMin"                                        
+                                            aria-describedby="addon-location_lat">
+                                    <br>
+                                    <span class="input-group-addon" id="addon-location_lat">Degrees</span>
+                                </div>
+                            </div>
+
+                            <!-- Longitude -->                    
+                            <div class="col-xs-6 col-xxs-12">
+                                <label class="control-label">Longitude</label>
+                                <div class="input-group">
+                                    <input  name="location.long" class="form-control normalize"
+                                            type="number" step="any" min="-180" max="180"
+                                            data-unittype="location" data-unit="degrees" data-unitpref="degMin"
+                                            aria-describedby="addon-location_long">
+                                    <span class="input-group-addon" id="addon-location_long">Degrees</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <br>
+
+                        <div class="spoiler reading-more" data-spoiler-link="location"></div>
+                        <div class="spoiler-content row" data-spoiler-link="location">
+
+                            <!-- Time Created -->
+                            <div class="col-xs-12">
+                                <label class="control-label">
+                                    Time Created
+                                </label>
+                                <input  name="timeCreated" class="form-control normalize"
+                                        type="number" value=""
+                                        data-unittype="time" data-unit="unix" data-unitpref="iso">
+                                <br>
+                            </div>
+
+                            <!-- Range -->
+                            <div class="col-sm-4 col-xs-12">
+                                <label class="control-label">Range (Optional)</label>
+                                <div class="input-group">
+                                    <input  name="location.range" class="form-control normalize"
+                                            type="number" step="any" min="0"
+                                            aria-describedby="addon-location_range"
+                                            data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
+                                    <span class="input-group-addon" id="addon-location_range">Meters</span>
+                                </div>
+                                <br>
+                            </div>
+                        
+
+                            <!-- Altitude -->
+                            <div class="col-sm-4 col-xs-12">
+                                <label class="control-label">Altitude (Optional)</label>
+                                <div class="input-group">
+                                    <input  name="location.alt" class="form-control normalize" id="location_alt"
+                                            type="number" step="any" 
+                                            aria-describedby="addon-location_alt"
+                                            data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
+                                    <span class="input-group-addon" id="addon-location_alt">Meters</span>
+                                </div>
+                                <br>
+                            </div>
+                        
+                            <!-- Altitude Range -->
+                            <div class="col-sm-4 col-xs-12">
+                                <label class="control-label">Altitude Range (Optional)</label>
+                                <div class="input-group">
+                                    <input  name="location.altRange" class="form-control normalize" id="location_altRange" 
+                                            type="number" step="any" min="0"
+                                            aria-describedby="addon-location_altRange"
+                                            data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
+                                    <span class="input-group-addon" id="addon-location_altRange">Meters</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    
+                    </div>
+                        
+                </div>
+
+                <div id="configuration-sensors"
+                     class="col-xs-12 col-md-5 configuration-chosen"
+                     style="display:none">
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!--scripts-->
+
+    <script src="/js/lib/jquery.spoiler.min.js"></script>
+    <script src="/js/lib/modernizr-custom.js"></script>
+    <script src="/js/lib/mobile-detect.min.js"></script>
+    <script src="/js/lib/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/lib/mustache.min.js"></script>
+    <!-- <script src="/js/pages/configurationReading.js"></script> -->
+    <script src="/js/pages/newReading.js"></script>
+
+    <!--script_map-->
+
+</body>

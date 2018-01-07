@@ -46,7 +46,7 @@ app.post('/logindo', (req, res) => {
     Auth.login(req.body.username, req.body.password, 
         (oid) => { // Success
             req.session.oid = oid.toString();
-            res.redirect('/dashboard');
+            res.redirect('/dashboard.html');
         },
         (error) => { // Failure
             res.redirect('/login?invalid=true');
@@ -136,7 +136,7 @@ app.post(`/user/editDo`, (req, res) => {
                 "user": data.user,
                 "edit": req.body
             },
-            () => { res.redirect(`/dashboard`); },
+            () => { res.redirect(`/dashboard.html`); },
             (error) => { res.send(`Error processing request. (${error.errorName})`); }
         );
     });
@@ -326,13 +326,13 @@ app.get(`/verify/${verifyPattern}`, (req, res) => {
             "error": error
         });
                    
-        res.redirect("/dashboard?verifyFailure=true");
+        res.redirect("/dashboard.html?verifyFailure=true");
     }
         
     Verify.useRequest(
         vid,
         () => {
-            res.redirect("/dashboard?verifySuccess=true");
+            res.redirect("/dashboard.html?verifySuccess=true");
         },
         fail
     );

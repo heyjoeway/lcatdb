@@ -1,7 +1,7 @@
-$(() => {
+function initModals() {
     let configuration = $('#configuration').text();
     
-    $('#sensor-new').click(function(e) {
+    $('#sensor-new').off('click').click(function(e) {
         e.preventDefault();
 
         modal(
@@ -11,7 +11,7 @@ $(() => {
         );
     });
 
-    $('#sensor-existing').click(function(e) {
+    $('#sensor-existing').off('click').click(function(e) {
         e.preventDefault();
 
         modal(
@@ -21,7 +21,7 @@ $(() => {
         );
     });
 
-    $('.sensor-remove').click(function(e) {
+    $('.sensor-remove').off('click').click(function(e) {
         e.preventDefault();
 
         let sid = $(this).data('sid');
@@ -32,4 +32,6 @@ $(() => {
             function() { window.location.reload(); }
         );
     });
-});
+}
+
+$(window).ready(initModals);

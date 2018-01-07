@@ -4,7 +4,7 @@
     <title><!--title--> - Readings</title>
 </head>
 <body>
-    <!--nav-->
+    <!--nav_auto-->
 
     {{#configuration}}
     <div class="container">
@@ -21,7 +21,7 @@
         &nbsp;&nbsp;
         <a class="btn btn-sm btn-primary" href="./readingsExport">Export All</a>
         &nbsp;&nbsp;        
-        <a class="btn btn-sm btn-secondary" href="./reading">Submit Reading</a>
+        <a class="btn btn-sm btn-secondary" href="/newReading.html?configuration={{_id}}">Submit Reading</a>
         {{/canEdit}}
         <hr>
         <ul class="list-group">

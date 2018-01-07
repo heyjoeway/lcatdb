@@ -152,6 +152,7 @@ app.post(`/api/offlineData`, (req, res) => {
         });
     }, function() {
         data.sensorTypes = SensorTypes.getTypes();
+        data.time = new Date().getTime();
         res.send(data);
     });
 

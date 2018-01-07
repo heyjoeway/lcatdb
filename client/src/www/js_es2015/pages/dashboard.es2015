@@ -1,0 +1,9 @@
+$(function() {
+    let queryObj = urlQueryObj(window.location.href);
+
+    ["verifySuccess", "verifyFailure"].forEach(function(key) {
+        if (queryObj[key]) $('#' + key).show();
+    });
+
+    updateNavbar();
+});

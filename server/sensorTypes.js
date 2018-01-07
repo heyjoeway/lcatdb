@@ -38,13 +38,7 @@ exports.getTypesMustache = function() {
 }
 
 exports.getTypes = function() {
-    let typesFinal = {};
-
-    Object.keys(types).forEach((key) => {
-        typesFinal[key] = types[key].data;
-    });
-
-    return typesFinal;
+    return types;
 }
 
 exports.getTypeName = function(type) {

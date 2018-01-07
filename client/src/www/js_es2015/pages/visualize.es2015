@@ -576,7 +576,7 @@ class GraphMap extends Graph {
 
     createGraph() {
         let queries = JSURL.stringify(this.data);
-        let url ="/map?embed=true,queries=" + queries;
+        let url ="/embed/map.html?queries=" + queries;
         let $element = $('<iframe></iframe>', {
             "class": "graph_map map-iframe",
             "src": url
@@ -959,6 +959,8 @@ class GraphManager {
 let dataSetManager, graphManager;
 
 $(() => {
+    updateNavbar();
+
     dataSetManager = new DataSetManager();
     graphManager = new GraphManager(dataSetManager);
 

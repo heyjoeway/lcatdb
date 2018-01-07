@@ -5,6 +5,7 @@ module.exports = function(grunt) {
 const PACKAGE = require("./package.json");
 
 const TITLE = "lcatᴰᴮ";
+const URL = "http://localhost:3000";
 
 // All paths should end in "/". I'm lazy.
 
@@ -55,77 +56,101 @@ config.sass.www = {
     }]
 };
 
-// <!--nav--> must come before <!--nav_nouser-->!!!!!
+// <!--nav--> must come before <!--nav_nouser--> and <!--nav_user-->!!!!!
 
 let replacements = [{
-    from: "<!--head-->",
-    to: fs.readFileSync(TEMPLATES_DIR + "head.html", "utf8")
+    match: "<!--head-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "head.html", "utf8")
 }, {
-    from: "<!--nav-->",
-    to: fs.readFileSync(TEMPLATES_DIR + "nav.html", "utf8")
+    match: "<!--nav_nouser-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_nouser.html", "utf8")
 }, {
-    from: "<!--nav_nouser-->",
-    to: fs.readFileSync(TEMPLATES_DIR + "nav_nouser.html", "utf8")
+    match: "<!--nav_user-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_user.html", "utf8")
 }, {
-    from: "<!--footer-->",
-    to: fs.readFileSync(TEMPLATES_DIR + "footer.html", "utf8")
+    match: "<!--nav_auto-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_auto.html", "utf8")
 }, {
-    from: "<!--scripts-->",
-    to: fs.readFileSync(TEMPLATES_DIR + "scripts.html", "utf8")
+    match: "<!--nav_blank-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_blank.html", "utf8")
 }, {
-    from: "<!--script_map-->",
-    to: fs.readFileSync(TEMPLATES_DIR + "script_map.html", "utf8")
+    match: "<!--footer-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "footer.html", "utf8")
 }, {
-    from: "<!--title-->",
-    to: TITLE
+    match: "<!--scripts-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "scripts.html", "utf8")
 }, {
-    from: "<!--version-->",
-    to: PACKAGE.version
+    match: "<!--script_map-->",
+    replacement: fs.readFileSync(TEMPLATES_DIR + "script_map.html", "utf8")
+}, {
+    match: "<!--title-->",
+    replacement: TITLE
+}, {
+    match: "<!--version-->",
+    replacement: PACKAGE.version
+}, {
+    match: "<!--url-->",
+    replacement: PACKAGE.version
 }];
 
-config.replace = {};
+config.replace = {
+    options: {
+        patterns: replacements,
+        prefix: ''
+    }
+};
 config.replace.www = {
-    expand: true,
-    src: [WWW_SRC + "pages/*.html"],
-    dest: WWW_TMP,
-    replacements: replacements
+    files: [{
+        expand: true,
+        cwd: WWW_SRC + "pages",
+        src: ["**/*.html", "**/*.mustache"],
+        dest: WWW_TMP
+    }, {
+        expand: true,
+        cwd: WWW_SRC + "js_es2015",
+        src: ["**/*.es2015"],
+        dest: WWW_TMP + "js_es2015"
+    }]
 };
 config.replace.views = {
-    expand: true,
-    src: [VIEWS_SRC + "*.mustache"],
-    dest: VIEWS_TMP,
-    replacements: replacements
+    files: [{
+        expand: true,
+        cwd: VIEWS_SRC,
+        src: ["**/*.mustache"],
+        dest: VIEWS_TMP
+    }]
 };
 config.replace.emails = {
-    expand: true,
-    src: [EMAILS_SRC + "*.mustache"],
-    dest: EMAILS_TMP,
-    replacements: replacements
+    files: [{
+        expand: true,
+        cwd: EMAILS_SRC,
+        src: ["**/*.mustache"],
+        dest: EMAILS_TMP
+    }]
 };
 
-config.htmlmin = {};
-config.htmlmin.www = {
+config.htmlmin = {
     options: {
         removeComments: true,
         collapseWhitespace: true,
         conservativeCollapse: true,
         removeEmptyAttributes: true
-    },
+    }
+};
+config.htmlmin.www = {
     files: [{
         "expand": true,
         "cwd": WWW_TMP,
         "src": ["**/*.html"],
-        "dest": WWW_BUILD,
-        "ext": ".html"
+        "dest": BUILD_DIR + "www" // following slash destroys directory structure
+    }, {
+        "expand": true,
+        "cwd": WWW_TMP,
+        "src": ["**/*.mustache"],
+        "dest": BUILD_DIR + "www" // following slash destroys directory structure
     }]
 };
 config.htmlmin.views = {
-    options: {
-        removeComments: true,
-        collapseWhitespace: true,
-        conservativeCollapse: true,
-        removeEmptyAttributes: true
-    },
     files: [{
         "expand": true,
         "cwd": VIEWS_TMP,
@@ -135,12 +160,6 @@ config.htmlmin.views = {
     }]
 };
 config.htmlmin.emails = {
-    options: {
-        removeComments: true,
-        collapseWhitespace: true,
-        conservativeCollapse: true,
-        removeEmptyAttributes: true
-    },
     files: [{
         "expand": true,
         "cwd": EMAILS_TMP,
@@ -159,7 +178,7 @@ config.babel = {
 config.babel.www = {
     files: [{
         "expand": true,
-        "cwd": WWW_SRC + "js_es2015/",
+        "cwd": WWW_TMP + "js_es2015/",
         "src": ["**/*.es2015"],
         "dest": WWW_TMP + "js/",
         "ext": ".js"

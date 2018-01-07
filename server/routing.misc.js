@@ -14,7 +14,7 @@ exports.init = function(app) {
 
 app.get('/', (req, res) => {
     if (req.session && req.session.oid)
-        res.redirect('/dashboard');
+        res.redirect('/dashboard.html');
     else
         res.redirect('/home.html');
 });
@@ -75,7 +75,7 @@ app.get('/login', (req, res) => {
         RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
     }, function() {
         if (data.user)
-            return res.redirect('/dashboard');
+            return res.redirect('/dashboard.html');
 
         RoutingCore.stepQuery(req, res, data, {}, this.next.bind(this));
     }, function(list) {

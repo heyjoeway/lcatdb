@@ -1,36 +1,43 @@
 $(() => {
-    $('.js').removeClass('js');
-    $('.no-js').hide();
-
-    $('#map-time-picker').change(function() {
-        let queryObj = urlQueryObj($('#map-time').attr('src'));
-        queryObj.timeAgo = $(this).val();
-        let newUrl = '/map?';
-
-        Object.keys(queryObj).forEach((key) => {
-            newUrl += key + '=' + queryObj[key] + '&';
+    function initMap() {
+        $('#map-time-picker').change(function() {
+            let queryObj = urlQueryObj($('#map-time').attr('src'));
+            queryObj.timeAgo = $(this).val();
+            let newUrl = '/embed/map.html?';
+    
+            Object.keys(queryObj).forEach((key) => {
+                newUrl += key + '=' + queryObj[key] + '&';
+            });
+    
+            newUrl = newUrl.substring(0, newUrl.length - 1);
+    
+            $('#map-time').attr('src', newUrl);
         });
-
-        newUrl = newUrl.substring(0, newUrl.length - 1);
-
-        $('#map-time').attr('src', newUrl);
-    });
-
-    $('#map-user-picker').change(function() {
-        let queryObj = urlQueryObj($('#map-time').attr('src'));
-        let creator = $(this).val();
-        if (creator == 'all') delete queryObj.creator;
-        else queryObj.creator = creator;
-        let newUrl = '/map?';
-
-        Object.keys(queryObj).forEach((key) => {
-            newUrl += key + '=' + queryObj[key] + '&';
+    
+        $('#map-user-picker').change(function() {
+            let queryObj = urlQueryObj($('#map-time').attr('src'));
+            let creator = $(this).val();
+            if (creator == 'all') delete queryObj.creator;
+            else queryObj.creator = creator;
+            let newUrl = '/embed/map.html?';
+    
+            Object.keys(queryObj).forEach((key) => {
+                newUrl += key + '=' + queryObj[key] + '&';
+            });
+    
+            newUrl = newUrl.substring(0, newUrl.length - 1);
+    
+            $('#map-time').attr('src', newUrl);
         });
+    }
 
-        newUrl = newUrl.substring(0, newUrl.length - 1);
-
-        $('#map-time').attr('src', newUrl);
-    });
+    function initJs() {
+        $('.js').removeClass('js');
+        $('.no-js').hide();
+    }
+    
+    initJs();
+    initMap();
 
     let unitSystem = localStorage.unitSystem;
     
@@ -46,11 +53,115 @@ $(() => {
         changeUnitSystem(system);
     });
 
-    testOnline();
-    setInterval(testOnline, 5000);
+    showOnline();
+    setInterval(showOnline, 5000);
+
+    window.activeInputBlock = 0;
+
+    if (window.parent == window)
+        window.offlineInfo = new OfflineInfoManager();
 });
 
-function testOnline() {
+class OfflineInfoManager {
+    constructor() {
+        this.block = false;
+        this.callbacks = [];
+        this.get();
+    }
+
+    /**
+     * Gets info necessary for offline operation
+     * 
+     * @param force 
+     * @param {function} callback Params: gotNewInfo {boolean}
+     */
+    get(force = false, callback) {
+        const OFFLINE_CACHE_TIME = 5 * 60 * 1000; // milliseconds
+    
+        if (callback) this.callbacks.push(callback);
+    
+        if (this.block) return;
+        this.block = true;
+        
+        let infoCurrent = this.info();
+        if (infoCurrent && !force) {
+            let timeCurrent = new Date().getTime();
+            let cacheExpired = infoCurrent.time - timeCurrent >= OFFLINE_CACHE_TIME;
+            if (!cacheExpired)
+                return this.finish(false);
+        }
+    
+        if (navigator.onLine) {
+            startInputBlock();
+            $.post('/api/offlineData', (data, status) => {
+                if (status == 'success') {
+                    if (data.error) {
+                        if (data.error.errorName == 'noSession')
+                            localStorage.offlineInfo = '';
+                        return this.finish(false);
+                    }
+
+                    localStorage.offlineInfo = JSON.stringify(data);
+                    this.finish(true);
+                } else this.finish(false);
+            }, 'json');
+        } else this.finish(false);
+    }
+
+    finish(gotNewInfo) {
+        console.log("offlineInfo: gotNewInfo = " + gotNewInfo);
+        this.callbacks.forEach((callback) => {
+            callback(gotNewInfo);
+        });
+        this.callbacks = [];
+    
+        this.block = false;
+        finishInputBlock();
+    }
+    
+    info() {
+        if (localStorage.offlineInfo)
+            return JSON.parse(localStorage.offlineInfo);
+    }
+
+    expire() {
+        let info = this.info();
+        info.time = 0;
+        localStorage.offlineInfo = JSON.stringify(info);
+    }
+}
+
+function updateNavbar() {
+    offlineInfo.get(false, function(gotNewInfo) {
+        $.get('/templates/navUser.mustache', function(template, status) {
+            if (status != 'success') return;
+    
+            let configurationId = $("#configuration-picker").val();
+
+    
+            $('#navbar').remove();
+            
+            $('body').append(
+                Mustache.render(template, offlineInfo.info())
+            );
+
+        });
+    });
+}
+
+function startInputBlock() {
+    $('#loading-overlay').removeClass('hide');
+    window.activeInputBlock++;
+}
+
+function finishInputBlock() {
+    if (--window.activeInputBlock <= 0) {
+        window.activeInputBlock = 0;
+        $('#loading-overlay').addClass('hide');
+    }
+}
+
+function showOnline() {
     $(".online_only_hide")[navigator.onLine ? 'show' : 'hide']();
     $(".online_only_disable")
         .prop('disabled', !navigator.onLine)
@@ -63,6 +174,9 @@ function testOnline() {
 }
 
 function changeUnitSystem(system) {
+    if (!system)
+        system = localStorage.unitSystem;
+
     let $normalize = $('.normalize');
     $normalize.unitnorm('deinit');
     $normalize.each(function() {
