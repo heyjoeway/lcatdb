@@ -10,7 +10,8 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "dependencies": {
-    "cordova-android": "^6.3.0",
+    "cordova-android": "^6.4.0",
+    "cordova-plugin-file": "^6.0.1",
     "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-googlemaps": "^2.1.1",
     "cordova-plugin-remote-injection": "^0.5.2",
@@ -23,7 +24,8 @@
       "cordova-plugin-googlemaps": {
         "API_KEY_FOR_ANDROID": "AIzaSyBRck99320QcQD_WlqJpFZHDNnFN0NJ1Io"
       },
-      "cordova-plugin-geolocation": {}
+      "cordova-plugin-geolocation": {},
+      "cordova-plugin-file": {}
     },
     "platforms": [
       "android"

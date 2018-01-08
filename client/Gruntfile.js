@@ -133,7 +133,7 @@ config.replace.cordova = {
     }, {
         expand: true,
         cwd: CORDOVA_SRC,
-        src: '**/*.html',
+        src: ["**/*.html", "**/*.mustache"],
         dest: CORDOVA_TMP
     }]
 };

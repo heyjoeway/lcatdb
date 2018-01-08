@@ -271,8 +271,8 @@ function inApp() {
     return typeof cordova != 'undefined';
 }
 
-function appUrls() {
-    if (!inApp()) return;
+function appUrls(force) {
+    if (!force && !inApp()) return;
 
     $.ajax({
         url: './files.json',
@@ -299,10 +299,15 @@ function appUrls() {
                 let isLocal = filelist.indexOf(href) != -1;
                 
                 let hrefFinal;
-                if (isLocal)
+                if (isLocal) {
                     hrefFinal = 'file:///android_asset/www/' + href;
-                else
-                    hrefFinal = serverUrl + href;
+                    $(this).click((e) => {
+                        e.preventDefault();
+
+                        window.open($(this).attr('href'));
+                    });
+
+                } else hrefFinal = serverUrl + href;
     
                 $(this).attr('href', hrefFinal);
             });

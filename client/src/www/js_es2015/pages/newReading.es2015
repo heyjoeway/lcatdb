@@ -232,6 +232,23 @@ function initDatetime() {
 
 // ----------------------------------------------------------------------------
 
+// https://stackoverflow.com/a/1186309
+function objectifyForm(formArray) {//serialize data function
+    var returnArray = {};
+    for (var i = 0; i < formArray.length; i++)
+       returnArray[formArray[i]['name']] = formArray[i]['value'];
+
+    return returnArray;
+}
+
+function queueReading() {
+    if (typeof cordova == 'undefined') return;
+
+    let formData = objectifyForm($('form').serializeArray());
+}
+
+// ----------------------------------------------------------------------------
+
 function init() {
     let queryObj = urlQueryObj(location.href);
     configurationId = queryObj.configuration;    
@@ -248,6 +265,16 @@ function init() {
     $("input[name=timeCreated]")
         .val((new Date).getTime())
         .change();
+
+    if (typeof window.parent.cordova != 'undefined') {
+        window.pluginWait = setInterval(function() {
+            if (window.parent.plugin) {
+                window.google = window.parent.plugin.google;
+                initMap();
+                clearInterval(window.pluginWait);
+            }
+        }, 1000);
+    } else $.getScript(`<!--map_url-->`); // this gets replaced by grunt
 }
 
 $(window).ready(init);

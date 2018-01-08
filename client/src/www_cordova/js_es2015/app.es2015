@@ -55,6 +55,34 @@ class OfflineEventPost extends OfflineEvent {
         //     "formData": "form data"
         // }
     }
+
+    submit(callback) {
+        $.post(this.data.formUrl, this.data.formData, (data, status) => {
+            console.log(status);
+            if (status == 'success') {
+                this.status = success;
+                callback({
+                    success: true
+                });
+                this.response = {
+                    data: data,
+                    status: status
+                };
+            } else { 
+                this.status = 'failure';
+                this.failures++;
+                callback({
+                    success: false
+                });
+            }
+        }).fail(() => {
+            this.status = 'failure';
+            this.failures++;
+            callback({
+                success: false
+            });
+        });
+    }
 }
 
 class OfflineEventQueue {
@@ -67,11 +95,15 @@ class OfflineEventQueue {
     autoSubmit() {
         this.events.forEach((event) => {
             if (!event.autoSubmit) return;
-
-            if (event.status == 'pending')
+            
+            if (event.status == 'pending') {
+                startInputBlock();
                 event.submit((result) => {
                     if (result.success) return this.removeEvent(event);
+                    else this.saveEvents();                    
+                    finishInputBlock();
                 });
+            }
 
             
         });
@@ -82,10 +114,12 @@ class OfflineEventQueue {
         let eventIndex = this.events.indexOf(event);
         if (eventIndex > -1)
             this.events.splice(eventIndex, 1);
+        this.saveEvents();
     }
 
     addEvent(event) {
-        this.events.push()
+        this.events.push(event);
+        this.saveEvents();        
     }
 
     toArray() {
@@ -114,3 +148,7 @@ class OfflineEventQueue {
         });
     }
 }
+
+$(() => {
+    window.offlineEventQueue = new OfflineEventQueue();
+});

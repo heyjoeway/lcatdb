@@ -359,7 +359,7 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
         Winston.debug('Error creating new reading', {
             "error": error
         });
-        res.send(`Error creating new reading. (${error.errorName})`);
+        res.send(error, 400);
     }
 
     function success(rid) {
