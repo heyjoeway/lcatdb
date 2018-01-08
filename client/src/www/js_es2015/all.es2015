@@ -1,3 +1,5 @@
+let serverUrl = '<!--url-->';
+
 $(() => {
     function initMap() {
         $('#map-time-picker').change(function() {
@@ -54,12 +56,14 @@ $(() => {
     });
 
     showOnline();
-    setInterval(showOnline, 5000);
+    setInterval(showOnline, 1000);
 
     window.activeInputBlock = 0;
 
     if (window.parent == window)
         window.offlineInfo = new OfflineInfoManager();
+
+    appUrls();
 });
 
 class OfflineInfoManager {
@@ -93,7 +97,8 @@ class OfflineInfoManager {
     
         if (navigator.onLine) {
             startInputBlock();
-            $.post('/api/offlineData', (data, status) => {
+            $.post(serverUrl + 'api/offlineData', (data, status) => {
+                console.log(status);
                 if (status == 'success') {
                     if (data.error) {
                         if (data.error.errorName == 'noSession')
@@ -104,7 +109,9 @@ class OfflineInfoManager {
                     localStorage.offlineInfo = JSON.stringify(data);
                     this.finish(true);
                 } else this.finish(false);
-            }, 'json');
+            }, 'json').fail((response) => {
+                this.finish(false);
+            });
         } else this.finish(false);
     }
 
@@ -133,7 +140,7 @@ class OfflineInfoManager {
 
 function updateNavbar() {
     offlineInfo.get(false, function(gotNewInfo) {
-        $.get('/templates/navUser.mustache', function(template, status) {
+        $.get('./templates/navUser.mustache', function(template, status) {
             if (status != 'success') return;
     
             let configurationId = $("#configuration-picker").val();
@@ -145,6 +152,7 @@ function updateNavbar() {
                 Mustache.render(template, offlineInfo.info())
             );
 
+            appUrls();
         });
     });
 }
@@ -256,5 +264,48 @@ function modal(title, url, callback) {
 
     $element.on('hidden.bs.modal', function() {
         $element.remove();
+    });
+}
+
+function inApp() {
+    return typeof cordova != 'undefined';
+}
+
+function appUrls() {
+    if (!inApp()) return;
+
+    $.ajax({
+        url: './files.json',
+        dataType: 'json',
+        cache: true,
+        success: function(data) {
+            let filelist = data.map((obj) => { return obj.location; })
+    
+            $('a').each(function() {
+                let href = $(this).attr('href');
+    
+                if (typeof href == 'undefined') return;
+    
+                if (href.substr(0, 1) == '.')
+                    href = href.substr(1);
+    
+                if (href.substr(0, 1) == '/')
+                    href = href.substr(1);
+                else return;
+                    
+                let query = href.split('?')[1];
+                href = href.split('?')[0];
+                
+                let isLocal = filelist.indexOf(href) != -1;
+                
+                let hrefFinal;
+                if (isLocal)
+                    hrefFinal = 'file:///android_asset/www/' + href;
+                else
+                    hrefFinal = serverUrl + href;
+    
+                $(this).attr('href', hrefFinal);
+            });
+        }
     });
 }

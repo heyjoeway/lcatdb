@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
     if (req.session && req.session.oid)
         res.redirect('/dashboard.html');
     else
-        res.redirect('/index.html');
+        res.redirect('/home.html');
 });
 
 // ------------------------------------

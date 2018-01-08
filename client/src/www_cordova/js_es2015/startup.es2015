@@ -1,0 +1,7 @@
+$(()=> {
+    offlineInfo.get(true, function(gotNewInfo) {
+        if (localStorage.offlineInfo)
+            return location.href = './dashboard.html';
+        location.href = './home.html';
+    });
+});

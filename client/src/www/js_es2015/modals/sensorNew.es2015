@@ -9,7 +9,7 @@ $(function() {
 
         window.parent.postMessage('modal.lock', '*');
 
-        $.post(`/sensors/newDo`,
+        $.post(`${serverUrl}sensors/newDo`,
             {
                 "type": $this.data('type'),
                 "model": $this.data('model'),

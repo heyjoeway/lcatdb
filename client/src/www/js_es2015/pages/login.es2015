@@ -6,4 +6,21 @@ $(function() {
     ["forgotSent", "invalid", "reset"].forEach(function(key) {
         if (queryObj[key]) $('#' + key).show();
     });
+
+    if (inApp()) $('input[type=submit]').click(function(e) {
+        e.preventDefault();
+
+        startInputBlock();
+
+        $.post(serverUrl + 'logindo', {
+            "username": $('input[name=username]').val(),
+            "password": $('input[name=password]').val(),
+            "infoOnly": true
+        }, function(data, status) {
+            if (data.success) location.href = "./dashboard.html";
+            else location.href = `./login.html?${data.errorName}=true`; 
+        }).fail(function() {
+
+        });
+    });
 });

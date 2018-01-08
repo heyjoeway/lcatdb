@@ -46,10 +46,22 @@ app.post('/logindo', (req, res) => {
     Auth.login(req.body.username, req.body.password, 
         (oid) => { // Success
             req.session.oid = oid.toString();
-            res.redirect('/dashboard.html');
+
+            if (req.body.infoOnly)
+                res.send({
+                    "success": true
+                });
+            else
+                res.redirect('/dashboard.html');
         },
         (error) => { // Failure
-            res.redirect('/login?invalid=true');
+            if (req.body.infoOnly)
+                res.send({
+                    "errorName": "invalid",
+                    "errorNameFull": "Login.invalid"
+                });
+            else
+                res.redirect('/login?invalid=true');
         }
     );
 });

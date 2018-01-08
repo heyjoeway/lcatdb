@@ -29,13 +29,14 @@ function updateConfigList(init) {
 }
 
 function changeConfig() {
-    $.get('/templates/configurationSensors.mustache', function(template, status) {
+    $.get('./templates/configurationSensors.mustache', function(template, status) {
         if (status != 'success') return;
 
         let configurationIndex = $("#configuration-picker").val();
 
         let data = offlineInfo.info();
         let configuration = data.configurations[configurationIndex]; 
+        configurationId = configuration['_id'];
 
         configuration.sensors.forEach(function(sensor) {
             sensor.html = Mustache.render(
@@ -122,7 +123,7 @@ function initSensorBtns() {
 
         modal(
             'Add New Sensor',
-            `/sensors/new?configuration=${configurationId}&modal=true`,
+            `${serverUrl}sensors/new?configuration=${configurationId}&modal=true`,
             modalFinish
         );
     });
@@ -132,7 +133,7 @@ function initSensorBtns() {
 
         modal(
             'Add Existing Sensor',
-            `/configurations/${configurationId}/addSensor?modal=true`,
+            `${serverUrl}configurations/${configurationId}/addSensor?modal=true`,
             modalFinish
         );
     });
@@ -144,7 +145,7 @@ function initSensorBtns() {
 
         modal(
             'Remove Sensor',
-            `/configurations/${configurationId}/removeSensor?modal=true&sid=${sid}`,
+            `${serverUrl}configurations/${configurationId}/removeSensor?modal=true&sid=${sid}`,
             modalFinish
         );
     });

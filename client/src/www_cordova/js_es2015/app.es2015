@@ -1,4 +1,4 @@
-let isApp = true;
+let isWebsite = false;
 
 class OfflineEvent {
     constructor(obj) {

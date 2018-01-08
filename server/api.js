@@ -81,6 +81,7 @@ app.post(`/api/offlineData`, (req, res) => {
     let data = {};
 
     new Chain(function() {
+        console.log("test1");
         if (req.session && req.session.oid)
             return this.next();
         
@@ -127,7 +128,7 @@ app.post(`/api/offlineData`, (req, res) => {
     }, function(list) {
         data.configurations = list;
         
-        this.pause(list.length - 1);
+        this.pause(list.length);
         let hasFailed = false;
         
         list.forEach((configuration) => {
@@ -150,6 +151,8 @@ app.post(`/api/offlineData`, (req, res) => {
                 }
             );
         });
+
+        this.next();
     }, function() {
         data.sensorTypes = SensorTypes.getTypes();
         data.time = new Date().getTime();

@@ -4,8 +4,10 @@ module.exports = function(grunt) {
 
 const PACKAGE = require("./package.json");
 
-const TITLE = "lcatᴰᴮ";
-const URL = "http://localhost:3000";
+const TITLE = "lcatDB";
+const URL = "http://192.168.1.147:3000/";
+const CORDOVA_BASE = '<base href="file:///android_asset/www/">';
+const MAP_URL = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAsPFPL4ttV7hbmVIF-BELdB9WD_c5SjJA&callback=initMap';
 
 // All paths should end in "/". I'm lazy.
 
@@ -90,8 +92,8 @@ let replacements = [{
     match: "<!--scripts-->",
     replacement: fs.readFileSync(TEMPLATES_DIR + "scripts.html", "utf8")
 }, {
-    match: "<!--script_map-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "script_map.html", "utf8")
+    match: "<!--map_url-->",
+    replacement: MAP_URL
 }, {
     match: "<!--title-->",
     replacement: TITLE
@@ -100,7 +102,7 @@ let replacements = [{
     replacement: PACKAGE.version
 }, {
     match: "<!--url-->",
-    replacement: PACKAGE.version
+    replacement: URL
 }];
 
 config.replace = {
@@ -128,6 +130,26 @@ config.replace.cordova = {
         cwd: CORDOVA_SRC + "js_es2015",
         src: ["**/*.es2015"],
         dest: CORDOVA_TMP + "js_es2015"
+    }, {
+        expand: true,
+        cwd: CORDOVA_SRC,
+        src: '**/*.html',
+        dest: CORDOVA_TMP
+    }]
+};
+config.replace.cordova_final = {
+    options: {
+        patterns: [{
+            match: "<!--base_cordova-->",
+            replacement: CORDOVA_BASE
+        }],
+        prefix: ''
+    },
+    files: [{
+        expand: true,
+        cwd: CORDOVA_BUILD,
+        src: ["**/*.html", "**/*.mustache"],
+        dest: CORDOVA_BUILD
     }]
 };
 config.replace.views = {
@@ -149,7 +171,7 @@ config.replace.emails = {
 
 config.htmlmin = {
     options: {
-        removeComments: true,
+        removeComments: false, // KEEP THIS, needed to set cordova base
         collapseWhitespace: true,
         conservativeCollapse: true,
         removeEmptyAttributes: true
@@ -168,6 +190,14 @@ config.htmlmin.www = {
         "dest": BUILD_DIR + "www" // following slash destroys directory structure
     }]
 };
+config.htmlmin.cordova = {
+    files: [{
+        expand: true,
+        cwd: CORDOVA_TMP,
+        src: '**/*.html',
+        dest: CORDOVA_BUILD
+    }]
+}
 config.htmlmin.views = {
     files: [{
         "expand": true,
@@ -276,11 +306,24 @@ config.copy.cordova_final = {
     }]
 };
 
+config.folder_list = {};
+config.folder_list.www = {
+    options: {
+        files: true,
+        folders: true
+    },
+    files: [{
+        cwd: WWW_BUILD,
+        src: ['**'],
+        dest: WWW_BUILD + 'files.json'
+    }]
+};
+
 // config['string-replace'] = {};
 // config['string-replace'].www = {
 //     files: [{
-//         src: WWW_BUILD + "index.html",
-//         dest: WWW_BUILD + "index.html"
+//         src: WWW_BUILD + "home.html",
+//         dest: WWW_BUILD + "home.html"
 //     }],
 //     options: {
 //         replacements: [{
@@ -307,6 +350,8 @@ grunt.registerTask('cordova-www', [
     'replace:cordova',
     'babel:cordova',
     'uglify:cordova',
+    'htmlmin:cordova',
+    'replace:cordova_final',
     'copy:cordova_final'
 ]);
 
@@ -330,7 +375,8 @@ grunt.registerTask('www', [
     'htmlmin:www',
     'babel:www',
     'uglify:www',
-    'copy:www'
+    'copy:www',
+    'folder_list:www'
 ]);
 
 grunt.registerTask('views-clean', [
