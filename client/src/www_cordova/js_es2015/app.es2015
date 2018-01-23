@@ -4,7 +4,9 @@ class OfflineEvent {
     constructor(obj) {
         obj = obj || {};
         this.type = obj.type || "OfflineEvent";
+        this.name = obj.name || "Unknown";
         this.data = obj.data || {};
+        this.timeCreated = obj.timeCreated || (new Date()).getTime();
         this.id = obj.id || this.randomId();
         this.autoSubmit = obj.autoSubmit || true;
         this.status = "pending";
@@ -25,7 +27,9 @@ class OfflineEvent {
     toObj() {
         return {
             "type": this.type,
+            "name": this.name,
             "data": this.data,
+            "timeCreated": this.timeCreated,
             "id": this.id,
             "autoSubmit": this.autoSubmit,
             "status": this.status,
@@ -44,43 +48,51 @@ class OfflineEvent {
 }
 
 class OfflineEventPost extends OfflineEvent {
-    constructor(data) {
-        super({
-            "type": "OfflineEventPost",
-            "data": data
-        });
+    constructor(obj) {
+        obj.type = "OfflineEventPost";
+        super(obj);
 
-        // data = {
+        // obj.data = {
         //     "formUrl": "form url",
         //     "formData": "form data"
         // }
     }
 
-    submit(callback) {
-        $.post(this.data.formUrl, this.data.formData, (data, status) => {
-            console.log(status);
-            if (status == 'success') {
-                this.status = success;
-                callback({
-                    success: true
-                });
-                this.response = {
-                    data: data,
-                    status: status
-                };
-            } else { 
-                this.status = 'failure';
-                this.failures++;
-                callback({
-                    success: false
-                });
-            }
-        }).fail(() => {
-            this.status = 'failure';
-            this.failures++;
-            callback({
-                success: false
+    submit(callback, force) {
+        function finish(success) {
+            if (callback) callback({
+                "success": success
             });
+            
+            finishInputBlock();
+        }
+
+        if ((this.status == "success") && !force) return;
+
+        if (!navigator.onLine) return;
+
+        startInputBlock();
+        $.post(
+            this.data.formUrl,
+            this.data.formData,
+            (data, status) => {
+                if (status == "success") {
+                    this.response = {
+                        data: data,
+                        status: status
+                    };
+                    this.status = "success";
+                    finish(true);
+                } else {
+                    this.status = "failure";
+                    this.failures++;
+                    finish(false);
+                }
+            }
+        ).fail(() => {
+            this.status = "failure";
+            this.failures++;
+            finish(false);
         });
     }
 }
@@ -89,31 +101,88 @@ class OfflineEventQueue {
     constructor(name) {
         this.events = [];
         this.name = name || 'default';
+        this.updateCallbacks = {};
         this.loadEvents();
     }
 
+    runUpdateCallbacks(msg) {
+        Object.keys(this.updateCallbacks).forEach((callbackId) => {
+            let callbackObj = this.updateCallbacks[callbackId];
+            callbackObj.callback(msg);
+            if (callbackObj.once) this.removeUpdateCallback(callbackId);
+        });
+    }
+
+    addUpdateCallback(callback, once) {
+        let callbackId = parseInt(Math.random().toString().replace('.', '')); // lole
+        this.updateCallbacks[callbackId] = {
+            "callback": callback,
+            "once": once
+        };
+        return callbackId;
+    }
+
+    removeUpdateCallback(id) {
+        this.updateCallbacks[id] = undefined;
+    }
+
     autoSubmit() {
-        this.events.forEach((event) => {
+        this.events.forEach((event, i) => {
+            if (event.status == 'pending')
+                return this.removeEventIndex(i);
+
             if (!event.autoSubmit) return;
             
             if (event.status == 'pending') {
-                startInputBlock();
                 event.submit((result) => {
-                    if (result.success) return this.removeEvent(event);
-                    else this.saveEvents();                    
-                    finishInputBlock();
+                    if (result.success) 
+                        return this.removeEventIndex(i);
+                    this.saveEvents();
                 });
             }
-
-            
         });
 
     }
 
     removeEvent(event) {
-        let eventIndex = this.events.indexOf(event);
-        if (eventIndex > -1)
-            this.events.splice(eventIndex, 1);
+        this.removeEventIndex(this.events.indexOf(event));
+    }
+
+    getEventIndexById(id) {
+        let indexFinal = -1;
+        this.events.some((event, i) => {
+            if (event.id == id) {
+                indexFinal = i;
+                return true;
+            }
+        });
+        return indexFinal;
+    }
+
+    getEventById(id) {
+        let eventFinal;
+        this.events.some((event) => {
+            if (event.id == id) {
+                eventFinal = event;
+                return true;
+            }
+        });
+        return eventFinal;
+    }
+
+    removeEventId(id) {
+        this.removeEventIndex(this.getEventIndexById(id));
+    }
+    
+    removeEventIndex(index) {
+        if (index <= -1) return;
+        if (typeof index == 'undefined') return;
+        this.events.splice(index, 1);
+        this.saveEvents();
+    }
+    
+    clearEvents() {
+        this.events = [];
         this.saveEvents();
     }
 
@@ -123,16 +192,17 @@ class OfflineEventQueue {
     }
 
     toArray() {
-        let objArray = [];
+        let eventsArray = [];
         this.events.forEach((event) => {
-            objArray.push(event.toObj());
+            eventsArray.push(event.toObj());
         });
-        return objArray;
+        return eventsArray;
     }
 
     saveEvents() {
         let key = `offlineEvents.${this.name}`;
         localStorage[key] = JSON.stringify(this.toArray());
+        this.runUpdateCallbacks("save");
     }
 
     loadEvents() {
@@ -142,13 +212,16 @@ class OfflineEventQueue {
         if ((typeof eventsString == 'undefined') || (eventsString == ''))
             return;
 
-        eventsArray = JSON.parse(eventsString);
+        let eventsArray = JSON.parse(eventsString);
         eventsArray.forEach((eventData) => {
             this.events.push(new OfflineEventPost(eventData)); // TODO
         });
+        this.runUpdateCallbacks("load");        
     }
 }
 
+var offlineEventQueue;
+
 $(() => {
-    window.offlineEventQueue = new OfflineEventQueue();
+    offlineEventQueue = new OfflineEventQueue();
 });

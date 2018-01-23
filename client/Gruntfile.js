@@ -5,35 +5,34 @@ module.exports = function(grunt) {
 const PACKAGE = require("./package.json");
 
 const TITLE = "lcatDB";
-const URL = "http://192.168.1.147:3000/";
+const URL = "http://joeybob.ddns.net:3000";
 const CORDOVA_BASE = '<base href="file:///android_asset/www/">';
 const MAP_URL = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAsPFPL4ttV7hbmVIF-BELdB9WD_c5SjJA&callback=initMap';
 
-// All paths should end in "/". I'm lazy.
-
-const SRC_DIR = "./src/";
-const BUILD_DIR = "./build/";
-const TMP_DIR = "./tmp/";
-const TEMPLATES_DIR = SRC_DIR + "templates/";
+const SRC_DIR = "./src";
+const BUILD_DIR = "./build";
+const TMP_DIR = "./tmp";
+const TEMPLATES_DIR = SRC_DIR + "/templates";
 
 // Also, I'm adding an extra layer onto the build/src directories in case we
 // ever want to build for a different platform.
+// Update: We did. Good call.
 
-const WWW_SRC = SRC_DIR + "www/";
-const WWW_BUILD = BUILD_DIR + "www/";
-const WWW_TMP = TMP_DIR + "www/";
+const WWW_SRC = SRC_DIR + "/www";
+const WWW_BUILD = BUILD_DIR + "/www";
+const WWW_TMP = TMP_DIR + "/www";
 
-const VIEWS_SRC = SRC_DIR + "views/";
-const VIEWS_BUILD = BUILD_DIR + "views/";
-const VIEWS_TMP = TMP_DIR + "views/";
+const VIEWS_SRC = SRC_DIR + "/views";
+const VIEWS_BUILD = BUILD_DIR + "/views";
+const VIEWS_TMP = TMP_DIR + "/views";
 
-const EMAILS_SRC = SRC_DIR + "emails/";
-const EMAILS_BUILD = BUILD_DIR + "emails/";
-const EMAILS_TMP = TMP_DIR + "emails/";
+const EMAILS_SRC = SRC_DIR + "/emails";
+const EMAILS_BUILD = BUILD_DIR + "/emails";
+const EMAILS_TMP = TMP_DIR + "/emails";
 
-const CORDOVA_SRC = SRC_DIR + "www_cordova/";
-const CORDOVA_BUILD = BUILD_DIR + "www_cordova/";
-const CORDOVA_TMP = TMP_DIR + "www_cordova/";
+const CORDOVA_SRC = SRC_DIR + "/www_cordova";
+const CORDOVA_BUILD = BUILD_DIR + "/www_cordova";
+const CORDOVA_TMP = TMP_DIR + "/www_cordova";
 const CORDOVA_FINAL = "./cordova/www";
 
 var config = {};
@@ -63,8 +62,8 @@ config.sass.www = {
         options: {
             style: "compressed",
         },
-        src: WWW_SRC + "css/style.scss",
-        dest: WWW_BUILD + "css/style.min.css"
+        src: WWW_SRC + "/css/style.scss",
+        dest: WWW_BUILD + "/css/style.min.css"
     }]
 };
 
@@ -72,25 +71,22 @@ config.sass.www = {
 
 let replacements = [{
     match: "<!--head-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "head.html", "utf8")
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/head.html`, "utf8")
 }, {
     match: "<!--nav_nouser-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_nouser.html", "utf8")
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_nouser.html`, "utf8")
 }, {
     match: "<!--nav_user-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_user.html", "utf8")
-}, {
-    match: "<!--nav_auto-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_auto.html", "utf8")
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_user.html`, "utf8")
 }, {
     match: "<!--nav_blank-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "nav_blank.html", "utf8")
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_blank.html`, "utf8")
 }, {
     match: "<!--footer-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "footer.html", "utf8")
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/footer.html`, "utf8")
 }, {
     match: "<!--scripts-->",
-    replacement: fs.readFileSync(TEMPLATES_DIR + "scripts.html", "utf8")
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/scripts.html`, "utf8")
 }, {
     match: "<!--map_url-->",
     replacement: MAP_URL
@@ -114,25 +110,25 @@ config.replace = {
 config.replace.www = {
     files: [{
         expand: true,
-        cwd: WWW_SRC + "pages",
+        cwd: WWW_SRC + "/pages",
         src: ["**/*.html", "**/*.mustache"],
         dest: WWW_TMP
     }, {
         expand: true,
-        cwd: WWW_SRC + "js_es2015",
+        cwd: WWW_SRC + "/js_es2015",
         src: ["**/*.es2015"],
-        dest: WWW_TMP + "js_es2015"
+        dest: WWW_TMP + "/js_es2015"
     }]
 };
 config.replace.cordova = {
     files: [{
         expand: true,
-        cwd: CORDOVA_SRC + "js_es2015",
+        cwd: CORDOVA_SRC + "/js_es2015",
         src: ["**/*.es2015"],
-        dest: CORDOVA_TMP + "js_es2015"
+        dest: CORDOVA_TMP + "/js_es2015"
     }, {
         expand: true,
-        cwd: CORDOVA_SRC,
+        cwd: CORDOVA_SRC + "/pages",
         src: ["**/*.html", "**/*.mustache"],
         dest: CORDOVA_TMP
     }]
@@ -143,7 +139,7 @@ config.replace.cordova_final = {
             match: "<!--base_cordova-->",
             replacement: CORDOVA_BASE
         }],
-        prefix: ''
+        prefix: ""
     },
     files: [{
         expand: true,
@@ -182,20 +178,25 @@ config.htmlmin.www = {
         "expand": true,
         "cwd": WWW_TMP,
         "src": ["**/*.html"],
-        "dest": BUILD_DIR + "www" // following slash destroys directory structure
+        "dest": BUILD_DIR + "/www" // following slash destroys directory structure
     }, {
         "expand": true,
         "cwd": WWW_TMP,
         "src": ["**/*.mustache"],
-        "dest": BUILD_DIR + "www" // following slash destroys directory structure
+        "dest": BUILD_DIR + "/www" // following slash destroys directory structure
     }]
 };
 config.htmlmin.cordova = {
     files: [{
-        expand: true,
-        cwd: CORDOVA_TMP,
-        src: '**/*.html',
-        dest: CORDOVA_BUILD
+        "expand": true,
+        "cwd": CORDOVA_TMP,
+        "src": ["**/*.html"],
+        "dest": BUILD_DIR + "/www_cordova" // following slash destroys directory structure
+    }, {
+        "expand": true,
+        "cwd": CORDOVA_TMP,
+        "src": ["**/*.mustache"],
+        "dest": BUILD_DIR + "/www_cordova" // following slash destroys directory structure
     }]
 }
 config.htmlmin.views = {
@@ -220,24 +221,24 @@ config.htmlmin.emails = {
 config.babel = {
     options: {
         sourceMap: true,
-        presets: ['env']
+        presets: ["env"]
     }
 };
 config.babel.www = {
     files: [{
         "expand": true,
-        "cwd": WWW_TMP + "js_es2015/",
+        "cwd": WWW_TMP + "/js_es2015/",
         "src": ["**/*.es2015"],
-        "dest": WWW_TMP + "js/",
+        "dest": WWW_TMP + "/js/",
         "ext": ".js"
     }]
 };
 config.babel.cordova = {
     files: [{
         "expand": true,
-        "cwd": CORDOVA_TMP + "js_es2015/",
+        "cwd": CORDOVA_TMP + "/js_es2015/",
         "src": ["**/*.es2015"],
-        "dest": CORDOVA_TMP + "js/",
+        "dest": CORDOVA_TMP + "/js/",
         "ext": ".js"
     }]
 };
@@ -251,17 +252,17 @@ config.uglify = {
 config.uglify.www = {
     files: [{
         expand: true,
-        cwd: WWW_TMP + 'js/',
-        src: '**/*.js',
-        dest: WWW_BUILD + "js/"
+        cwd: WWW_TMP + "/js/",
+        src: "**/*.js",
+        dest: WWW_BUILD + "/js/"
     }]
 };
 config.uglify.cordova = {
     files: [{
         expand: true,
-        cwd: CORDOVA_TMP + 'js/',
-        src: '**/*.js',
-        dest: CORDOVA_BUILD + "js/"
+        cwd: CORDOVA_TMP + "/js/",
+        src: "**/*.js",
+        dest: CORDOVA_BUILD + "/js/"
     }]
 };
 
@@ -269,31 +270,31 @@ config.copy = {};
 config.copy.www = {
     files: [{
         expand: true,
-        cwd: WWW_SRC + 'js_ext/',
-        src: '**/*',
-        dest: WWW_BUILD + "js/"
+        cwd: WWW_SRC + "/js_ext/",
+        src: "**/*",
+        dest: WWW_BUILD + "/js/"
     }, {
         expand: true,
-        cwd: WWW_SRC + 'img/',
-        src: '**/*.{svg,png,jpg,jpeg,gif,json}',
-        dest: WWW_BUILD + "img/"
+        cwd: WWW_SRC + "/img/",
+        src: "**/*.{svg,png,jpg,jpeg,gif,json}",
+        dest: WWW_BUILD + "/img/"
     }, {
         expand: true,
-        cwd: WWW_SRC + 'fonts/',
-        src: '**/*',
-        dest: WWW_BUILD + "fonts/"
+        cwd: WWW_SRC + "/fonts/",
+        src: "**/*",
+        dest: WWW_BUILD + "/fonts/"
     }, {
         expand: true,
-        cwd: WWW_SRC + 'favicon/',
-        src: '**/*',
-        dest: WWW_BUILD + "favicon/"
+        cwd: WWW_SRC + "/favicon/",
+        src: "**/*",
+        dest: WWW_BUILD + "/favicon/"
     }]
 };
 config.copy.cordova = {
     files: [{
         expand: true,
         cwd: WWW_BUILD,
-        src: '**/*',
+        src: "**/*",
         dest: CORDOVA_BUILD
     }]
 };
@@ -301,7 +302,7 @@ config.copy.cordova_final = {
     files: [{
         expand: true,
         cwd: CORDOVA_BUILD,
-        src: '**/*',
+        src: "**/*",
         dest: CORDOVA_FINAL
     }]
 };
@@ -313,25 +314,11 @@ config.folder_list.www = {
         folders: true
     },
     files: [{
-        cwd: WWW_BUILD,
-        src: ['**'],
-        dest: WWW_BUILD + 'files.json'
+        cwd: WWW_BUILD + "/",
+        src: ["**"],
+        dest: WWW_BUILD + "/files.json"
     }]
 };
-
-// config['string-replace'] = {};
-// config['string-replace'].www = {
-//     files: [{
-//         src: WWW_BUILD + "home.html",
-//         dest: WWW_BUILD + "home.html"
-//     }],
-//     options: {
-//         replacements: [{
-//             pattern: '{{VERSION}}',
-//             replacement: PACKAGE.version
-//         }]
-//     }
-// };
 
 grunt.initConfig(config);
 
@@ -339,7 +326,8 @@ require('load-grunt-tasks')(grunt); // Automatically loads all grunt tasks.
 // jfc why isn't this just included by default
 
 grunt.registerTask('default', [
-    "www-clean",
+    // "www-clean",
+    "cordova-www",
     "views-clean",
     "emails-clean"
 ]);
@@ -360,6 +348,7 @@ grunt.registerTask('cordova', [
 ]);
 
 grunt.registerTask('cordova-clean', [
+    'clean:www',    
     'clean:cordova',
     'cordova-www'
 ]);

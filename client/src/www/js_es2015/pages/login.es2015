@@ -12,7 +12,7 @@ $(function() {
 
         startInputBlock();
 
-        $.post(serverUrl + 'logindo', {
+        $.post(`${serverUrl}/logindo`, {
             "username": $('input[name=username]').val(),
             "password": $('input[name=password]').val(),
             "infoOnly": true

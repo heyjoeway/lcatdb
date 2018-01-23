@@ -25,6 +25,13 @@
                     <div class="btn-image-short">Submit a Reading</div>
                 </div></a>
                 <br>
+                <a class="cordova_only_hide" style="display:none" href="./queue.html">
+                    <div class="btn btn-image">
+                        <img src="./img/dashboard/visualize.png">
+                        <div class="btn-image-short">View Queue</div>
+                    </div>
+                </a>
+                <br>
                 <a href="./visualize.html"><div class="btn btn-image">
                     <img src="./img/dashboard/visualize.png">
                     <div class="btn-image-short">Visualize Data</div>
@@ -36,7 +43,7 @@
                 </div></a>
                 <br>
             </div>
-            <div class="col-xs-12 col-sm-6 col-md-7">
+            <div class="col-xs-12 col-sm-6 col-md-7 online_only_hide">
                 <br>
                 <h3 class="h-inline">Map</h3>
                 &nbsp;&nbsp;
@@ -55,7 +62,7 @@
                     <option value="31557600">Last 1 Year</option>
                 </select>
                 <br>
-                <iframe id="map-time" class="map-iframe" src="/embed/map.html?embed=true&timeAgo=604800"></iframe>
+                <iframe id="map-time" class="map-iframe" src="./embed/map.html?embed=true&timeAgo=604800"></iframe>
             </div>
         </div>
     </div>

@@ -59,12 +59,18 @@ function changeConfig() {
 
         changeUnitSystem();
         initSensorBtns();
+        updateSubmitCordova();
     });
 }
 
 // ----------------------------------------------------------------------------
 
 function updateMap() {
+    if (typeof cordova == 'undefined') updateMapWeb();
+    else updateMapCordova();
+}
+
+function updateMapWeb() {
     let lat = $('input[name="location.lat"]').val();
     let long = $('input[name="location.long"]').val();
 
@@ -79,7 +85,37 @@ function updateMap() {
     map.setCenter(pos);
 }
 
+function updateMapCordova() {
+    let lat = $('input[name="location.lat"]').val();
+    let long = $('input[name="location.long"]').val();
+
+    if ((lat == 0) && (long == 0)) {
+        lat = 44.57670853058025;
+        long = -73.32539651979982;
+    }
+    
+    let pos = {
+        lat: parseFloat(lat),
+        lng: parseFloat(long)
+    };
+
+    try {
+        marker.setPosition(pos);
+    } catch(e) { }
+    map.animateCamera({
+        target: pos,
+        duration: 1000
+    });
+}
+
+// ----------------------------------------------------------------------------
+
 function initMap() {
+    if (typeof cordova == 'undefined') initMapWeb();
+    else initMapCordova(); 
+}
+
+function initMapWeb() {
     map = new google.maps.Map(document.getElementById('map'), {
         "zoom": 11,
         "center": {
@@ -107,7 +143,62 @@ function initMap() {
     $('input[name="location.lat"]').change(updateMap);
     $('input[name="location.long"]').change(updateMap);
 
-    updateMap();
+    updateMapWeb();
+}
+
+function initMapCordova() {
+    map = plugin.google.maps.Map.getMap(document.getElementById('map'), {
+        "mapType": plugin.google.maps.MapTypeId.TERRAIN,
+        "controls": {
+            "compass": true,
+            "myLocationButton": false,
+            "indoorPicker": true,
+            "zoom": true
+        },
+        "camera": {
+            "target": {
+                "lat": 44.57670853058025,
+                "lng": -73.32539651979982
+            },
+            zoom: 11
+        },
+        "preferences": {
+            "zoom": {
+                "minZoom": 10,
+                "maxZoom": 18
+            },
+            "building": true
+        }
+    });
+
+    map.one(plugin.google.maps.event.MAP_READY, function() {
+        marker = map.addMarker({
+            "position": {
+                "lat": 44.57670853058025,
+                "lng": -73.32539651979982
+            },
+            "draggable": true,
+            'title': "Your Location",
+            'snippet': "Press a few seconds on this marker to drag.",
+        }, function(marker) {
+            window.marker = marker;
+    
+            marker.on(plugin.google.maps.event.MARKER_DRAG_END, function() {
+                let pos = marker.getPosition();
+                $('input[name="location.lat"]').val(pos.lat).change();
+                $('input[name="location.long"]').val(pos.lng).change();
+                updateMapCordova();
+            });
+        
+            $('input[name="location.lat"]').change(updateMapCordova);
+            $('input[name="location.long"]').change(updateMapCordova);
+        
+            updateMapCordova();
+    
+        });
+    });
+
+
 }
 
 // ----------------------------------------------------------------------------
@@ -123,7 +214,7 @@ function initSensorBtns() {
 
         modal(
             'Add New Sensor',
-            `${serverUrl}sensors/new?configuration=${configurationId}&modal=true`,
+            `${serverUrl}/sensors/new?configuration=${configurationId}&modal=true`,
             modalFinish
         );
     });
@@ -133,7 +224,7 @@ function initSensorBtns() {
 
         modal(
             'Add Existing Sensor',
-            `${serverUrl}configurations/${configurationId}/addSensor?modal=true`,
+            `${serverUrl}/configurations/${configurationId}/addSensor?modal=true`,
             modalFinish
         );
     });
@@ -145,7 +236,7 @@ function initSensorBtns() {
 
         modal(
             'Remove Sensor',
-            `${serverUrl}configurations/${configurationId}/removeSensor?modal=true&sid=${sid}`,
+            `${serverUrl}/configurations/${configurationId}/removeSensor?modal=true&sid=${sid}`,
             modalFinish
         );
     });
@@ -154,42 +245,78 @@ function initSensorBtns() {
 // ----------------------------------------------------------------------------
 
 function getLocation() {
+    if (typeof cordova == 'undefined') getLocationWeb();
+    else getLocationCordova();
+}
+
+function getLocationWeb() {
     if (!mobileDetect.phone()) return;
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (pos) => { // Success
-                $('input[name="location.lat"]').val(
-                    pos.coords.latitude).change();
-                $('input[name="location.long"]').val(
-                    pos.coords.longitude).change();
-                $('input[name="location.range"]').val(
-                    pos.coords.accuracy).change();
-                $('input[name="location.alt"]').val(
-                    pos.coords.altitude).change();
-                $('input[name="location.altRange"]').val(
-                    pos.coords.altitudeAccuracy).change();
-                updateMap();
-            },
-            (error) => { // Failure
-                $.notify({
-                    "message": 'Could not retrieve location. Please allow location on your device.'
-                }, {
-                    "type": 'warning'
-                });
-            },
-            { // Options
-                "enableHighAccuracy": true,
-                "maximumAge": 3 * 60 * 1000, // 3 minutes
-                "timeout": 15 * 1000 // 15 sec (may increase)
-            }
-        );
-    } else {
+    if (!navigator.geolocation) {
         $.notify({
             "message": 'Could not retrieve location. Geolocation is not supported by this browser.'
         }, {
             "type": 'warning'
         });
+        return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+        (pos) => { // Success
+            $('input[name="location.lat"]')
+                .val(pos.coords.latitude)
+                .change();
+            $('input[name="location.long"]')
+                .val(pos.coords.longitude)
+                .change();
+            $('input[name="location.range"]')
+                .val(pos.coords.accuracy)
+                .change();
+            $('input[name="location.alt"]')
+                .val(pos.coords.altitude)
+                .change();
+            $('input[name="location.altRange"]')
+                .val(pos.coords.altitudeAccuracy)
+                .change();
+            updateMapWeb();
+        },
+        getLocationFail,
+        { // Options
+            "enableHighAccuracy": true,
+            "maximumAge": 3 * 60 * 1000, // 3 minutes
+            "timeout": 15 * 1000 // 15 sec (may increase)
+        }
+    );
+}
+
+function getLocationCordova() {
+    map.getMyLocation(function(location) {
+        console.log(location);
+
+        $('input[name="location.lat"]')
+            .val(location.latLng.lat)
+            .change();
+        $('input[name="location.long"]')
+            .val(location.latLng.lng)
+            .change();
+        $('input[name="location.range"]')
+            .val('')
+            .change();
+        $('input[name="location.alt"]')
+            .val('')
+            .change();
+        $('input[name="location.altRange"]')
+            .val('')
+            .change();
+        updateMapCordova(); 
+    }, getLocationFail);
+}
+
+function getLocationFail() {
+    $.notify({
+        "message": 'Could not retrieve location. Please allow location on your device.'
+    }, {
+        "type": 'warning'
+    });
 }
 
 // ----------------------------------------------------------------------------
@@ -247,6 +374,28 @@ function queueReading() {
     let formData = objectifyForm($('form').serializeArray());
 }
 
+// ----------------------------------------------------------------------------
+
+function updateSubmitCordova() {
+    if (typeof cordova == 'undefined') return;
+    
+    $('input[name=publish]').off('click').click(function(e) {
+        e.preventDefault();
+        submitCordova();
+    });
+}
+
+function submitCordova() {
+    startInputBlock();
+    offlineEventQueue.addEvent(new OfflineEventPost({
+        "data": {
+            "formUrl": `${serverUrl}/configurations/${configurationId}/readingDo`,
+            "formData": $('#form').serializeArray()
+        },
+        "name": "Reading"
+    }));
+    location.href = './queue.html';
+}
 // ----------------------------------------------------------------------------
 
 function init() {

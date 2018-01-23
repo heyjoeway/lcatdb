@@ -295,7 +295,7 @@
         var base = toBase(type, unitIn, val);
         var result = toUnit(type, unitOut, base);
         if (round) {
-            let roundMultiplier = Math.pow(10, round);
+            var roundMultiplier = Math.pow(10, round);
             result = Math.round(result * roundMultiplier) / roundMultiplier;
         }
         return result;
@@ -468,13 +468,19 @@
             var originalUnit = $original.data('unit');
             var unitRound = parseInt($original.data('unitround'));
 
-            $clone[valMethod](convertUnit(
-                unitType,
-                originalUnit,
-                cloneUnit,
-                $original[valMethod](),
-                unitRound
-            )).trigger('change', true);
+            var originalVal = $original[valMethod]();
+            var cloneVal = '';
+
+            if (originalVal != '')
+                cloneVal = convertUnit(
+                    unitType,
+                    originalUnit,
+                    cloneUnit,
+                    originalVal,
+                    unitRound
+                );
+
+            $clone[valMethod](cloneVal).trigger('change', true);
         });
 
         return true;

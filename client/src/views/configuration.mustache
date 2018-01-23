@@ -4,7 +4,7 @@
     <title><!--title--> - Configuration</title>
 </head>
 <body>
-    <!--nav_auto-->
+    <!--nav_user-->{{^user}}<!--nav_nouser-->{{/user}}
 
     <div class="container">
     {{#configuration}}
@@ -95,7 +95,7 @@
             <option value="31557600">Last 1 Year</option>
         </select>
         <br>
-        <iframe id="map-time" class="map-iframe" src="/embed/map.html?embed=true&configuration={{_id}}&timeAgo=604800"></iframe>
+        <iframe id="map-time" class="map-iframe" src="./embed/map.html?embed=true&configuration={{_id}}&timeAgo=604800"></iframe>
 
         <hr>
 

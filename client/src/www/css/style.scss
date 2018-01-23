@@ -60,7 +60,7 @@ body:not(.no-nav) {
     text-align: center;
     font-size: 10px;
     /* this is literally just a grey pixel */
-    background-image: url('/img/reading/blackpixel.png');
+    background-image: url('./img/reading/blackpixel.png');
     color: #DDDDDD;
 
     background-repeat: repeat-x;
@@ -104,9 +104,9 @@ body:not(.no-nav) {
 }
 
 #loading-overlay {
-    transition: opacity 0.1s;
+    // transition: opacity 0.1s;
 
-    opacity: 1;
+    // opacity: 1;
     position: fixed;
     width: 100%;
     height: 100%;
@@ -118,9 +118,9 @@ body:not(.no-nav) {
     background: #222222AA;
 
     &.hide {
-        display: block !important;
-        opacity: 0;
-        pointer-events: none;
+        // display: block !important;
+        // opacity: 0;
+        // pointer-events: none;
     }
 }
 

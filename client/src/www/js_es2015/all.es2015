@@ -1,11 +1,13 @@
 let serverUrl = '<!--url-->';
 
-$(() => {
+$('document').ready(() => {
     function initMap() {
+        // window.mapTime = new Map('#map-time');
+
         $('#map-time-picker').change(function() {
             let queryObj = urlQueryObj($('#map-time').attr('src'));
             queryObj.timeAgo = $(this).val();
-            let newUrl = '/embed/map.html?';
+            let newUrl = './embed/map.html?';
     
             Object.keys(queryObj).forEach((key) => {
                 newUrl += key + '=' + queryObj[key] + '&';
@@ -21,7 +23,7 @@ $(() => {
             let creator = $(this).val();
             if (creator == 'all') delete queryObj.creator;
             else queryObj.creator = creator;
-            let newUrl = '/embed/map.html?';
+            let newUrl = './embed/map.html?';
     
             Object.keys(queryObj).forEach((key) => {
                 newUrl += key + '=' + queryObj[key] + '&';
@@ -33,30 +35,37 @@ $(() => {
         });
     }
 
+    // ------------------------------------------------------------------------
+    
     function initJs() {
         $('.js').removeClass('js');
         $('.no-js').hide();
     }
     
-    initJs();
-    initMap();
+    // ------------------------------------------------------------------------
 
-    let unitSystem = localStorage.unitSystem;
+    function initUnitSystem() {
+        let unitSystem = localStorage.unitSystem;
+        
+        if (!unitSystem) {
+            unitSystem = 'imperial';
+            localStorage.unitSystem = 'imperial';
+        }
     
-    if (!unitSystem) {
-        unitSystem = 'imperial';
-        localStorage.unitSystem = 'imperial';
+        changeUnitSystem(unitSystem);
+    
+        $('#unit-system-picker').change(function() {
+            let system = $(this).val();
+            changeUnitSystem(system);
+        });
     }
 
-    changeUnitSystem(unitSystem);
+    initJs();
+    initMap();
+    initUnitSystem();
 
-    $('#unit-system-picker').change(function() {
-        let system = $(this).val();
-        changeUnitSystem(system);
-    });
-
-    showOnline();
-    setInterval(showOnline, 1000);
+    handleOnline();
+    setInterval(handleOnline, 1000);
 
     window.activeInputBlock = 0;
 
@@ -64,7 +73,13 @@ $(() => {
         window.offlineInfo = new OfflineInfoManager();
 
     appUrls();
+
+    document.addEventListener("deviceready", function() {
+        appUrls(true);
+    }, false);
 });
+    
+// ----------------------------------------------------------------------------
 
 class OfflineInfoManager {
     constructor() {
@@ -97,8 +112,7 @@ class OfflineInfoManager {
     
         if (navigator.onLine) {
             startInputBlock();
-            $.post(serverUrl + 'api/offlineData', (data, status) => {
-                console.log(status);
+            $.post(`${serverUrl}/api/offlineData`, (data, status) => {
                 if (status == 'success') {
                     if (data.error) {
                         if (data.error.errorName == 'noSession')
@@ -138,6 +152,8 @@ class OfflineInfoManager {
     }
 }
 
+// ----------------------------------------------------------------------------
+
 function updateNavbar() {
     offlineInfo.get(false, function(gotNewInfo) {
         $.get('./templates/navUser.mustache', function(template, status) {
@@ -145,17 +161,14 @@ function updateNavbar() {
     
             let configurationId = $("#configuration-picker").val();
 
-    
             $('#navbar').remove();
-            
-            $('body').append(
-                Mustache.render(template, offlineInfo.info())
-            );
-
+            $('body').append(Mustache.render(template, offlineInfo.info()));
             appUrls();
         });
     });
 }
+
+// ----------------------------------------------------------------------------
 
 function startInputBlock() {
     $('#loading-overlay').removeClass('hide');
@@ -169,7 +182,13 @@ function finishInputBlock() {
     }
 }
 
-function showOnline() {
+// ----------------------------------------------------------------------------
+
+function handleOnline() {
+    if (window.onLinePrevious == navigator.onLine) return;
+
+    window.onLinePrevious = navigator.onLine;
+
     $(".online_only_hide")[navigator.onLine ? 'show' : 'hide']();
     $(".online_only_disable")
         .prop('disabled', !navigator.onLine)
@@ -179,7 +198,12 @@ function showOnline() {
     $(".offline_only_disable")
         .prop('disabled', navigator.onLine)
         [navigator.onLine ? 'addClass' : 'removeClass']('disabled');
+
+    if (navigator.onLine && $('#map-time')[0])
+        $('#map-time')[0].contentWindow.location.reload();
 }
+
+// ----------------------------------------------------------------------------
 
 function changeUnitSystem(system) {
     if (!system)
@@ -197,6 +221,8 @@ function changeUnitSystem(system) {
     localStorage.unitSystem = system;
     $('#unit-system-picker').val(system);
 }
+
+// ----------------------------------------------------------------------------
 
 function urlQueryObj(url) {
     let query = url.split('?')[1];
@@ -217,6 +243,8 @@ function urlQueryObj(url) {
 
     return obj;
 }
+
+// ----------------------------------------------------------------------------
 
 function modal(title, url, callback) {
     let $element = $('<div></div>');
@@ -274,6 +302,8 @@ function inApp() {
 function appUrls(force) {
     if (!force && !inApp()) return;
 
+    $(".cordova_only_hide").show();
+
     $.ajax({
         url: './files.json',
         dataType: 'json',
@@ -303,14 +333,168 @@ function appUrls(force) {
                     hrefFinal = 'file:///android_asset/www/' + href;
                     $(this).click((e) => {
                         e.preventDefault();
-
                         window.open($(this).attr('href'));
                     });
 
-                } else hrefFinal = serverUrl + href;
+                } else hrefFinal = `${serverUrl}/${href}`;
     
                 $(this).attr('href', hrefFinal);
             });
         }
     });
 }
+
+// ----------------------------------------------------------------------------
+
+function testCordova(callback) {
+    if (typeof cordova != 'undefined') return callback(true);
+
+    const cordovaTimerMax = 1000;
+
+    let cordovaTimer = 1000;
+    let cordovaInterval = setInterval(() => {
+        cordovaTimer += 10;
+        if (typeof cordova != 'undefined') {
+            callback(true);
+            clearInterval(cordovaInterval);
+        } else if (cordovaTimer >= cordovaTimerMax) {
+            callback(false);
+            clearInterval(cordovaInterval);
+        }
+    }, 10);
+}
+
+// ----------------------------------------------------------------------------
+
+// class Map {
+//     constructor(selector, request) {
+//         this.selector = selector;
+//         this.request = request;
+//         this.data = [];
+
+//         this.$element = $(selector);
+//         this.element = this.$element[0];
+
+//         this.$element.data('map_obj', this);
+
+//         this.mapReady = false;
+//         this.dataReady = false;
+
+//         this.testCordova((isCordova) => {
+//             this.isCordova = isCordova;
+//             this.init();
+//         });
+//     }
+
+//     testCordova(callback) {
+//         if (typeof cordova != 'undefined') return callback(true);
+
+//         const cordovaTimerMax = 1000;
+
+//         let cordovaTimer = 1000;
+//         let cordovaInterval = setInterval(() => {
+//             cordovaTimer += 10;
+//             if (typeof plugin.google != 'undefined') {
+//                 callback(true);
+//                 clearInterval(cordovaInterval);
+//             } else if (cordovaTimer >= cordovaTimerMax) {
+//                 callback(false);
+//                 clearInterval(cordovaInterval);
+//             }
+//         }, 10);
+//     }
+
+//     init() {
+//         if (this.isCordova) this.initCordova();
+//         else this.initWeb();
+//     }
+
+//     initCordova() {
+//         this.map = plugin.google.maps.Map.getMap(this.element);
+//         this.mapReady = true;
+//     }
+
+//     initWeb() {
+//         console.log("TODO");
+//         if (typeof google == "undefined") {
+//             $.getScript('<!--map_url-->', function() {
+
+//             });
+//         }
+//     }
+
+//     updateRequest(request) {
+//         if (request) this.request = this.request;
+
+//         let queries;
+//         if (this.request.queries) {
+//             queries = this.request.queries;
+//         } else {
+//             let query = {
+//                 "fields": {
+//                     "location.lat": 1,
+//                     "location.long": 1
+//                 },
+//                 "filter": {
+//                     "timeCreated": {}
+//                 },
+//                 "sort": [
+//                     ["_id", -1]
+//                 ]
+//             };
+    
+//             let readingsMax = parseInt(this.request.readingsMax);
+//             if (readingsMax) {
+//                 query.filter.pageSize = readingsMax;
+//                 query.filter.page = 1;
+//             }
+    
+//             let timeMin = parseInt(this.request.timeMin);
+//             let timeAgo = parseInt(this.request.timeAgo);
+//             if (typeof timeAgo != 'undefined') {
+//                 let date = new Date();
+//                 date.setSeconds(date.getSeconds() - timeAgo);
+//                 timeMin = date.getTime();
+//             }
+    
+//             if (timeMin || timeMin == 0)
+//                 query.filter.timeCreated['$gte'] = timeMin;
+    
+//             let timeMax = parseInt(this.request.timeMax);
+//             if (timeMax) query.filter.timeCreated['$lte'] = timeMax;
+    
+//             let id = this.request.id;
+//             if (id) query.filter['_id'] = id;
+    
+//             let configuration = this.request.configuration;
+//             if (configuration) query.filter.configuration = configuration;
+    
+//             let creator = this.request.creator;
+//             if (creator) query.filter.creator = creator;
+    
+//             queries = [query];
+//         }
+
+//         this.getQueries(queries);
+//     }
+    
+//     getQueries(queries) {
+//         this.dataReady = false;
+//         this.data = [];
+//         let queriesLeft = queries.length;
+    
+//         queries.forEach((query, arr, i) => {
+    
+//             $.post('/api/readings', query, function(dataSet, textStatus) {        
+//                 if (textStatus == 'success') {
+//                     this.readings.push(dataSet);
+//                     queriesLeft--;
+//                     if (queriesLeft == 0) {
+//                         this.dataReady = true;                        
+//                         updateMap();
+//                     }
+//                 }
+//             });
+//         });
+//     }
+// }

@@ -1,3 +1,4 @@
 $(() => {
+    console.log('fuck');
     if (appUrls) appUrls(true);
 });

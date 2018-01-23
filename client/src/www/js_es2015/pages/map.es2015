@@ -148,16 +148,6 @@ function updateMap() {
 }
 
 function init() {
-    if (typeof window.parent.cordova != 'undefined') {
-        window.pluginWait = setInterval(function() {
-            if (window.parent.plugin) {
-                window.google = window.parent.plugin.google;
-                initMap();
-                clearInterval(window.pluginWait);
-            }
-        }, 1000);
-    } else $.getScript(`<!--map_url-->`); // this gets replaced by grunt
-
     let queryObj = urlQueryObj(window.location.toString());
 
     if (queryObj.queries) {

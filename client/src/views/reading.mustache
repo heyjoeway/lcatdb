@@ -5,7 +5,7 @@
     <title><!--title--> - Reading</title>
 </head>
 <body>
-    <!--nav_auto-->
+    <!--nav_user-->{{^user}}<!--nav_nouser-->{{/user}}
 
     <div class="container">
         {{#reading}}
@@ -152,7 +152,7 @@
             </div>
             <div class="col-xs-12 col-sm-6">
                 <h3>Map</h3>
-                <iframe class="map-iframe" src="/embed/map.html?embed=true&id={{_id}}"></iframe>
+                <iframe class="map-iframe" src="./embed/map.html?embed=true&id={{_id}}"></iframe>
                 <br><br>
             </div>
         {{/reading}}

@@ -1,0 +1,31 @@
+{{#queueList}}
+<li class="list-group-item">
+    <div class="row small">
+        <div class="col-xs-8">{{name}}&nbsp;
+            <span class="text-muted">
+                (<span class="normalize"
+                    data-unittype="time"
+                    data-unit="unix"
+                    data-unitpref="human12hr">
+                    {{timeCreated}}
+                </span>)
+            </span>
+        </div>
+        <div class="col-xs-4 text-right extra-small text-muted">
+                {{status}}&nbsp;&nbsp;
+            <a  class="event-submit btn btn-secondary btn-sm"
+                data-eventid="{{id}}">
+                <span class="glyphicon glyphicon-upload"></span>
+            </a>
+            &nbsp;&nbsp;
+            <a  class="event-remove btn btn-secondary btn-sm"
+                data-eventid="{{id}}">
+            <span class="glyphicon glyphicon-trash"></span>
+        </a>
+        </div>
+    </div>
+</li>
+{{/queueList}}
+{{^queueList}}
+The queue is currently empty.
+{{/queueList}}
