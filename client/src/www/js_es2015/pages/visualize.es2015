@@ -1,7 +1,11 @@
 let typeNames = {
-    "depth": "Depth",
-    "temperature": "Temperature"
-}
+    "values.depth": "Depth",
+    "values.temperature": "Temperature",
+    "timeCreated": "Time Created",
+    "location.lat": "Latitude",
+    "location.long": "Longitude",
+    "location.alt": "Altitude"
+};
 
 Array.prototype.xor = function(other) {
     let newArray = [];
@@ -730,6 +734,7 @@ class Graph2d extends Graph {
         if (!props.x.var.startsWith('values'))
             fields[props.x.var] = 1;
 
+
         if (!props.y.var.startsWith('values'))
             fields[props.y.var] = 1;
 
@@ -740,9 +745,11 @@ class Graph2d extends Graph {
     }
 
     createGraph() {
+        console.log(this.data)
+
         let props = this.props;
         let config = {
-            "type": "line",
+            "type": "scatter",
             "data": {
                 "datasets": this.data
             },
@@ -753,14 +760,14 @@ class Graph2d extends Graph {
                         "display": true,
                         "scaleLabel": {
                             "display": true,
-                            "labelString": props.x.var
+                            "labelString": typeNames[props.x.var]
                         }
                     }],
                     "yAxes": [{
                         "display": true,
                         "scaleLabel": {
                             "display": true,
-                            "labelString": props.y.var
+                            "labelString": typeNames[props.y.var]
                         }
                     }]
                 }

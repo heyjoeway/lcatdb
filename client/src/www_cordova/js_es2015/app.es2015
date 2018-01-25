@@ -127,21 +127,30 @@ class OfflineEventQueue {
     }
 
     autoSubmit() {
-        this.events.forEach((event, i) => {
-            if (event.status == 'pending')
-                return this.removeEventIndex(i);
-
-            if (!event.autoSubmit) return;
-            
-            if (event.status == 'pending') {
-                event.submit((result) => {
-                    if (result.success) 
-                        return this.removeEventIndex(i);
-                    this.saveEvents();
-                });
-            }
+        this.events.forEach((event) => {
+            this.submitEvent(event);
         });
+    }
 
+    submitEvent(event, manual) {
+        if (event.status == 'success')
+            return this.removeEvent(event);
+
+        if (!event.autoSubmit && !manual) return;
+    
+        if ((event.status == 'pending') || manual) {
+            event.submit((result) => {
+                if (result.success) 
+                    return this.removeEvent(event);
+                this.saveEvents();
+            });
+        }
+
+        this.runUpdateCallbacks('submit');
+    }
+
+    submitEventId(id, manual) {
+        this.submitEvent(this.getEventById(id), manual);
     }
 
     removeEvent(event) {

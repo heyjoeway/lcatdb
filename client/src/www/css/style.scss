@@ -25,6 +25,18 @@ body:not(.no-nav) {
     width: 100%;
 }
 
+.newReadingMap {
+    height: 512px;
+    width: 100%;
+}
+
+@media (max-width: 550px) {
+    .newReadingMap {
+        height: 256px;
+        width: 100%;
+    }
+}
+
 .h-inline {
     display: inline-block;
     vertical-align: middle;
@@ -60,7 +72,7 @@ body:not(.no-nav) {
     text-align: center;
     font-size: 10px;
     /* this is literally just a grey pixel */
-    background-image: url('./img/reading/blackpixel.png');
+    background-image: url('../img/reading/blackpixel.png');
     color: #DDDDDD;
 
     background-repeat: repeat-x;
@@ -106,7 +118,7 @@ body:not(.no-nav) {
 #loading-overlay {
     // transition: opacity 0.1s;
 
-    // opacity: 1;
+    opacity: 0.75;
     position: fixed;
     width: 100%;
     height: 100%;
@@ -115,7 +127,7 @@ body:not(.no-nav) {
     left: 0;
 
     z-index: 9999999;
-    background: #222222AA;
+    background: #333;
 
     &.hide {
         // display: block !important;

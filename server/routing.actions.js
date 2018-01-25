@@ -366,26 +366,9 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
         res.redirect(`/readings/${rid}`);
     }
 
-    // ----
-
-    // Reorganize Sensor data
-
-    let rawData = req.body;
-    let newData = {};
-
-    Object.keys(rawData).forEach((key) => {
-        Utils.setPath(newData, key, rawData[key]);
-    });
-
-    let oldValues = newData.values || {};
-    let valueKeys = Object.keys(oldValues);
-    let hasFailed = false;
-
-    newData.values = [];
-
-    // ----
-
-    let data = {};
+    let data = {
+        "reading": req.body
+    };
 
     new Chain(function() {
         RoutingCore.stepUser(req, res, data, {}, this.next.bind(this));
@@ -403,41 +386,7 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
                 "errorNameFull": "Routing.actions.readingDo.noConfiguration"
             });
 
-        this.pause(valueKeys.length);
-        this.next();
-
-        valueKeys.forEach((key) => {
-            let sid = ObjectId(key);
-            if (hasFailed) return;
-            Sensor.find(sid,
-                (sensor) => {
-                    newData.values.push({
-                        "sensor": sid.toString(),
-                        "type": sensor.type,
-                        "data": oldValues[key]
-                    });
-
-                    this.next();
-                },
-                (error) => {
-                    if (hasFailed) return;
-                    fail({
-                        "errorName": "sensorFind",
-                        "errorNameFull": "Routing.actions.readingDo.sensorFind",
-                        "errorData": {
-                            "errorFind": error
-                        }
-                    });
-                    hasFailed = true;
-                }
-            );
-        });
-    }, function() {
-        Reading.new({
-            "user": data.user,
-            "configuration": data.configuration,
-            "data": newData
-        }, success, fail);
+        Reading.new(data, success, fail);
     });
 });
 

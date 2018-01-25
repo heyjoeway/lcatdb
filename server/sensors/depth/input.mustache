@@ -1,21 +1,21 @@
 <label class="control-label">Depth</label>
 <div class="input-group">
-    <input  name="values.{{_id}}.depth" class="form-control normalize"
-            type="number" step="any"
-            aria-describedby="addon-values_{{_id}}_depth"
+    <input  name="values[{{index}}][data][depth]" class="form-control normalize"
+            type="number" step="any" required
+            aria-describedby="addon-values_{{index}}_depth"
             data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
     <br>
-    <span class="input-group-addon" id="addon-values_{{_id}}_depth">Meters</span>
+    <span class="input-group-addon" id="addon-values_{{index}}_depth">Meters</span>
 </div>
-<div class="spoiler reading-more" data-spoiler-link="{{_id}}"></div>
-<div class="spoiler-content" data-spoiler-link="{{_id}}">
+<div class="spoiler reading-more" data-spoiler-link="{{index}}"></div>
+<div class="spoiler-content" data-spoiler-link="{{index}}">
     <label class="control-label">Depth Range (Optional)</label>
     <div class="input-group">
-        <input  name="values.{{_id}}.depthRange" class="form-control normalize"
+        <input  name="values[{{index}}][data][depthRange]" class="form-control normalize"
                 type="number" step="any" 
-                aria-describedby="addon-values_{{_id}}_depthRange"
+                aria-describedby="addon-values_{{index}}_depthRange"
                 data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
         <br>
-        <span id="addon-values_{{_id}}_depthRange" class="input-group-addon">Meters</span>
+        <span id="addon-values_{{index}}_depthRange" class="input-group-addon">Meters</span>
     </div>
 </div>

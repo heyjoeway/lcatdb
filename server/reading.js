@@ -11,10 +11,12 @@ const ObjectId = require('mongodb').ObjectId;
 // ----------------------------------------------------------------------------
 
 const Schema = require('./schema.js');
+const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js')
 const Configurations = require('./configurations.js');
 const Db = require('./db.js');
 const Utils = require('./utils.js');
+const Chain = Utils.Chain;
 
 // ----------------------------------------------------------------------------
 
@@ -167,63 +169,6 @@ exports.validate = function(reading) {
     }
 }
 
-// exports.new = function(user, configuration, data, success, failure, publish) {
-//     function fail(error) {
-//         Winston.debug("Could not create new reading.", {
-//             "error": error
-//         });
-//         failure(error);
-//     }
-
-//     let canEdit = Configurations.canEdit(user, configuration);
-//     if (!canEdit) return fail({
-//         "errorName": "canEdit",
-//         "errorNameFull": "Reading.new.canEdit"
-//     });
-
-//     let newData = deepmerge(
-//         data,
-//         Schema.defaults('/Reading')
-//     );
-
-//     [
-//         newData.configuration,
-//         newData.creator,
-//         newData.publisher,
-//         newData.published,
-//         newData.timePublished
-//     ] = [
-//         ObjectId(configuration["_id"]).toString(),
-//         ObjectId(user["_id"]).toString(),
-//         ObjectId(user["_id"]).toString(),
-//         true,
-//         Date.now()
-//     ];
-
-//     let validityError = exports.validate(newData);
-//     if (validityError) return fail(validityError);
-
-//     let readings = Db.collection('readings');
-
-//     readings.save(newData, (error, result) => {
-//         if (error) return fail({
-//             "errorName": "readingSave",
-//             "errorNameFull": "Reading.new.readingSave",
-//             "errorData": {
-//                 "errorSave": error
-//             }
-//         });
-
-//         let rid = ObjectId(result.ops[0]["_id"]);
-
-//         Winston.debug('Successfully created new reading.', {
-//             "ridString": rid.toString()
-//         });
-
-//         success(rid);
-//     });
-// }
-
 exports.new = function(ctx, success, failure) {
     function fail(error) {
         Winston.debug("Could not create new reading.", {
@@ -238,12 +183,12 @@ exports.new = function(ctx, success, failure) {
         user,
         configuration,
         cid,
-        data
+        reading
     ] = [
         ctx.user,
         ctx.configuration,
         ctx.cid,
-        ctx.data
+        ctx.reading
     ];
 
     // ----
@@ -276,44 +221,81 @@ exports.new = function(ctx, success, failure) {
     if (!creatorId) return;    
     
     // ----
+
+    let hasFailed = false;
+    new Chain(function() {
+        this.pause(reading.values.length);
+        this.next();
+
+        reading.values.forEach((value) => {
+            if (hasFailed) return;
+            let sid = value.sensor;
+            Sensor.find(sid,
+                (sensor) => {
+                    if (hasFailed) return;
+                    if (sensor.type != value.type) {
+                        fail({
+                            "errorName": "sensorFind",
+                            "errorNameFull": "Reading.new.sensorType"
+                        });
+                        hasFailed = true;
+                        return;
+                    }
+
+                    this.next();
+                },
+                (error) => {
+                    if (hasFailed) return;
+                    fail({
+                        "errorName": "sensorFind",
+                        "errorNameFull": "Reading.new.sensorFind",
+                        "errorData": {
+                            "errorFind": error
+                        }
+                    });
+                    hasFailed = true;
+                }
+            );
+        });
+    }, function() {
+        let newData = deepmerge(
+            reading,
+            Schema.defaults('/Reading')
+        );
     
-    let newData = deepmerge(
-        data,
-        Schema.defaults('/Reading')
-    );
-
-    [
-        newData.configuration,
-        newData.creator,
-        newData.publisher,
-        newData.published,
-        newData.timePublished
-    ] = [
-        cid.toString(),
-        creatorId.toString(),
-        creatorId.toString(),
-        true,
-        Date.now()
-    ];
-
-    let validityError = exports.validate(newData);
-    if (validityError) return fail(validityError);
-
-    Db.collection('readings').save(newData, (error, result) => {
-        if (error) return fail({
-            "errorName": "readingSave",
-            "errorNameFull": "Reading.new.readingSave",
-            "errorData": {
-                "errorSave": error
-            }
+        [
+            newData.configuration,
+            newData.creator,
+            newData.publisher,
+            newData.published,
+            newData.timePublished
+        ] = [
+            cid.toString(),
+            creatorId.toString(),
+            creatorId.toString(),
+            true,
+            Date.now()
+        ];
+    
+        let validityError = exports.validate(newData);
+        if (validityError) return fail(validityError);
+    
+        Db.collection('readings').save(newData, (error, result) => {
+            if (error) return fail({
+                "errorName": "readingSave",
+                "errorNameFull": "Reading.new.readingSave",
+                "errorData": {
+                    "errorSave": error
+                }
+            });
+    
+            let rid = ObjectId(result.ops[0]["_id"]);
+    
+            Winston.debug('Successfully created new reading.', {
+                "ridString": rid.toString()
+            });
+    
+            success(rid);
         });
-
-        let rid = ObjectId(result.ops[0]["_id"]);
-
-        Winston.debug('Successfully created new reading.', {
-            "ridString": rid.toString()
-        });
-
-        success(rid);
     });
 }

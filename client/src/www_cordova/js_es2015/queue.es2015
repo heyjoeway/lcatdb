@@ -24,7 +24,7 @@ function updateList() {
 
         $('.event-submit').off('click').click(function() {
             let eventId = parseInt($(this).data('eventid'));
-            offlineEventQueue.getEventById(eventId).submit();
+            offlineEventQueue.submitEventId(eventId, true);
         });
 
         $('.event-remove').off('click').click(function() {

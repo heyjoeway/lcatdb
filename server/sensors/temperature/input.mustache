@@ -1,21 +1,21 @@
 <label class="control-label">Temperature</label>
 <div class="input-group">
-    <input  name="values.{{_id}}.temperature" class="form-control normalize"
-            type="number" step="any"
-            aria-describedby="addon-values_{{_id}}_temperature"
+    <input  name="values[{{index}}][data][temperature]" class="form-control normalize"
+            type="number" step="any" required
+            aria-describedby="addon-values_{{index}}_temperature"
             data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
-    <span class="input-group-addon" id="addon-values_{{_id}}_temperature">Meters</span>
+    <span class="input-group-addon" id="addon-values_{{index}}_temperature">Meters</span>
     <br>
 </div>
-<div class="spoiler reading-more" data-spoiler-link="{{_id}}"></div>
-<div class="spoiler-content" data-spoiler-link="{{_id}}">
+<div class="spoiler reading-more" data-spoiler-link="{{index}}"></div>
+<div class="spoiler-content" data-spoiler-link="{{index}}">
     <label class="control-label">Temperature Range (Optional)</label>
     <div class="input-group">
-        <input  name="values.{{_id}}.temperatureRange" class="form-control normalize"
+        <input  name="values[{{index}}][data][temperatureRange]" class="form-control normalize"
                 type="number" step="any" 
-                aria-describedby="addon-values_{{_id}}_temperatureRange"
+                aria-describedby="addon-values_{{index}}_temperatureRange"
                 data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
-        <span id="addon-values_{{_id}}_temperatureRange" class="input-group-addon">Meters</span>
+        <span id="addon-values_{{index}}_temperatureRange" class="input-group-addon">Meters</span>
         <br>
     </div>
 </div>

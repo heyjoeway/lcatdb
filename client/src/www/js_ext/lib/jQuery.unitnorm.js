@@ -130,6 +130,8 @@
                         return (degrees + (minutes / 60) + (seconds / 3600)) * (negative ? -1 : 1);
                     },
                     "to": function(d) {
+                        if (isNaN(d)) return '';                        
+
                         var negative = d < 0 ? '-' : '';
                         d = Math.abs(d);
                         var degrees = Math.floor(d);
@@ -190,6 +192,8 @@
                         return (degrees + (minutes / 60) + (seconds / 3600)) * (negative ? -1 : 1);
                     },
                     "to": function(d) {
+                        if (isNaN(d)) return '';
+
                         var negative = d < 0 ? '-' : '';
                         d = Math.abs(d);
                         var degrees = Math.floor(d);

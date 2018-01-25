@@ -1,7 +1,10 @@
-$(()=> {
+$('document').ready(()=> {
     offlineInfo.get(true, function(gotNewInfo) {
         if (localStorage.offlineInfo)
-            return location.href = './dashboard.html';
-        location.href = './home.html';
+            history.replaceState({}, '<!--title--> - Dashboard', './dashboard.html');
+        else
+            history.replaceState({}, '<!--title--> - Home', './home.html');
+
+        location.reload();
     });
 });

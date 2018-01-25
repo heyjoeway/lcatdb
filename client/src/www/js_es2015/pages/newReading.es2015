@@ -38,7 +38,8 @@ function changeConfig() {
         let configuration = data.configurations[configurationIndex]; 
         configurationId = configuration['_id'];
 
-        configuration.sensors.forEach(function(sensor) {
+        configuration.sensors.forEach(function(sensor, i) {
+            sensor.index = i;
             sensor.html = Mustache.render(
                 data.sensorTypes[sensor.type].inputTemplate,
                 sensor
@@ -59,7 +60,7 @@ function changeConfig() {
 
         changeUnitSystem();
         initSensorBtns();
-        updateSubmitCordova();
+        updateSubmit();
     });
 }
 
@@ -71,8 +72,8 @@ function updateMap() {
 }
 
 function updateMapWeb() {
-    let lat = $('input[name="location.lat"]').val();
-    let long = $('input[name="location.long"]').val();
+    let lat = $('input[name="location[lat]"]').val();
+    let long = $('input[name="location[long]"]').val();
 
     if ((lat == 0) && (long == 0)) {
         lat = 44.57670853058025;
@@ -86,8 +87,8 @@ function updateMapWeb() {
 }
 
 function updateMapCordova() {
-    let lat = $('input[name="location.lat"]').val();
-    let long = $('input[name="location.long"]').val();
+    let lat = $('input[name="location[lat]"]').val();
+    let long = $('input[name="location[long]"]').val();
 
     if ((lat == 0) && (long == 0)) {
         lat = 44.57670853058025;
@@ -111,39 +112,43 @@ function updateMapCordova() {
 // ----------------------------------------------------------------------------
 
 function initMap() {
-    if (typeof cordova == 'undefined') initMapWeb();
+    if (typeof cordova == 'undefined')
+        setTimeout(initMapWeb, 1000);
     else initMapCordova(); 
 }
 
 function initMapWeb() {
+    let pos = {
+        "lat": 44.57670853058025,
+        "lng": -73.32539651979982
+    };
+
     map = new google.maps.Map(document.getElementById('map'), {
         "zoom": 11,
-        "center": {
-            "lat": 44.57670853058025,
-            "lng": -73.32539651979982
-        },
+        "center": pos,
         "streetViewControl": false,
         "mapTypeId": "terrain",
         "scrollwheel": false
     });
     
     marker = new google.maps.Marker({
-        map: map,
-        draggable: true,
-        animation: google.maps.Animation.DROP
+        "map": map,
+        "draggable": true,
+        "animation": google.maps.Animation.DROP,
+        "position": pos
     });
 
     google.maps.event.addListener(marker, 'dragend', () => {
         var pos = marker.getPosition();
-        $('input[name="location.lat"]').val(pos.lat()).change();
-        $('input[name="location.long"]').val(pos.lng()).change();
+        $('input[name="location[lat]"]').val(pos.lat()).change();
+        $('input[name="location[long]"]').val(pos.lng()).change();
         updateMap();
     });
 
-    $('input[name="location.lat"]').change(updateMap);
-    $('input[name="location.long"]').change(updateMap);
+    $('input[name="location[lat]"]').change(updateMap);
+    $('input[name="location[long]"]').change(updateMap);
 
-    updateMapWeb();
+    getLocation(true);
 }
 
 function initMapCordova() {
@@ -151,8 +156,8 @@ function initMapCordova() {
         "mapType": plugin.google.maps.MapTypeId.TERRAIN,
         "controls": {
             "compass": true,
-            "myLocationButton": false,
-            "indoorPicker": true,
+            "myLocationButton": true,
+            "indoorPicker": false,
             "zoom": true
         },
         "camera": {
@@ -185,16 +190,15 @@ function initMapCordova() {
     
             marker.on(plugin.google.maps.event.MARKER_DRAG_END, function() {
                 let pos = marker.getPosition();
-                $('input[name="location.lat"]').val(pos.lat).change();
-                $('input[name="location.long"]').val(pos.lng).change();
+                $('input[name="location[lat]"]').val(pos.lat).change();
+                $('input[name="location[long]"]').val(pos.lng).change();
                 updateMapCordova();
             });
         
-            $('input[name="location.lat"]').change(updateMapCordova);
-            $('input[name="location.long"]').change(updateMapCordova);
+            $('input[name="location[lat]"]').change(updateMapCordova);
+            $('input[name="location[long]"]').change(updateMapCordova);
         
-            updateMapCordova();
-    
+            getLocation(true);
         });
     });
 
@@ -244,7 +248,9 @@ function initSensorBtns() {
 
 // ----------------------------------------------------------------------------
 
-function getLocation() {
+function getLocation(auto) {
+    if (auto && !(localStorage['location.auto'] == 'true')) return updateMap();
+
     if (typeof cordova == 'undefined') getLocationWeb();
     else getLocationCordova();
 }
@@ -262,19 +268,19 @@ function getLocationWeb() {
 
     navigator.geolocation.getCurrentPosition(
         (pos) => { // Success
-            $('input[name="location.lat"]')
+            $('input[name="location[lat]"]')
                 .val(pos.coords.latitude)
                 .change();
-            $('input[name="location.long"]')
+            $('input[name="location[long]"]')
                 .val(pos.coords.longitude)
                 .change();
-            $('input[name="location.range"]')
+            $('input[name="location[range]"]')
                 .val(pos.coords.accuracy)
                 .change();
-            $('input[name="location.alt"]')
+            $('input[name="location[alt]"]')
                 .val(pos.coords.altitude)
                 .change();
-            $('input[name="location.altRange"]')
+            $('input[name="location[altRange]"]')
                 .val(pos.coords.altitudeAccuracy)
                 .change();
             updateMapWeb();
@@ -292,19 +298,19 @@ function getLocationCordova() {
     map.getMyLocation(function(location) {
         console.log(location);
 
-        $('input[name="location.lat"]')
+        $('input[name="location[lat]"]')
             .val(location.latLng.lat)
             .change();
-        $('input[name="location.long"]')
+        $('input[name="location[long]"]')
             .val(location.latLng.lng)
             .change();
-        $('input[name="location.range"]')
+        $('input[name="location[range]"]')
             .val('')
             .change();
-        $('input[name="location.alt"]')
+        $('input[name="location[alt]"]')
             .val('')
             .change();
-        $('input[name="location.altRange"]')
+        $('input[name="location[altRange]"]')
             .val('')
             .change();
         updateMapCordova(); 
@@ -376,13 +382,23 @@ function queueReading() {
 
 // ----------------------------------------------------------------------------
 
-function updateSubmitCordova() {
-    if (typeof cordova == 'undefined') return;
-    
-    $('input[name=publish]').off('click').click(function(e) {
+function updateSubmit() {
+    $(document).on('submit', 'form', function(e) {
         e.preventDefault();
-        submitCordova();
-    });
+        submit();
+     });
+    // $('#publish').off('click').click(function(e) {
+    // });
+}
+
+function submit() {
+    if (typeof cordova == 'undefined') submitWeb();
+    else submitCordova();
+}
+
+function submitWeb() {
+    startInputBlock();
+    
 }
 
 function submitCordova() {
@@ -424,6 +440,11 @@ function init() {
             }
         }, 1000);
     } else $.getScript(`<!--map_url-->`); // this gets replaced by grunt
+
+    $("#location_auto").prop('checked', localStorage['location.auto'] == 'true');
+    $("#location_auto").change(function() {
+        localStorage['location.auto'] = $(this).prop('checked').toString();
+    });
 }
 
 $(window).ready(init);
@@ -436,7 +457,7 @@ $(window).ready(init);
 
 // let prefHandlers = [
 //     {
-//         "name": 'locationalways',
+//         "name": 'location_auto',
 //         "load": function() {
 //             let queryObj = urlQueryObj(location.href);
 

@@ -18,8 +18,7 @@
                         <option value="imperial" selected="selected">Imperial Units</option>
                         <option value="metric">Metric Units</option>
                     </select>
-                    <br>
-
+                    &nbsp;&nbsp;&nbsp;
                     <select id="configuration-picker" class="selectpicker"></select>
 
                     <div class="configuration-notchosen">
@@ -28,14 +27,14 @@
 
                     <div class="configuration-chosen" style="display:none">
 
-                        <a id="configuration-link" class="online_only_hide">View Configuration</a>
+                        <!-- <a id="configuration-link" class="online_only_hide">View Configuration</a> -->
 
                         <!-- Location + Time -->
                         <div id="location_mobile" style="display:none">
                             <p>Choose a location by using GPS, dragging the marker to the desired spot, or by inputting coordinates in the boxes below.</p>
                             <button type="button" class="btn btn-sm btn-primary" onclick="getLocation()">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <label class="custom-control custom-checkbox">
-                                <input type="checkbox" id="locationalways" class="custom-control-input">
+                                <input type="checkbox" id="location_auto" class="custom-control-input">
                                 <span class="custom-control-indicator"></span>
                                 <span class="custom-control-description">Get Location Automatically</span>
                             </label>
@@ -44,7 +43,7 @@
                         <div id="location_desktop" style="display:none">
                             <p>Choose a location by either dragging the marker to the desired spot or by inputting coordinates in the boxes below.</p>
                         </div>
-                        <div class="map" id="map"></div>
+                        <div class="newReadingMap" id="map"></div>
 
                         <br>
 
@@ -55,22 +54,22 @@
                             <div class="col-xs-6 col-xxs-12">
                                 <label class="control-label">Latitude</label>
                                 <div class="input-group">
-                                    <input  name="location.lat" class="form-control normalize"
-                                            type="number" step="any"
+                                    <input  name="location[lat]" class="form-control normalize"
+                                            type="number" step="any" required
                                             min="-90" max="90"
                                             data-unittype="location" data-unit="degrees" data-unitpref="degMin"                                        
                                             aria-describedby="addon-location_lat">
-                                    <br>
                                     <span class="input-group-addon" id="addon-location_lat">Degrees</span>
                                 </div>
+                                <br>
                             </div>
 
                             <!-- Longitude -->                    
                             <div class="col-xs-6 col-xxs-12">
                                 <label class="control-label">Longitude</label>
                                 <div class="input-group">
-                                    <input  name="location.long" class="form-control normalize"
-                                            type="number" step="any" min="-180" max="180"
+                                    <input  name="location[long]" class="form-control normalize"
+                                            type="number" step="any" min="-180" max="180" required
                                             data-unittype="location" data-unit="degrees" data-unitpref="degMin"
                                             aria-describedby="addon-location_long">
                                     <span class="input-group-addon" id="addon-location_long">Degrees</span>
@@ -90,7 +89,7 @@
                                     Time Created
                                 </label>
                                 <input  name="timeCreated" class="form-control normalize"
-                                        type="number" value=""
+                                        type="number" value="" required
                                         data-unittype="time" data-unit="unix" data-unitpref="iso">
                                 <br>
                             </div>
@@ -99,7 +98,7 @@
                             <div class="col-sm-4 col-xs-12">
                                 <label class="control-label">Range (Optional)</label>
                                 <div class="input-group">
-                                    <input  name="location.range" class="form-control normalize"
+                                    <input  name="location[range]" class="form-control normalize"
                                             type="number" step="any" min="0"
                                             aria-describedby="addon-location_range"
                                             data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
@@ -113,7 +112,7 @@
                             <div class="col-sm-4 col-xs-12">
                                 <label class="control-label">Altitude (Optional)</label>
                                 <div class="input-group">
-                                    <input  name="location.alt" class="form-control normalize" id="location_alt"
+                                    <input  name="location[alt]" class="form-control normalize" id="location_alt"
                                             type="number" step="any" 
                                             aria-describedby="addon-location_alt"
                                             data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
@@ -126,7 +125,7 @@
                             <div class="col-sm-4 col-xs-12">
                                 <label class="control-label">Altitude Range (Optional)</label>
                                 <div class="input-group">
-                                    <input  name="location.altRange" class="form-control normalize" id="location_altRange" 
+                                    <input  name="location[altRange]" class="form-control normalize" id="location_altRange" 
                                             type="number" step="any" min="0"
                                             aria-describedby="addon-location_altRange"
                                             data-unittype="length" data-unit="meters" data-unitprefsystem="imperial">
@@ -151,6 +150,7 @@
 
     <!--scripts-->
 
+    <script src="./js/lib/jquery.serialize-object.js"></script>
     <script src="./js/lib/jquery.spoiler.min.js"></script>
     <script src="./js/lib/modernizr-custom.js"></script>
     <script src="./js/lib/mobile-detect.min.js"></script>

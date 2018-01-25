@@ -81,7 +81,6 @@ app.post(`/api/offlineData`, (req, res) => {
     let data = {};
 
     new Chain(function() {
-        console.log("test1");
         if (req.session && req.session.oid)
             return this.next();
         
@@ -99,12 +98,11 @@ app.post(`/api/offlineData`, (req, res) => {
                     "errorName": "userNotFound",
                     "errorNameFull": "Api.userInfo.userNotFound",
                     "errorData": {
-                        // "errorFind": error,
                         "oid": oid
                     }
                 });
             },
-            Schema.fieldsSafePrivate('/User')
+            // Schema.fieldsSafePrivate('/User');
         );
 
     }, function(user) {

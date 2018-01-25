@@ -110,23 +110,33 @@ class OfflineInfoManager {
                 return this.finish(false);
         }
     
-        if (navigator.onLine) {
-            startInputBlock();
-            $.post(`${serverUrl}/api/offlineData`, (data, status) => {
-                if (status == 'success') {
-                    if (data.error) {
-                        if (data.error.errorName == 'noSession')
-                            localStorage.offlineInfo = '';
-                        return this.finish(false);
-                    }
+        if (!navigator.onLine) return this.finish(false);
+    
+        startInputBlock();
+        
+        $.ajax({
+            "url": `${serverUrl}/api/offlineData`,
+            "dataType": "json",
+            "cache": false,
+            "timeout": 4500,
+            "method": "POST",
+            "success": (data, status) => {
+                if (status != 'success')
+                    return this.finish(false);
 
-                    localStorage.offlineInfo = JSON.stringify(data);
-                    this.finish(true);
-                } else this.finish(false);
-            }, 'json').fail((response) => {
+                if (data.error) {
+                    if (data.error.errorName == 'noSession')
+                        localStorage.offlineInfo = '';
+                    return this.finish(false);
+                }
+
+                localStorage.offlineInfo = JSON.stringify(data);
+                this.finish(true);
+            },
+            "error": () => {
                 this.finish(false);
-            });
-        } else this.finish(false);
+            }
+        });
     }
 
     finish(gotNewInfo) {
@@ -380,38 +390,39 @@ function testCordova(callback) {
 //         this.mapReady = false;
 //         this.dataReady = false;
 
-//         this.testCordova((isCordova) => {
-//             this.isCordova = isCordova;
-//             this.init();
-//         });
+//         // this.testCordova((isCordova) => {
+//         //     this.isCordova = isCordova;
+//         // });
+//         this.init();
 //     }
 
-//     testCordova(callback) {
-//         if (typeof cordova != 'undefined') return callback(true);
+//     // testCordova(callback) {
+//     //     if (typeof cordova != 'undefined') return callback(true);
 
-//         const cordovaTimerMax = 1000;
+//     //     const cordovaTimerMax = 1000;
 
-//         let cordovaTimer = 1000;
-//         let cordovaInterval = setInterval(() => {
-//             cordovaTimer += 10;
-//             if (typeof plugin.google != 'undefined') {
-//                 callback(true);
-//                 clearInterval(cordovaInterval);
-//             } else if (cordovaTimer >= cordovaTimerMax) {
-//                 callback(false);
-//                 clearInterval(cordovaInterval);
-//             }
-//         }, 10);
-//     }
+//     //     let cordovaTimer = 1000;
+//     //     let cordovaInterval = setInterval(() => {
+//     //         cordovaTimer += 10;
+//     //         if (typeof plugin.google != 'undefined') {
+//     //             callback(true);
+//     //             clearInterval(cordovaInterval);
+//     //         } else if (cordovaTimer >= cordovaTimerMax) {
+//     //             callback(false);
+//     //             clearInterval(cordovaInterval);
+//     //         }
+//     //     }, 10);
+//     // }
 
 //     init() {
-//         if (this.isCordova) this.initCordova();
-//         else this.initWeb();
+//         // if (this.isCordova) this.initCordova();
+//         // else
+//         this.initWeb();
 //     }
 
 //     initCordova() {
-//         this.map = plugin.google.maps.Map.getMap(this.element);
-//         this.mapReady = true;
+//         // this.map = plugin.google.maps.Map.getMap(this.element);
+//         // this.mapReady = true;
 //     }
 
 //     initWeb() {
@@ -484,14 +495,13 @@ function testCordova(callback) {
 //         let queriesLeft = queries.length;
     
 //         queries.forEach((query, arr, i) => {
-    
-//             $.post('/api/readings', query, function(dataSet, textStatus) {        
+//             $.post('/api/readings', query, (dataSet, textStatus) => {
 //                 if (textStatus == 'success') {
 //                     this.readings.push(dataSet);
 //                     queriesLeft--;
 //                     if (queriesLeft == 0) {
 //                         this.dataReady = true;                        
-//                         updateMap();
+//                         this.updateMap();
 //                     }
 //                 }
 //             });
