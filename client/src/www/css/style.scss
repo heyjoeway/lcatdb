@@ -3,6 +3,7 @@
 @import "./lib/bootstrap/bootstrap-xxs";
 @import "./lib/bootstrap/bootstrap-datetimepicker";
 @import "./lib/spinner";
+@import "./lib/vis.min";
 
 @import "fonts";
 @import "home";
@@ -94,8 +95,8 @@ body:not(.no-nav) {
 }
 
 .dropdown-menu {
-    padding: 16px;
-    user-select: none;
+    // padding: 16px;
+    // user-select: none;
 }
 
 .dropdown-item {
@@ -103,7 +104,7 @@ body:not(.no-nav) {
 }
 
 .navbar-brand {
-    padding: 16px;
+    padding: 16px 4px;
 }
 
 .extra-small {
@@ -116,7 +117,7 @@ body:not(.no-nav) {
 }
 
 #loading-overlay {
-    // transition: opacity 0.1s;
+    transition: opacity 0.2s;
 
     opacity: 0.75;
     position: fixed;
@@ -129,10 +130,10 @@ body:not(.no-nav) {
     z-index: 9999999;
     background: #333;
 
-    &.hide {
+    &.disabled {
         // display: block !important;
-        // opacity: 0;
-        // pointer-events: none;
+        opacity: 0;
+        pointer-events: none;
     }
 }
 
@@ -146,4 +147,11 @@ body:not(.no-nav) {
 
 a.disabled {
     pointer-events: none;
+}
+
+.navbar-toggle > svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    fill: #fff;
 }

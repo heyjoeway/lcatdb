@@ -211,7 +211,7 @@ exports.new = function(ctx, success, failure) {
 
     if (!Configurations.canEdit(user, configuration))
         return fail({
-            "errorName": "canEdit",
+        "errorName": "canEdit",
             "errorNameFull": "Reading.new.canEdit"
         });
 
@@ -224,39 +224,46 @@ exports.new = function(ctx, success, failure) {
 
     let hasFailed = false;
     new Chain(function() {
-        this.pause(reading.values.length);
-        this.next();
+        try {
+            this.pause(reading.values.length);
+            this.next();
 
-        reading.values.forEach((value) => {
-            if (hasFailed) return;
-            let sid = value.sensor;
-            Sensor.find(sid,
-                (sensor) => {
-                    if (hasFailed) return;
-                    if (sensor.type != value.type) {
+            reading.values.forEach((value) => {
+                if (hasFailed) return;
+                let sid = value.sensor;
+                Sensor.find(sid,
+                    (sensor) => {
+                        if (hasFailed) return;
+                        if (sensor.type != value.type) {
+                            fail({
+                                "errorName": "sensorFind",
+                                "errorNameFull": "Reading.new.sensorType"
+                            });
+                            hasFailed = true;
+                            return;
+                        }
+
+                        this.next();
+                    },
+                    (error) => {
+                        if (hasFailed) return;
                         fail({
                             "errorName": "sensorFind",
-                            "errorNameFull": "Reading.new.sensorType"
+                            "errorNameFull": "Reading.new.sensorFind",
+                            "errorData": {
+                                "errorFind": error
+                            }
                         });
                         hasFailed = true;
-                        return;
                     }
-
-                    this.next();
-                },
-                (error) => {
-                    if (hasFailed) return;
-                    fail({
-                        "errorName": "sensorFind",
-                        "errorNameFull": "Reading.new.sensorFind",
-                        "errorData": {
-                            "errorFind": error
-                        }
-                    });
-                    hasFailed = true;
-                }
-            );
-        });
+                );
+            });
+        } catch (e) {
+            fail({
+                "errorName": "process",
+                "errorNameFull": "Reading.new.process"
+            });
+        }
     }, function() {
         let newData = deepmerge(
             reading,

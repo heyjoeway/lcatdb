@@ -274,16 +274,23 @@
                         <div class="col-xs-3 col-xxs-4">
                             <div class="dropdown" style="display:inline-block">
                                 <button class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">+</button>
-                                <div class="dropdown-menu dropdown-menu-right"> 
-                                    <p>Basic</p>                                    
-                                    <!--<a class="dropdown-item" id="map">Geographical Map</a><br>-->
-                                    <a class="dropdown-item new_graph" data-type="map">Map</a><br>
-                                    <a class="dropdown-item new_graph" data-type="2d">2-D Plot</a><br>
-                                    <!--<a class="dropdown-item" id="3d">3-D Plot</a><br>-->
+                                <div class="dropdown-menu dropdown-menu-right">                                
+                                    <li>
+                                        <a class="dropdown-item new_graph" data-type="map">Map</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item new_graph" data-type="2d"> 2-D Plot</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item new_graph" data-type="3d">3-D Plot</a>
+                                    </li>
                                     <hr>
-                                    <p>Advanced</p>
-                                    <a class="dropdown-item new_graph" data-type="raw">Raw Data</a><br>
-                                    <a class="dropdown-item new_graph" data-type="query">Query</a> 
+                                    <li>
+                                        <a class="dropdown-item new_graph" data-type="raw">Raw Data</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item new_graph" data-type="query">Query</a>
+                                    </li>
                                 </div>
                             </div>
                             &nbsp;&nbsp;
@@ -350,7 +357,46 @@
 
                                 </select>
                             </div>
-                            <!--<div class="graph_typeprefs" id="3d"></div>-->
+                            
+                            <div class="graph_typeprefs" id="3d">
+                                <h5>X Axis</h5>
+                                <select name="x.var" class="graph-control graph-control-3d form-control">
+                                    <option value="values.depth">Depth</option>
+                                    <option value="values.temperature">Temperature</option>
+                                    <option value="timeCreated">Time</option>
+                                    <option value="location.lat">Latitude</option>
+                                    <option value="location.long">Longitude</option>
+                                    <option value="location.alt">Altitude</option>
+                                </select>
+                                <h5>Y Axis</h5>
+                                <select name="y.var" class="graph-control graph-control-3d form-control">
+                                    <option value="values.depth">Depth</option>
+                                    <option value="values.temperature">Temperature</option>
+                                    <option value="timeCreated">Time</option>
+                                    <option value="location.lat">Latitude</option>
+                                    <option value="location.long">Longitude</option>
+                                    <option value="location.alt">Altitude</option>
+                                </select>
+                                <h5>Z Axis</h5>
+                                <select name="z.var" class="graph-control graph-control-3d form-control">
+                                    <option value="values.depth">Depth</option>
+                                    <option value="values.temperature">Temperature</option>
+                                    <option value="timeCreated">Time</option>
+                                    <option value="location.lat">Latitude</option>
+                                    <option value="location.long">Longitude</option>
+                                    <option value="location.alt">Altitude</option>
+                                </select>
+                                <h5>Color</h5>
+                                <select name="style.var" class="graph-control graph-control-3d form-control">
+                                    <option value="values.depth">Depth</option>
+                                    <option value="values.temperature">Temperature</option>
+                                    <option value="timeCreated">Time</option>
+                                    <option value="location.lat">Latitude</option>
+                                    <option value="location.long">Longitude</option>
+                                    <option value="location.alt">Altitude</option>
+                                </select>
+                            </div>
+
                             <div class="graph_typeprefs" id="raw">
                                 <br>
                                 <p>No preferences are currently available for this type.</p>
@@ -387,7 +433,9 @@
 
     <!--scripts-->
     <script src="./js/lib/bootstrap-datetimepicker.min.js"></script>
-    <script src="./js/lib/Chart.bundle.min.js"></script>
+    <!-- <script src="./js/lib/Chart.bundle.min.js"></script> -->
+    <script src="./js/lib/vis.min.js"></script>
+
     <script src="./js/lib/modernizr-custom.js"></script>
     <script src="./js/lib/jsurl.js"></script>
     <script src="./js/lib/mustache.min.js"></script>    

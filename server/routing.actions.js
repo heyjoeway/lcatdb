@@ -363,7 +363,13 @@ app.post(`/configurations/${configPattern}/readingDo`, (req, res) => {
     }
 
     function success(rid) {
-        res.redirect(`/readings/${rid}`);
+        if (req.body.infoOnly)
+            res.send({
+                "success": true,
+                "rid": rid
+            });
+        else
+            res.redirect(`/readings/${rid}`);
     }
 
     let data = {

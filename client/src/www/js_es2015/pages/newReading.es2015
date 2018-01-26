@@ -396,21 +396,52 @@ function submit() {
     else submitCordova();
 }
 
-function submitWeb() {
+function submitWeb(failCallback) {
+    function finish(success, data) {
+        
+        if (success)
+            location.href = `${serverUrl}/readings/${data.rid}`;
+        else {
+            if (failCallback) return failCallback(data);
+            $.notify({
+                "message": "Could not submit reading. Make sure you're online and that all of the fields are properly filled out."
+            }, {
+                "type": 'danger'
+            });
+            finishInputBlock();
+        }
+    }
+
     startInputBlock();
-    
+
+    let formData = $('#form').serializeArray();
+    formData.push({
+        "name": "infoOnly",
+        "value": true
+    });
+
+    $.post(
+        `${serverUrl}/configurations/${configurationId}/readingDo`,
+        formData,
+        (data, status) => {
+            finish(status == "success", data);
+        }
+    ).fail(() => {
+        finish(false);
+    });
 }
 
 function submitCordova() {
-    startInputBlock();
-    offlineEventQueue.addEvent(new OfflineEventPost({
-        "data": {
-            "formUrl": `${serverUrl}/configurations/${configurationId}/readingDo`,
-            "formData": $('#form').serializeArray()
-        },
-        "name": "Reading"
-    }));
-    location.href = './queue.html';
+    submitWeb(function(data) {
+        offlineEventQueue.addEvent(new OfflineEventPost({
+            "data": {
+                "formUrl": `${serverUrl}/configurations/${configurationId}/readingDo`,
+                "formData": $('#form').serializeArray()
+            },
+            "name": "Reading"
+        }));
+        location.href = './queue.html';
+    })
 }
 // ----------------------------------------------------------------------------
 

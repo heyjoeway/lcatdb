@@ -19,7 +19,9 @@ function updateList() {
                 "queueList": offlineEventQueue.toArray()
             })
         );
-        $('#queue_submit').removeAttr('disabled');
+        if (navigator.onLine)
+            $('#queue_submit').removeAttr('disabled');
+        
         changeUnitSystem();
 
         $('.event-submit').off('click').click(function() {

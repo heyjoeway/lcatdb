@@ -182,13 +182,20 @@ function updateNavbar() {
 
 function startInputBlock() {
     $('#loading-overlay').removeClass('hide');
+    setTimeout(function() {
+        $('#loading-overlay').removeClass('disabled');
+    }, 10);
     window.activeInputBlock++;
 }
 
 function finishInputBlock() {
     if (--window.activeInputBlock <= 0) {
         window.activeInputBlock = 0;
-        $('#loading-overlay').addClass('hide');
+        
+        $('#loading-overlay').addClass('disabled');
+        setTimeout(function() {
+            $('#loading-overlay').addClass('hide');
+        }, 250);
     }
 }
 
