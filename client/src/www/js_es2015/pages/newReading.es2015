@@ -58,6 +58,7 @@ function changeConfig() {
         $('.configuration-chosen').show();
         $('.configuration-notchosen').hide();
 
+        $('#configuration-sensors .spoiler').spoiler();
         changeUnitSystem();
         initSensorBtns();
         updateSubmit();

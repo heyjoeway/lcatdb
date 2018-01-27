@@ -2,35 +2,56 @@
 <nav id="navbar" class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2"
-                data-_extension-text-contrast="">
+            <button type="button" class="navbar-toggle" id="sidebar_show">
                 <svg>
                     <use xlink:href="./img/menu.svg#layer1"></use>
                 </svg>
-                <span class="sr-only">Toggle navigation</span>
             </button>
             <a class="navbar-brand" href="./dashboard.html">
-                <img src="./img/logo-small-white.png">
+                <img src="./img/logo.svg">
             </a>
         </div>
-    
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
-            <ul class="nav navbar-nav">
-                <li><a href="./newReading.html">Submit Reading</a></li>
-                <li><a href="./visualize.html">Visualize</a></li>
-                <li><a class="online_only_disable" href="./configurations">Configurations</a></li>
-                <li><a class="online_only_disable" href="./sensors">Sensors</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{username}}<span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a class="online_only_disable" href="./logout">Logout</a></li>
-                        <li><a class="online_only_disable" href="./user/edit">Edit User Info</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+
     </div>
 </nav>
+
+<div id="sidebar">
+    <div id="sidebar_cont">
+        <img id="sidebar_logo" src="./img/logo.svg"></img>
+        <ul class="sidebar_nav">
+            <li>
+                <a href="./dashboard.html">Dashboard</a>
+                <i class="material-icons">home</i>
+            </li>
+            <li>
+                <a href="./newReading.html">Submit Reading</a>
+                <i class="material-icons">mode_edit</i>
+            </li>
+            <li class="cordova_only_hide" style="display:none">
+                <a href="./queue.html">View Queue</a>
+                <i class="material-icons">format_list_bulleted</i>
+            </li>
+            <li class="online_only_hide">
+                <a href="./visualize.html">Visualize</a>
+                <i class="material-icons">assessment</i>
+            </li>
+            <li class="online_only_hide">
+                <a href="./configurations">Configurations</a>
+                <i class="material-icons">directions_boat</i>
+            </li>
+            <li class="online_only_hide">
+                <a href="./sensors">Sensors</a>
+                <i class="material-icons">device_hub</i>
+            </li>
+            <li class="online_only_hide">
+                <a href="./logout">Logout</a>
+                <i class="material-icons">exit_to_app</i>
+            </li>
+            <li class="online_only_hide">
+                <a href="./user/edit">Edit User Info</a>
+                <i class="material-icons">person</i>
+            </li>
+        </ul>
+    </div>
+</div>
 {{/user}}

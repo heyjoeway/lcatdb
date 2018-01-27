@@ -63,6 +63,7 @@ $('document').ready(() => {
     initJs();
     initMap();
     initUnitSystem();
+    initSidebar();
 
     handleOnline();
     setInterval(handleOnline, 1000);
@@ -172,7 +173,11 @@ function updateNavbar() {
             let configurationId = $("#configuration-picker").val();
 
             $('#navbar').remove();
+            $('#sidebar').remove();
             $('body').append(Mustache.render(template, offlineInfo.info()));
+            $("#sidebar_show").click(function() {
+                setTimeout(showSidebar, 1);
+            });
             appUrls();
         });
     });
@@ -382,6 +387,35 @@ function testCordova(callback) {
 }
 
 // ----------------------------------------------------------------------------
+
+let sidebarOpen = false;
+
+function initSidebar() {
+    $(window).click(hideSidebar);
+    $("#sidebar_show").click(function() {
+        setTimeout(showSidebar, 1);
+    });
+}
+
+function showSidebar() {
+    $("#sidebar").show();    
+    setTimeout(function() {
+        $("#sidebar").addClass("sidebar_show");
+        sidebarOpen = true;
+    }, 10);
+}
+
+function hideSidebar() {
+    if (!sidebarOpen) return;
+    sidebarOpen = false;
+    $("#sidebar").removeClass("sidebar_show");
+    setTimeout(function() {
+        $("#sidebar").hide();    
+    }, 150);
+}
+
+// ----------------------------------------------------------------------------
+
 
 // class Map {
 //     constructor(selector, request) {
