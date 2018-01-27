@@ -178,6 +178,7 @@ function updateNavbar() {
             $("#sidebar_show").click(function() {
                 setTimeout(showSidebar, 1);
             });
+            handleOnline();
             appUrls();
         });
     });

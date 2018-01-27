@@ -3,15 +3,11 @@
  * for anyone working with this in the future:
  * 
  * - UseCamelCase. No_snake_case.
- * - Prefer using ' for quotations. Only use " in objects.
- * - All relative paths should begin with './'. Even in dialogue.
- * - All filesystem paths should end with '/', if they point to a directory.
  * - Do not do ANYTHING synchronously. Do everything async.
  *   - In terms of I/O, anyway.
  *   - Except for the initial config loading.
  * - Always use Winston for logging. Only use console.log for >>very<<
  *   temporary debugging.
- * - Write all JS objects in valid JSON format. Use quotes (") around keys.
 */
 
 const STATIC = __dirname + '/www/';

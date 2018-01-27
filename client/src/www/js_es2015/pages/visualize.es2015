@@ -310,7 +310,6 @@ class DataSet {
             query['page'] = 1;
         }
 
-        console.log(query);
         return query;
     }
 
@@ -695,7 +694,6 @@ class Graph2d extends Graph {
                     let valueOrganized;
 
                     let valueVar = props[axis].var;
-                    // console.log(valueVar);
                     let isValue = valueVar.startsWith('values');
                     if (!isValue) {
                         valueOrganized = getPropertyByPath(readingRaw, valueVar);
@@ -723,7 +721,6 @@ class Graph2d extends Graph {
             });
         });
 
-        console.log(dataOrganized);
         return dataOrganized;
     }
 
@@ -821,7 +818,6 @@ class Graph3d extends Graph {
                     let valueOrganized;
 
                     let valueVar = props[axis].var;
-                    // console.log(valueVar);
                     let isValue = valueVar.startsWith('values');
                     if (!isValue) {
                         valueOrganized = getPropertyByPath(readingRaw, valueVar);
@@ -853,7 +849,6 @@ class Graph3d extends Graph {
             });
         });
 
-        console.log(dataOrganized);
         return dataOrganized;
     }
 
@@ -964,7 +959,6 @@ class GraphManager {
     }
 
     callback(set, status) {
-        console.log(status);
         this.updateSets();
     }
 

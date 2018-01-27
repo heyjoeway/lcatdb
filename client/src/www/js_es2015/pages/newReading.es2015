@@ -297,7 +297,6 @@ function getLocationWeb() {
 
 function getLocationCordova() {
     map.getMyLocation(function(location) {
-        console.log(location);
 
         $('input[name="location[lat]"]')
             .val(location.latLng.lat)
