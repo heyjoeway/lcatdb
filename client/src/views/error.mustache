@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Internal Server Error</title>
+</head>
+<body>
+    <!--nav_blank-->
+
+    <div class="container">
+        <h2>Something went wrong.</h2>
+        <h4>"It's not you, it's us."</h4>
+        <hr>
+        <p>There was an internal server error on our end and we weren't able to finish processing your request.</p>
+        {{#error}}
+            <p>If you see one of the developers/administrators, make sure to send them this:</p>
+            <code><pre>{{error}}</pre></code><br>
+        {{/error}}
+        <a href="/" class="btn btn-primary">Return to Home</a>
+    </div>
+</body>

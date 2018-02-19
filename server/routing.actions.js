@@ -11,10 +11,18 @@ const Chain = Utils.Chain;
 const Forgot = require('./forgot.js');
 const Verify = require('./verify.js');
 const RoutingCore = require('./routing.core.js');
+const Config = require('./config.json');
+
 
 exports.init = function(app) {
 
-app.get('/configurations/new', (req, res, user) => {
+if (Config.debugMode) {
+    app.get('/oops', (req, res) => {
+        var test = app.dsdsdsadsadds.dsas;
+    });
+}
+
+app.get('/configurations/new', (req, res) => {
     let data = {};
 
     new Chain(function() {
@@ -30,7 +38,7 @@ app.get('/configurations/new', (req, res, user) => {
 });
 
 
-app.post('/forgotDo', (req, res, user) => {
+app.post('/forgotDo', (req, res) => {
     let email = ('' || req.body.email).toLowerCase();
     Forgot.createRequest(email, function(succeeded) {
         if (succeeded) res.redirect('/login?forgotSent=true');
@@ -42,7 +50,7 @@ app.post('/forgotDo', (req, res, user) => {
 // Login
 // ------------------------------------
 
-app.post('/logindo', (req, res) => {
+app.post('/loginDo', (req, res) => {
     Auth.login(req.body.username, req.body.password, 
         (oid) => { // Success
             req.session.oid = oid.toString();
@@ -55,13 +63,14 @@ app.post('/logindo', (req, res) => {
                 res.redirect('/dashboard.html');
         },
         (error) => { // Failure
+            console.log(req.body);
             if (req.body.infoOnly)
                 res.send({
                     "errorName": "invalid",
                     "errorNameFull": "Login.invalid"
                 });
             else
-                res.redirect('/login?invalid=true');
+                res.redirect('/login.html?invalid=true');
         }
     );
 });

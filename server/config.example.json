@@ -20,5 +20,12 @@
     "port": 3000,
     "log": {
         "level": "debug"
-    }
+    },
+    "errors": {
+        "showData": true,
+        "encryptData": false,
+        "encryptAlgorithm": "aes-256-ctr",
+        "encryptPassword": ""
+    },
+    "debugMode": true
 }

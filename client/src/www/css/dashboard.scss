@@ -1,0 +1,32 @@
+
+.dashboard-nav-container {
+    padding: 0px 16px;
+}
+
+.dashboard-map-container {
+    flex-grow: 1;
+    position: relative;
+}
+
+.dashboard-mapcontrols {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    padding-right: 64px;
+}
+
+.dashboard-container {
+    flex-direction: column;
+
+    .map-iframe {
+        position: absolute;
+        min-height: unset;
+        height: 100%;        
+    }
+}
+
+@media (min-width: 1200px) {
+    .page-dashboard {
+        padding-top: 0 !important;
+    }
+}

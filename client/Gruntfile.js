@@ -5,7 +5,8 @@ module.exports = function(grunt) {
 const PACKAGE = require("./package.json");
 
 const TITLE = "lcatDB";
-const URL = "http://joeybob.ddns.net:3000";
+// const URL = "http://joeybob.ddns.net:3000";
+const URL = "http://localhost:3000";
 const CORDOVA_BASE = '<base href="file:///android_asset/www/">';
 const MAP_URL = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAsPFPL4ttV7hbmVIF-BELdB9WD_c5SjJA&callback=initMap';
 
@@ -73,11 +74,14 @@ let replacements = [{
     match: "<!--head-->",
     replacement: fs.readFileSync(`${TEMPLATES_DIR}/head.html`, "utf8")
 }, {
+    match: "<!--nav_user-->",
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_user.html`, "utf8")
+}, {
     match: "<!--nav_nouser-->",
     replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_nouser.html`, "utf8")
 }, {
-    match: "<!--nav_user-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_user.html`, "utf8")
+    match: "<!--nav_auto-->",
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_auto.html`, "utf8")
 }, {
     match: "<!--nav_blank-->",
     replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_blank.html`, "utf8")
@@ -120,6 +124,14 @@ config.replace.www = {
         dest: WWW_TMP + "/js_es2015"
     }]
 };
+config.replace.www_recursive = {
+    files: [{
+        expand: true,
+        cwd: WWW_TMP,
+        src: ["**/*.html", "**/*.mustache"],
+        dest: WWW_TMP
+    }]
+};
 config.replace.cordova = {
     files: [{
         expand: true,
@@ -152,6 +164,14 @@ config.replace.views = {
     files: [{
         expand: true,
         cwd: VIEWS_SRC,
+        src: ["**/*.mustache"],
+        dest: VIEWS_TMP
+    }]
+};
+config.replace.views_recursive = {
+    files: [{
+        expand: true,
+        cwd: VIEWS_TMP,
         src: ["**/*.mustache"],
         dest: VIEWS_TMP
     }]
@@ -361,6 +381,7 @@ grunt.registerTask('www-clean', [
 grunt.registerTask('www', [
     'sass:www',
     'replace:www',
+    'replace:www_recursive',
     'htmlmin:www',
     'babel:www',
     'uglify:www',
@@ -375,6 +396,7 @@ grunt.registerTask('views-clean', [
 
 grunt.registerTask('views', [
     'replace:views',
+    'replace:views_recursive',
     'htmlmin:views'
 ]);
 

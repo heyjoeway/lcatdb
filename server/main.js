@@ -53,6 +53,7 @@ const bodyParser = require('body-parser');
 const Session = require('client-sessions');
 
 const mustache = require('mustache-express');
+const Crypto = require('crypto');
 
 // ----------------------------------------------------------------------------
 // Champy-DB specific modules
@@ -119,3 +120,33 @@ app.use(Express.static(STATIC));
 
 Routing.init(app);
 Api.init(app);
+
+// ============================================================================
+// ERROR HANDLING
+// ============================================================================
+
+app.use(function(err, req, res, next) {
+    var errorText;
+
+    if (Config.errors.showData) {
+        if (!Config.errors.encryptData) {
+            errorText = "WARNING: RAW STACK SENT\n\n" + err.stack;
+        } else {
+            var cipher = Crypto.createCipher(
+                Config.errors.encryptAlgorithm,
+                Config.errors.encryptPassword
+            );
+            errorText = cipher.update(err.stack, 'utf8', 'hex');
+            errorText += cipher.final('hex');
+        }
+    }
+
+    Winston.error(err.stack);
+    res.status(500).render('error', {
+        "error": errorText
+    });
+});
+
+app.use(function (req, res) {
+    res.status(404).sendFile(STATIC + "404.html");
+});

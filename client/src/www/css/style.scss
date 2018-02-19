@@ -5,6 +5,8 @@
 @import "./lib/spinner";
 @import "./lib/vis.min";
 
+$large-screen-width: 1200px;
+
 @import "fonts";
 @import "home";
 @import "spoiler";
@@ -13,9 +15,12 @@
 @import "visualize";
 @import "map";
 @import "sidebar";
+@import "dashboard";
 
-body:not(.no-nav) {
-    padding-top: 70px;
+@media (max-width: 1199px) {
+    body:not(.no-nav) {
+        padding-top: 70px;
+    }
 }
 
 .js {
@@ -155,4 +160,54 @@ a.disabled {
     left: 0;
     top: 0;
     fill: #fff;
+}
+
+.container-flex {
+    height: 100%;
+    display: flex;
+}
+
+.container-centerall {
+    justify-content: center;
+    align-items: center;
+}
+
+.container-nopad {
+    padding: 0px;
+}
+
+@media (min-width: 1200px) {
+    .container-nopad {
+        width: calc(100vw - 256px);
+    }
+}
+
+.container-login {
+    max-width: 455px;
+    margin: 8px;
+    margin-bottom: 64px;
+    background: white;
+    padding: 1px 32px 16px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 64px -8px rgba(0, 0, 0, 1);
+}
+
+.body-fullheight {
+    height: 100vh;
+}
+
+.body-transparentnavbar {
+    .navbar {
+        background: none;
+        box-shadow: none;
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 1));
+    }
+}
+
+.body-darkbg {
+    background: #212121;
+}
+
+.btn {
+    margin-bottom: 8px;
 }

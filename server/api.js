@@ -102,7 +102,7 @@ app.post(`/api/offlineData`, (req, res) => {
                     }
                 });
             },
-            // Schema.fieldsSafePrivate('/User');
+            Schema.fieldsSafePrivate('/User')
         );
 
     }, function(user) {

@@ -3,50 +3,37 @@
     <!--head-->
     <title><!--title--> - Dashboard</title>
 </head>
-<body>
+<body class="body-fullheight page-dashboard">
     <!--nav_blank-->
 
-    <div class="container">
+    <div class="container container-nopad container-flex dashboard-container">
 
-        <div id="verifySuccess" style="display:none" class="alert alert-success">
+        <!-- <div id="verifySuccess" style="display:none" class="alert alert-success">
             <p>User successfully verified!</p>
         </div>
 
         <div id="verifyFailure" style="display:none" class="alert alert-warning">
             <p>User unsuccessfully verified. Requests expire after 24 hours.</p>
+        </div> -->
+        <div class="dashboard-nav-container">
+            <ul class="visible-xs visible-sm visible-md sidebar-nav row">
+                <li class="col-xs-12 col-sm-6 col-md-4">
+                    <a href="./newReading.html">Submit Reading</a>
+                    <i class="material-icons">mode_edit</i>
+                </li>
+                <li class="col-xs-12 col-sm-6 col-md-4 cordova_only_hide" style="display:none">
+                    <a href="./queue.html">View Queue</a>
+                    <i class="material-icons">format_list_bulleted</i>
+                </li>
+                <li class="col-xs-12 col-sm-6 col-md-4 online_only_hide">
+                    <a href="./visualize.html">Visualize</a>
+                    <i class="material-icons">assessment</i>
+                </li>
+            </ul>
         </div>
 
-        <div class="row">
-             <div class="col-xs-12 col-sm-6 col-md-5"> 
-                <h3 id="user-greet"></h3>
-                <h4>What would you like to do?</h4>
-                <a href="./newReading.html"><div class="btn btn-image">
-                    <img src="./img/dashboard/reading.png">
-                    <div class="btn-image-short">Submit a Reading</div>
-                </div></a>
-                <br>
-                <a class="cordova_only_hide" style="display:none" href="./queue.html">
-                    <div class="btn btn-image">
-                        <img src="./img/dashboard/queue.png">
-                        <div class="btn-image-short">View Queue</div>
-                    </div>
-                    <br>
-                </a>
-                <a href="./visualize.html"><div class="online_only_disable btn btn-image">
-                    <img src="./img/dashboard/visualize.png">
-                    <div class="btn-image-short">Visualize Data</div>
-                </div></a>
-                <br>
-                <a href="./configurations" class="online_only_disable"><div class="online_only_disable btn btn-image">
-                    <img src="./img/dashboard/configurations.png">
-                    <div class="btn-image-short">View Configurations</div>
-                </div></a>
-                <br>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-7 online_only_hide">
-                <br>
-                <h3 class="h-inline">Map</h3>
-                &nbsp;&nbsp;
+        <div class="dashboard-map-container online_only_hide">
+            <div class="dashboard-mapcontrols">
                 <select id="map-user-picker" class="selectpicker">
                     <option value="all">All Users</option>
                     <option value="{{_id}}">Just Me</option>
@@ -62,8 +49,8 @@
                     <option value="31557600">Last 1 Year</option>
                 </select>
                 <br>
-                <iframe id="map-time" class="map-iframe" src="./embed/map.html?embed=true&timeAgo=604800"></iframe>
             </div>
+            <iframe id="map-time" class="map-iframe" src="./embed/map.html?embed=true&timeAgo=604800"></iframe>
         </div>
     </div>
 
