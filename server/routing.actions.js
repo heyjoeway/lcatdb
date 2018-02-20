@@ -158,7 +158,12 @@ app.post(`/user/editDo`, (req, res) => {
                 "edit": req.body
             },
             () => { res.redirect(`/dashboard.html`); },
-            (error) => { res.send(`Error processing request. (${error.errorName})`); }
+            (error) => {
+                let knownErrors = ["emailTaken"];
+                let unknownError = !knownErrors.includes(error.errorName);
+                res.redirect(`/user/edit?${error.errorName}=true,unknownError=${unknownError}`) ;
+                // res.send(`Error processing request. (${error.errorName})`);
+            }
         );
     });
 });

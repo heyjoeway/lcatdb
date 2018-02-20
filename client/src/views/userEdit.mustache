@@ -10,6 +10,18 @@
         {{#user}}
         <h2>Edit User Info</h2>
         <hr>
+        
+        {{#query.emailTaken}}
+        <div class="alert alert-warning">
+            <p>Email already taken.</p>
+        </div>
+        {{/query.emailTaken}}
+        {{#query.unknownError}}
+        <div id="error-other" class="alert alert-warning">
+            <p>Unknown error.</p>
+        </div>
+        {{/query.unknownError}}
+
         <form action="/user/editDo" method="post" class="row">
 
             <label class="col-xs-2 col-xxs-12"><strong>Email</strong></label>
