@@ -10,6 +10,7 @@
 /client/.sass-cache
 
 /client/cordova/platforms/**
+/client/cordova/config.xml
 /client/cordova/node_modules/**
 /client/cordova/plugins/**
 /client/cordova/www/**

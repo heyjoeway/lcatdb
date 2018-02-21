@@ -34,7 +34,8 @@ const EMAILS_TMP = TMP_DIR + "/emails";
 const CORDOVA_SRC = SRC_DIR + "/www_cordova";
 const CORDOVA_BUILD = BUILD_DIR + "/www_cordova";
 const CORDOVA_TMP = TMP_DIR + "/www_cordova";
-const CORDOVA_FINAL = "./cordova/www";
+const CORDOVA_ROOT = "./cordova";
+const CORDOVA_FINAL = CORDOVA_ROOT + "/www";
 
 var config = {};
 
@@ -143,6 +144,9 @@ config.replace.cordova = {
         cwd: CORDOVA_SRC + "/pages",
         src: ["**/*.html", "**/*.mustache"],
         dest: CORDOVA_TMP
+    }, {
+        src: [CORDOVA_ROOT + "/config.src.xml"],
+        dest: CORDOVA_ROOT + "/config.xml"
     }]
 };
 config.replace.cordova_final = {

@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.jojudge.lcatdb" version="<!--version-->" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name><!--title--></name>
+    <description>
+        An easy to use database for Lake Champlain citizen science observations.
+    </description>
+    <author email="admin@lcatdb.org" href="<!--url-->">
+        Joseph Judge
+    </author>
+
+    <content src="index.html" />
+    <preference name="loadUrlTimeoutValue" value="60000" />
+    <preference name="errorURL" value="file:///android_asset/www/index.html" />
+        <platform name="android">
+        <allow-intent href="market:*" />
+        <icon density="ldpi" src="res/icon/android/ldpi.png" />
+        <icon density="mdpi" src="res/icon/android/mdpi.png" />
+        <icon density="hdpi" src="res/icon/android/hdpi.png" />
+        <icon density="xhdpi" src="res/icon/android/xhdpi.png" />
+        <icon density="xxhdpi" src="res/icon/android/xxhdpi.png" />
+        <icon density="xxxhdpi" src="res/icon/android/xxxhdpi.png" />
+    </platform>
+    <engine name="android" spec="^7.0.0" />
+
+    <plugin name="cordova-plugin-whitelist" spec="1" />
+    <access origin="*" />
+    <allow-navigation href="<!--url-->/*" />
+    <!-- <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" /> -->
+    <!-- <allow-intent href="tel:*" /> -->
+    <!-- <allow-intent href="sms:*" /> -->
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <!-- <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform> -->
+
+    <plugin name="cordova-plugin-inappbrowser" spec="^2.0.1" />
+
+    <plugin name="cordova-plugin-remote-injection" spec="^0.5.2" />
+    
+    <plugin name="cordova-plugin-geolocation" spec="^4.0.1" />
+    
+    <plugin name="cordova-plugin-googlemaps" spec="^2.1.1">
+        <variable name="API_KEY_FOR_ANDROID" value="AIzaSyApkxIIDBDeimqgSG1-zGRAca6KvhWBXBo" />
+    </plugin>
+    
+    <plugin name="cordova-plugin-splashscreen" spec="^5.0.1" />
+    <preference name="SplashScreenDelay" value="3000" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="SplashMaintainAspectRatio" value="true" />
+    <platform name="android">
+        <splash density="land-hdpi" src="res/screen/android/screen-hdpi-landscape.png" />
+        <splash density="land-ldpi" src="res/screen/android/screen-ldpi-landscape.png" />
+        <splash density="land-mdpi" src="res/screen/android/screen-mdpi-landscape.png" />
+        <splash density="land-xhdpi" src="res/screen/android/screen-xhdpi-landscape.png" />
+        <splash density="port-hdpi" src="res/screen/android/screen-hdpi-portrait.png" />
+        <splash density="port-ldpi" src="res/screen/android/screen-ldpi-portrait.png" />
+        <splash density="port-mdpi" src="res/screen/android/screen-mdpi-portrait.png" />
+        <splash density="port-xhdpi" src="res/screen/android/screen-xhdpi-portrait.png" />
+    </platform>
+    
+    <plugin name="cordova-plugin-statusbar" spec="^2.4.1" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarStyle" value="lightcontent" />
+    <preference name="StatusBarBackgroundColor" value="#15609c" />
+</widget>
