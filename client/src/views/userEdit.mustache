@@ -37,6 +37,7 @@
                 <h6 class="text-danger">There is no email currently set.</h6>
                 <p>If you lose your username or password, you will no longer be able to recover your account.</p>
                 {{/email}}
+                <!--requires_email_start-->
                 {{#email}}
                 {{#verified}}
                 <p><strong class="text-success">&#10004;</strong>  This email has been verified.</p>
@@ -56,8 +57,9 @@
                 {{/verifyError}}
                 {{/verified}}
                 <br>
+                {{/email}}
+                <!--requires_email_end-->
             </div>
-            {{/email}}
 
             <label class="col-xs-2 col-xxs-12"><strong>First Name</strong></label>
             <div class="col-xs-10 col-xxs-12">

@@ -48,7 +48,12 @@
 
 	&:before {
 		opacity: 1 !important;
-	}
+    }
+}
+
+#sidebar_btn > svg {
+    width: 64px;
+    height: 64px;
 }
 
 #sidebar_cont {

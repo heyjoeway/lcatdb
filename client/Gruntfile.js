@@ -37,6 +37,8 @@ const CORDOVA_TMP = TMP_DIR + "/www_cordova";
 const CORDOVA_ROOT = "./cordova";
 const CORDOVA_FINAL = CORDOVA_ROOT + "/www";
 
+const ENABLE_EMAIL = false;
+
 var config = {};
 
 config.clean = {};
@@ -104,6 +106,12 @@ let replacements = [{
 }, {
     match: "<!--url-->",
     replacement: URL
+}, {
+    match: "<!--requires_email_start-->",
+    replacement: ENABLE_EMAIL ? "" : "<!--"
+}, {
+    match: "<!--requires_email_end-->",
+    replacement: ENABLE_EMAIL ? "" : "-->"    
 }];
 
 config.replace = {

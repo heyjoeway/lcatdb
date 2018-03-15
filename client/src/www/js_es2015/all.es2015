@@ -175,7 +175,7 @@ function updateNavbar() {
             $('#navbar').remove();
             $('#sidebar').remove();
             $('body').append(Mustache.render(template, offlineInfo.info()));
-            $("#sidebar_show").click(function() {
+            $("#sidebar_btn").click(function() {
                 setTimeout(showSidebar, 1);
             });
             handleOnline();
@@ -393,15 +393,17 @@ let sidebarOpen = false;
 
 function initSidebar() {
     $(window).click(hideSidebar);
-    $("#sidebar_show").click(function() {
+    $("#sidebar_btn").click(function() {
         setTimeout(showSidebar, 1);
     });
 }
 
 function showSidebar() {
-    $("#sidebar").show();    
+    $("#sidebar").show();
+    $("#sidebar-overlay").removeClass("hide");
     setTimeout(function() {
         $("#sidebar").addClass("sidebar_show");
+        $("#sidebar-overlay").removeClass("disabled");
         sidebarOpen = true;
     }, 10);
 }
@@ -410,8 +412,10 @@ function hideSidebar() {
     if (!sidebarOpen) return;
     sidebarOpen = false;
     $("#sidebar").removeClass("sidebar_show");
+    $("#sidebar-overlay").addClass("disabled");    
     setTimeout(function() {
-        $("#sidebar").hide();    
+        $("#sidebar").hide();
+        $("#sidebar-overlay").addClass("hide");
     }, 150);
 }
 

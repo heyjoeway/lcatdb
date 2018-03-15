@@ -12,6 +12,7 @@
         "rounds": 5
     },
     "email": {
+        "enabled": false,
         "service": "gmail",
         "auth": {
           "user": "joseph14078@gmail.com",

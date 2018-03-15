@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const mustache = require('mustache');
 const fs = require('fs');
 const Winston = require('winston');
+const Config = require("./config.json");
 
 let transporter, templates;
 
@@ -34,6 +35,11 @@ exports.send = function(config, success, failure) {
         failure(false);
     }
 
+    if (!Config.email.enabled) return fail({
+        "errorName": "disabled",
+        "errorNameFull": "Email.send.disabled"
+    });
+    
     transporter.sendMail(config, (error, data) => {
         if (error)
             return fail({
