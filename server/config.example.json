@@ -2,6 +2,7 @@
     "db": {
         "uri": "mongodb://main:jNBXyYvHS8XSeVKU@ds123370.mlab.com:23370/champy-db"
     },
+    "domain": "http://localhost:3000",    
     "session": {
         "secret": "T5RyO3Hvih0O4gWO",
         "duration": 3600000,
