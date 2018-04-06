@@ -8,6 +8,7 @@
 /client/tmp
 /client/build
 /client/.sass-cache
+/client/config.json
 
 /client/cordova/platforms/**
 /client/cordova/config.xml

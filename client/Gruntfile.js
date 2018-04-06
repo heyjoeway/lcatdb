@@ -37,7 +37,9 @@ const CORDOVA_TMP = TMP_DIR + "/www_cordova";
 const CORDOVA_ROOT = "./cordova";
 const CORDOVA_FINAL = CORDOVA_ROOT + "/www";
 
-const ENABLE_EMAIL = false;
+const Config = require("./config.json");
+
+const ENABLE_EMAIL = Config.email;
 
 var config = {};
 
@@ -358,8 +360,8 @@ require('load-grunt-tasks')(grunt); // Automatically loads all grunt tasks.
 // jfc why isn't this just included by default
 
 grunt.registerTask('default', [
-    // "www-clean",
-    "cordova-www",
+    "www-clean",
+    // "cordova-www",
     "views-clean",
     "emails-clean"
 ]);
