@@ -35,6 +35,8 @@ exports.send = function(config, success, failure) {
         failure(false);
     }
 
+    config.from = Config.email.auth.user;
+
     if (!Config.email.enabled) return fail({
         "errorName": "disabled",
         "errorNameFull": "Email.send.disabled"
