@@ -3,12 +3,14 @@ const fs = require('fs');
 module.exports = function(grunt) {
 
 const PACKAGE = require("./package.json");
+const CONFIG = require("./config.json");
+
 
 const TITLE = "lcatDB";
 // const URL = "http://joeybob.ddns.net:3000";
-const URL = "http://localhost:3000";
+const URL = CONFIG.url;
 const CORDOVA_BASE = '<base href="file:///android_asset/www/">';
-const MAP_URL = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAsPFPL4ttV7hbmVIF-BELdB9WD_c5SjJA&callback=initMap';
+const MAP_URL = CONFIG.map;
 
 const SRC_DIR = "./src";
 const BUILD_DIR = "./build";
@@ -37,9 +39,8 @@ const CORDOVA_TMP = TMP_DIR + "/www_cordova";
 const CORDOVA_ROOT = "./cordova";
 const CORDOVA_FINAL = CORDOVA_ROOT + "/www";
 
-const Config = require("./config.json");
 
-const ENABLE_EMAIL = Config.email;
+const ENABLE_EMAIL = CONFIG.email;
 
 var config = {};
 
