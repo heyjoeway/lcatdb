@@ -53,7 +53,7 @@ function changeConfig() {
         );
         $('#configuration-link').prop(
             'href',
-            '/configurations/' + configuration['_id']
+            `${serverUrl}/configurations/${configuration['_id']}`
         );
         $('.configuration-chosen').show();
         $('.configuration-notchosen').hide();

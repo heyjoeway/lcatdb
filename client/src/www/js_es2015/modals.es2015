@@ -1,36 +1,36 @@
+let modalsData = [{
+    selector: '#sensor-new',
+    title: 'Add New Sensor',
+    url: () => {
+        let cid = $('#configuration').text();        
+        return `/sensors/new?configuration=${cid}&modal=true`
+    },
+    callback: () => { window.location.reload(); }
+}, {
+    selector: '#sensor-existing',
+    title: 'Add Existing Sensor',
+    url: () => {
+        let cid = $('#configuration').text();
+        return `/configurations/${cid}/addSensor?modal=true`
+    },
+    callback: () => { window.location.reload(); }
+}, {
+    selector: '.sensor-remove',
+    title: 'Remove Sensor',
+    url: function(element) {
+        let cid = $('#configuration').text();
+        let sid = $(element).data('sid');
+        return `/configurations/${cid}/removeSensor?modal=true&sid=${sid}`;
+    },
+    callback: () => { window.location.reload(); }
+}];
+
 function initModals() {
-    let configuration = $('#configuration').text();
-    
-    $('#sensor-new').off('click').click(function(e) {
-        e.preventDefault();
-
-        modal(
-            'Add New Sensor',
-            `/sensors/new?configuration=${configuration}&modal=true`,
-            function() { window.location.reload(); }
-        );
-    });
-
-    $('#sensor-existing').off('click').click(function(e) {
-        e.preventDefault();
-
-        modal(
-            'Add Existing Sensor',
-            `/configurations/${configuration}/addSensor?modal=true`,
-            function() { window.location.reload(); }
-        );
-    });
-
-    $('.sensor-remove').off('click').click(function(e) {
-        e.preventDefault();
-
-        let sid = $(this).data('sid');
-
-        modal(
-            'Remove Sensor',
-            `/configurations/${configuration}/removeSensor?modal=true&sid=${sid}`,
-            function() { window.location.reload(); }
-        );
+    modalsData.forEach(data => {
+        $(data.selector).off('click').click(function(e) {
+            e.preventDefault();            
+            modal(data.title, data.url(this), data.callback);
+        });
     });
 }
 

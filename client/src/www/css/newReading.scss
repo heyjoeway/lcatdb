@@ -1,0 +1,46 @@
+.newReadingMap {
+    height: 512px;
+    width: 100%;
+}
+
+@media (max-width: 550px) {
+    .newReadingMap {
+        height: 256px;
+        width: 100%;
+        // position: absolute !important;
+        // left: 0;
+        // top: -256px;
+        // z-index: 999;
+        // box-shadow: 0 0 12px rgba(0,0,0,0.5);
+        // background: #888;
+    }
+
+    #page-newReading {
+        // padding-top: 314px !important;
+    }
+}
+
+.reading-more {
+    width: 100%;
+    position: relative;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    font-size: 10px;
+    /* this is literally just a grey pixel */
+    background-image: url('../img/reading/blackpixel.png');
+    color: #888;
+
+    background-repeat: repeat-x;
+    background-position-y: center;
+
+    &::before {
+        content: "Show More";
+        background: #fff;
+    }
+
+    &.spoiler-active::before {
+        content: "Show Less";
+    }
+}
+

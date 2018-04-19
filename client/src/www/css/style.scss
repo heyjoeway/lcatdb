@@ -12,6 +12,7 @@ $large-screen-width: 1200px;
 @import "spoiler";
 @import "tutorial";
 @import "reading";
+@import "newReading";
 @import "visualize";
 @import "map";
 @import "sidebar";
@@ -30,18 +31,6 @@ $large-screen-width: 1200px;
 .map {
     height: 512px;
     width: 100%;
-}
-
-.newReadingMap {
-    height: 512px;
-    width: 100%;
-}
-
-@media (max-width: 550px) {
-    .newReadingMap {
-        height: 256px;
-        width: 100%;
-    }
 }
 
 .h-inline {
@@ -71,38 +60,10 @@ $large-screen-width: 1200px;
     // line-height: 64px;
 }
 
-.reading-more {
-    width: 100%;
-    position: relative;
-    height: 24px;
-    line-height: 24px;
-    text-align: center;
-    font-size: 10px;
-    /* this is literally just a grey pixel */
-    background-image: url('../img/reading/blackpixel.png');
-    color: #DDDDDD;
-
-    background-repeat: repeat-x;
-    background-position-y: center;
-
-    &::before {
-        content: "Show More";
-        background: #fff;
-    }
-
-    &.spoiler-active::before {
-        content: "Show Less";
-    }
-}
 
 .modal iframe {
     width: 100%;
     border: none;
-}
-
-.dropdown-menu {
-    // padding: 16px;
-    // user-select: none;
 }
 
 .dropdown-item {
@@ -118,28 +79,9 @@ $large-screen-width: 1200px;
 }
 
 .bootstrap-select {
-    width: 140px !important;
+    width: auto !important;
+    min-width: 140px;
     margin-bottom: 10px;
-}
-
-#sidebar-overlay {
-    transition: opacity 0.15s;
-
-    opacity: 0.75;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    
-    top: 0;
-    left: 0;
-
-    z-index: 9997;
-    background: #333;
-    pointer-events: none;
-
-    &.disabled {
-        opacity: 0;
-    }
 }
 
 #loading-overlay {
@@ -230,4 +172,14 @@ a.disabled {
 
 .btn {
     margin-bottom: 8px;
+}
+
+.modal-body > iframe {
+    transition: height 0.2s;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }

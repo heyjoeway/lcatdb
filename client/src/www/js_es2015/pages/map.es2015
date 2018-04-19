@@ -70,7 +70,7 @@ function initData() {
 
     queries.forEach((query, arr, i) => {
 
-        $.post('/api/readings', query, function(dataSet, textStatus) {        
+        $.post(`${serverUrl}/api/readings`, query, function(dataSet, textStatus) {        
             if (textStatus == 'success') {
                 data.push(dataSet);
                 queriesLeft--;

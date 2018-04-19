@@ -24,7 +24,9 @@
                             <h3 class="h-inline">Sets</h3>
                         </div>
                         <div class="col-xs-7 col-xxs-8">
-                            <select id="list_set" class="form-control"></select>
+                            <select id="list_set" class="form-control" disabled>
+                                <option value="" disabled selected hidden>No data sets created.</option>
+                            </select>
                         </div>
                         <div class="col-xs-3 col-xxs-4">
                             <button id="new_set" class="btn btn-sm btn-primary">+</button>
@@ -207,14 +209,14 @@
                             </div>
 
                             <!-- Whitelist users -->
-                            <div class="form-check">
+                            <!-- <div class="form-check">
                                 <label class="form-check-label">
                                     <input  name="users.limit" class="form-check-input set-control"
                                             type="radio" value="whitelist"
                                             disabled>
                                     Allow entries from only the following users:
                                 </label>
-                            </div>
+                            </div> -->
 
                         </div>
 
@@ -262,14 +264,16 @@
 
             </div>
             <hr>
-            <div id="view_graphs" class="view row" style="display:none">
+            <div id="view_graphs" class="view row">
                 <div id="section_graphs" class="col-xs-12">
                     <div class="row">
                         <div class="col-xs-3 col-xxs-12">
                             <h3 class="h-inline">Graphs</h3>
                         </div>
                         <div class="col-xs-6 col-xxs-8">
-                            <select id="list_graph" class="form-control"></select>
+                            <select id="list_graph" class="form-control" disabled>
+                                <option value="" disabled selected hidden>No graphs created.</option>
+                            </select>
                         </div>
                         <div class="col-xs-3 col-xxs-4">
                             <div class="dropdown" style="display:inline-block">

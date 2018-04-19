@@ -3,8 +3,9 @@
     <input  name="values[{{index}}][data][temperature]" class="form-control normalize"
             type="number" step="any" required
             aria-describedby="addon-values_{{index}}_temperature"
-            data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
-    <span class="input-group-addon" id="addon-values_{{index}}_temperature">Meters</span>
+            data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial"
+            placeholder="Temperature">
+    <span class="input-group-addon" id="addon-values_{{index}}_temperature">Celcius</span>
     <br>
 </div>
 <div class="spoiler reading-more" data-spoiler-link="{{index}}"></div>
@@ -14,8 +15,9 @@
         <input  name="values[{{index}}][data][temperatureRange]" class="form-control normalize"
                 type="number" step="any" 
                 aria-describedby="addon-values_{{index}}_temperatureRange"
-                data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial">
-        <span id="addon-values_{{index}}_temperatureRange" class="input-group-addon">Meters</span>
+                data-unittype="temperature" data-unit="celcius" data-unitprefsystem="imperial"
+                placeholder="Temperature Range (Optional)">
+        <span id="addon-values_{{index}}_temperatureRange" class="input-group-addon">Celcius</span>
         <br>
     </div>
 </div>

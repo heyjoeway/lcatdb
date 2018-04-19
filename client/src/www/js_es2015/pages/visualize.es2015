@@ -20,7 +20,16 @@ function isUndefined(val) {
     return typeof val == 'undefined';
 }
 
-function jqValue($element, newVal) {
+function genUid(size = 32) {
+    let uid = "";
+    let charSet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+    for (let i = 0; i < size; i++) {
+        uid += charSet[Math.round(Math.random() * (charSet.length - 1))];
+    }
+    return uid;
+}
+
+function jqValue($element, newVal) { 
     let propType = $element.prop('type');
     if (isUndefined(newVal)) {
         let propVal = $element.val();
@@ -44,10 +53,9 @@ function jqValue($element, newVal) {
                 'checked',
                 $element.val() == newVal
             );
-        } else if (propType == 'checkbox')
+        } else if (propType == 'checkbox') {
             $element.prop('checked', newVal);
-        else
-            $element.val(newVal);
+        } else $element.val(newVal);
     }
 }
 
@@ -123,7 +131,7 @@ function setProps(selector, props) {
         }
 
         let propVal = getPropertyByPath(props, propName)
-        if (!propVal) return;
+        if (typeof propVal == "undefined") return;
 
         jqValue($element, propVal);
     });
@@ -163,16 +171,15 @@ class DataSet {
     }
 
     constructor(data) {
-        if (typeof data == 'string')
-            data = { "name": data };
-        
-        if (typeof data != 'undefined')
-            this.name = data.name;
+        data = data || {};
 
-        this.props = $.extend(
+        this.name = data.name || "N/A";
+        this.uid = data.uid || genUid();
+
+        this.props = this.defaultProps();
+        $.extend(
             true, // deep
-            {}, //target
-            this.defaultProps(),
+            this.props, //target
             data.props
         );
 
@@ -198,9 +205,9 @@ class DataSet {
     toJSON() {
         return {
             "name": this.name,
+            "uid": this.uid,
             "props": this.props
         };
-
     }
 
     toString() {
@@ -341,10 +348,11 @@ class DataSetManager {
             this.switchSet(setId);
         });
 
-        this.load();
-
+        this.setUidMap = {};
         this.callbacks = {};
         this.callbackCtr = 0;
+
+        this.load();
     }
 
     addCallback(callback) {
@@ -363,34 +371,40 @@ class DataSetManager {
     }
 
     clear() {
-        while (this.sets.length) {
-            this.deleteSet();
+        while (this.sets.length)
+            this.removeSet();
+
+        this.nameCounter = 0;
+    }
+
+    toJSON() {
+        return {
+            sets: this.sets.map(set => set.toJSON()),
+            nameCounter: this.nameCounter,
+            setCurrent: this.setCurrent
         }
     }
 
-    store() {
-        let setData = [];
-        this.sets.forEach((set) => {
-            setData.push(set.toJSON());
+    fromJSON(jsonObj) {
+        this.clear();
+        jsonObj.sets.forEach((setData) => {
+            this.addSet(new DataSet(setData));
         });
+        this.switchSet(jsonObj.setCurrent);
+        this.nameCounter = jsonObj.nameCounter || 0;
+    }
 
-        localStorage["visualize.dataSets"] = JSON.stringify(setData);
+
+    store() {
+        localStorage["visualize.DataSetManager"] = JSON.stringify(this.toJSON());
     }
 
     load() {
-        this.clear();
-        let setData;
-        try {
-            setData = JSON.parse(localStorage["visualize.dataSets"]);
-        } catch(e) { 
-            return;
-        }
-    
-        setData.forEach((data) => {
-            this.sets.push(new DataSet(data));
-        });
-
-        this.switchSet(0);
+        // try {
+            this.fromJSON(JSON.parse(
+                localStorage["visualize.DataSetManager"] || "{}"
+            ));
+        // } catch(e) { }
     }
 
     populateMenu() {
@@ -401,20 +415,31 @@ class DataSetManager {
             html += `<option value="${i}" ${selected}>${set.name}</option>`;
         });
 
+        $("#list_set").prop('disabled', html == '');
+        if (html == '')
+            html = `<option value="" disabled selected hidden>No data sets created.</option>`;
+
         $("#list_set").html(html);
     }
 
     newSet() {
-        let set = new DataSet(
-            "Set " + (this.nameCounter++)
-        );
+        let set = new DataSet({
+            name: "Set " + (this.nameCounter++)
+        });
 
-        set.addCallback(this.runCallbacks.bind(this));
-
-        this.sets.push(set);
-        this.switchSet(this.sets.length - 1);
+        this.addSet(set);
 
         this.runCallbacks("new");
+        this.switchSet(this.sets.length - 1);
+
+        this.store();
+    }
+
+    addSet(set) {
+        set.addCallback(this.runCallbacks.bind(this));
+        this.sets.push(set);
+        if (typeof set.uid != 'undefined')    
+           this.setUidMap[set.uid] = set;
     }
 
     switchSet(i) {
@@ -428,39 +453,50 @@ class DataSetManager {
 
         if (this.setCurrent == -1) {
             $('#section_properties').hide();
-            $('#view_graphs').hide();
+            // $('#view_graphs').hide();
             $('#section_description').show();
         } else {
             $('#section_properties').show();
-            $('#view_graphs').show();
+            // $('#view_graphs').show();
             $('#section_description').hide();
             this.sets[this.setCurrent].propsToControls();
         }
 
         this.populateMenu();
+    }
 
+    removeSet(i) {
+        if (this.sets.length == 0)
+            return;
+    
+        if (typeof i == 'undefined')
+            i = this.setCurrent;
+    
+        let set = this.sets[i];
+    
+        if (typeof set.uid != 'undefined')
+            delete this.setUidMap[set.uid];
+        this.sets.splice(i, 1);
+    
+        set.destroy();
+    
+        if (this.setCurrent >= this.sets.length)
+            this.setCurrent = this.sets.length - 1;
     }
 
     deleteSet(i) {
-        if (this.sets.length == 0)
-            return;
-
-        if (typeof i == 'undefined')
-            i = this.setCurrent;
-        
-        this.sets[i].destroy();
-        // delete this.sets[i];
-        this.sets.splice(i, 1);
-
-        if (this.setCurrent >= this.sets.length)
-            this.setCurrent = this.sets.length - 1;
-
+        this.removeSet(i);
         this.switchSet();
+        this.store();
     }
 
     controlChange(e) {
         this.sets[this.setCurrent].controlsToProps();
         this.store();
+    }
+
+    getSetByUid(setUid) {
+        return this.setUidMap[setUid];
     }
 }
 
@@ -470,21 +506,27 @@ class Graph {
     }
 
     constructor(data) {
-        if (typeof data == 'string')
-            data = { "name": data };
-        
         if (typeof data != 'undefined')
             this.name = data.name;
 
-        this.props = $.extend(
+        this.props = this.defaultProps();
+        $.extend(
             true, // deep
-            {}, //target
-            this.defaultProps(),
-            data.props
+            this.props, // target
+            data.props // src
         );
 
-        this.type = "None";
-        this.sets = [];
+        this.type = "none";
+        this.sets = data.sets || [];
+    }
+
+    toJSON() {
+        return {
+            "props": this.props,
+            "type": this.type,
+            "sets": this.sets.map(set => set.uid),
+            "name": this.name
+        }
     }
 
     addSet(dataSet) {
@@ -528,7 +570,7 @@ class Graph {
             if (data) this.data.push(data);
             setsLeft--;
             if (setsLeft == 0) callback(this.data);
-        }
+        };
 
         gotData();
 
@@ -536,7 +578,7 @@ class Graph {
             let query = set.propsToQuery();
             query.fields = fields;
 
-            $.post('/api/readings', query, (data, status) => {
+            $.post(`${serverUrl}/api/readings`, query, (data, status) => {
                 if (status == 'success') gotData(data);
             });
         });
@@ -546,7 +588,6 @@ class Graph {
         let html = '';
         return html;
     }
-
 }
 
 class GraphMap extends Graph {
@@ -768,7 +809,6 @@ class Graph2d extends Graph {
     }
 }
 
-
 class Graph3d extends Graph {
     static get typeName() { return "3-D Plot"; }
 
@@ -955,7 +995,7 @@ class GraphManager {
             this.createGraph();
         });
 
-        // this.load();
+        this.load();
     }
 
     callback(set, status) {
@@ -963,9 +1003,8 @@ class GraphManager {
     }
 
     clear() {
-        while (this.graphs.length) {
-            this.deleteGraph();
-        }
+        while (this.graphs.length)
+            this.removeGraph();
     }
 
     populateMenu() {
@@ -976,16 +1015,27 @@ class GraphManager {
             html += `<option value="${i}" ${selected}>${graph.name}</option>`;
         });
 
+        $("#list_graph").prop('disabled', html == '');
+        if (html == '')
+            html = `<option value="" disabled selected hidden>No graphs created.</option>`;
+
+
         $("#list_graph").html(html);
     }
 
     newGraph(type) {
         let graphType = graphTypeDict[type];
 
-        this.graphs.push(new graphType(
-            `Graph ${this.nameCounter++} (${graphType.typeName})`
-        ));
+        this.addGraph(new graphType({
+            "name": `Graph ${this.nameCounter++} (${graphType.typeName})`
+        }));
         this.switchGraph(this.graphs.length - 1);
+
+        this.store();
+    }
+
+    addGraph(graph) {
+        this.graphs.push(graph);
     }
 
     switchGraph(i) {
@@ -1012,21 +1062,25 @@ class GraphManager {
         this.updateSets();
     }
 
-    deleteGraph(i) {
+    removeGraph(i) {
         if (this.graphs.length == 0)
             return;
-
+    
         if (typeof i == 'undefined')
             i = this.graphCurrent;
         
         this.graphs[i].destroy();
-        // delete this.graphs[i];
         this.graphs.splice(i, 1);
-
+    
         if (this.graphCurrent >= this.graphs.length)
             this.graphCurrent = this.graphs.length - 1;
 
+    }
+
+    deleteGraph(i) {
+        this.removeGraph(i);
         this.switchGraph();
+        this.store();
     }
 
     updateSets() {
@@ -1059,6 +1113,8 @@ class GraphManager {
         this.graphs[this.graphCurrent].addSet(set);
 
         this.updateSets();
+
+        this.store();
     }
 
     removeSets() {
@@ -1069,6 +1125,8 @@ class GraphManager {
         });
 
         this.updateSets();
+
+        this.store();
     }
 
     createGraph() {
@@ -1080,7 +1138,46 @@ class GraphManager {
 
     controlChange(e) {
         this.graphs[this.graphCurrent].controlsToProps();
-        // this.store();
+        this.store();
+    }
+
+    toJSON() {
+        return {
+            graphs: this.graphs.map(graph => graph.toJSON()),
+            nameCounter: this.nameCounter,
+            graphCurrent: this.graphCurrent
+        };
+    }
+
+    fromJSON(jsonObj) {
+        this.clear();
+
+        jsonObj.graphs.forEach(graph => {
+            let graphType = graphTypeDict[graph.type];
+
+            this.addGraph(new graphType({
+                "props": graph.props,
+                "name": graph.name,
+                "sets": graph.sets.map(
+                    setUid => this.dataSetManager.getSetByUid(setUid)
+                )
+            }));
+        });
+
+        this.switchGraph(jsonObj.graphCurrent);
+        this.nameCounter = jsonObj.nameCounter;
+    }
+
+    store() {
+        localStorage["visualize.GraphManager"] = JSON.stringify(this.toJSON());
+    }
+
+    load() {
+        // try {
+            this.fromJSON(JSON.parse(
+                localStorage["visualize.GraphManager"] || "{}"
+            ));
+        // } catch (e) { }
     }
 }
 
