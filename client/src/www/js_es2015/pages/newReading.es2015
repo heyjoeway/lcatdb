@@ -68,11 +68,6 @@ function changeConfig() {
 // ----------------------------------------------------------------------------
 
 function updateMap() {
-    if (typeof cordova == 'undefined') updateMapWeb();
-    else updateMapCordova();
-}
-
-function updateMapWeb() {
     let lat = $('input[name="location[lat]"]').val();
     let long = $('input[name="location[long]"]').val();
 
@@ -81,68 +76,43 @@ function updateMapWeb() {
         long = -73.32539651979982;
     }
     
-    let pos = new google.maps.LatLng(lat, long);
+    let pos = [lat, long];
 
-    marker.setPosition(pos);
-    map.setCenter(pos);
-}
-
-function updateMapCordova() {
-    let lat = $('input[name="location[lat]"]').val();
-    let long = $('input[name="location[long]"]').val();
-
-    if ((lat == 0) && (long == 0)) {
-        lat = 44.57670853058025;
-        long = -73.32539651979982;
-    }
-    
-    let pos = {
-        lat: parseFloat(lat),
-        lng: parseFloat(long)
-    };
-
-    try {
-        marker.setPosition(pos);
-    } catch(e) { }
-    map.animateCamera({
-        target: pos,
-        duration: 1000
-    });
+    marker.setLatLng(pos);
+    map.panTo(pos);
 }
 
 // ----------------------------------------------------------------------------
 
 function initMap() {
-    if (typeof cordova == 'undefined')
-        setTimeout(initMapWeb, 1000);
-    else initMapCordova(); 
-}
+    let pos = [
+        44.57670853058025,
+        -73.32539651979982
+    ];
 
-function initMapWeb() {
-    let pos = {
-        "lat": 44.57670853058025,
-        "lng": -73.32539651979982
-    };
-
-    map = new google.maps.Map(document.getElementById('map'), {
-        "zoom": 11,
-        "center": pos,
-        "streetViewControl": false,
-        "mapTypeId": "terrain",
-        "scrollwheel": false
+    map = L.map('map');
+    map.on('load', () => {
+        setInterval(() => {
+            map.invalidateSize();
+        }, 1000);
     });
+    map.setView(pos, 11);
+
+    let layer = L.tileLayer(mapConfig.url, mapConfig.options);
+    layer.addTo(map);
+
+    marker = L.marker(pos, {
+        draggable: true,
+        autoPan: true,
+        icon: L.icon({
+            iconUrl: './img/map/markerRed.png'
+        })
+    }).addTo(map);
     
-    marker = new google.maps.Marker({
-        "map": map,
-        "draggable": true,
-        "animation": google.maps.Animation.DROP,
-        "position": pos
-    });
-
-    google.maps.event.addListener(marker, 'dragend', () => {
-        var pos = marker.getPosition();
-        $('input[name="location[lat]"]').val(pos.lat()).change();
-        $('input[name="location[long]"]').val(pos.lng()).change();
+    marker.on('dragend', () => {
+        var pos = marker.getLatLng();
+        $('input[name="location[lat]"]').val(pos.lat).change();
+        $('input[name="location[long]"]').val(pos.lng).change();
         updateMap();
     });
 
@@ -150,60 +120,6 @@ function initMapWeb() {
     $('input[name="location[long]"]').change(updateMap);
 
     getLocation(true);
-}
-
-function initMapCordova() {
-    map = plugin.google.maps.Map.getMap(document.getElementById('map'), {
-        "mapType": plugin.google.maps.MapTypeId.TERRAIN,
-        "controls": {
-            "compass": true,
-            "myLocationButton": true,
-            "indoorPicker": false,
-            "zoom": true
-        },
-        "camera": {
-            "target": {
-                "lat": 44.57670853058025,
-                "lng": -73.32539651979982
-            },
-            zoom: 11
-        },
-        "preferences": {
-            "zoom": {
-                "minZoom": 10,
-                "maxZoom": 18
-            },
-            "building": true
-        }
-    });
-
-    map.one(plugin.google.maps.event.MAP_READY, function() {
-        marker = map.addMarker({
-            "position": {
-                "lat": 44.57670853058025,
-                "lng": -73.32539651979982
-            },
-            "draggable": true,
-            'title': "Your Location",
-            'snippet': "Press a few seconds on this marker to drag.",
-        }, function(marker) {
-            window.marker = marker;
-    
-            marker.on(plugin.google.maps.event.MARKER_DRAG_END, function() {
-                let pos = marker.getPosition();
-                $('input[name="location[lat]"]').val(pos.lat).change();
-                $('input[name="location[long]"]').val(pos.lng).change();
-                updateMapCordova();
-            });
-        
-            $('input[name="location[lat]"]').change(updateMapCordova);
-            $('input[name="location[long]"]').change(updateMapCordova);
-        
-            getLocation(true);
-        });
-    });
-
-
 }
 
 // ----------------------------------------------------------------------------
@@ -250,13 +166,6 @@ function initSensorBtns() {
 // ----------------------------------------------------------------------------
 
 function getLocation(auto) {
-    if (auto && !(localStorage['location.auto'] == 'true')) return updateMap();
-
-    if (typeof cordova == 'undefined') getLocationWeb();
-    else getLocationCordova();
-}
-
-function getLocationWeb() {
     if (!mobileDetect.phone()) return;
     if (!navigator.geolocation) {
         $.notify({
@@ -293,28 +202,6 @@ function getLocationWeb() {
             "timeout": 15 * 1000 // 15 sec (may increase)
         }
     );
-}
-
-function getLocationCordova() {
-    map.getMyLocation(function(location) {
-
-        $('input[name="location[lat]"]')
-            .val(location.latLng.lat)
-            .change();
-        $('input[name="location[long]"]')
-            .val(location.latLng.lng)
-            .change();
-        $('input[name="location[range]"]')
-            .val('')
-            .change();
-        $('input[name="location[alt]"]')
-            .val('')
-            .change();
-        $('input[name="location[altRange]"]')
-            .val('')
-            .change();
-        updateMapCordova(); 
-    }, getLocationFail);
 }
 
 function getLocationFail() {
@@ -462,66 +349,12 @@ function init() {
         .val((new Date).getTime())
         .change();
 
-    if (typeof window.parent.cordova != 'undefined') {
-        window.pluginWait = setInterval(function() {
-            if (window.parent.plugin) {
-                window.google = window.parent.plugin.google;
-                initMap();
-                clearInterval(window.pluginWait);
-            }
-        }, 1000);
-    } else $.getScript(`<!--map_url-->`); // this gets replaced by grunt
-
     $("#location_auto").prop('checked', localStorage['location.auto'] == 'true');
     $("#location_auto").change(function() {
         localStorage['location.auto'] = $(this).prop('checked').toString();
     });
+
+    initMap();
 }
 
 $(window).ready(init);
-
-
-// function prefValue(key, val) {
-//     if (val) localStorage[`configurations.${configurationId}.${key}`] = val;
-//     return localStorage[`configurations.${configurationId}.${key}`];
-// }
-
-// let prefHandlers = [
-//     {
-//         "name": 'location_auto',
-//         "load": function() {
-//             let queryObj = urlQueryObj(location.href);
-
-//             if ('quick' in queryObj) prefValue(this.name, true)
-
-//             let isSet = prefValue(this.name) == 'true';
-
-//             $('#' + this.name).prop('checked', isSet);
-//             if (isSet) getLocation();
-//         },
-//         "save": function() {
-//             prefValue(this.name, $('#' + this.name).prop('checked').toString());
-//         },
-//         "listen": function() {
-//             $('#' + this.name).change(() => { this.save() });
-//         }
-//     }
-// ];
-
-// function loadPrefs() {
-//     prefHandlers.forEach((handler) => {
-//         handler.load();
-//     });
-// }
-
-// function savePrefs() {
-//     prefHandlers.forEach((handler) => {
-//         handler.save();
-//     });
-// }
-
-// function listenPrefs() {
-//     prefHandlers.forEach((handler) => {
-//         handler.listen();
-//     });
-// }

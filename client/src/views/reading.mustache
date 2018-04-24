@@ -11,7 +11,6 @@
         {{#reading}}
         <div class="row">
             <div class="col-xs-12 col-sm-6">
-                <br>
                 <h2>Reading</h2>
                 {{#user}}
                 <a href="/newReading.html?configuration={{configuration}}" class="btn btn-primary">
@@ -128,7 +127,6 @@
                 <hr>
 
                 <h2 class="h-inline">Values</h2>
-                &nbsp;&nbsp;&nbsp;
                 <select id="unit-system-picker" class="selectpicker">
                     <option value="imperial" selected="selected">Imperial Units</option>
                     <option value="metric">Metric Units</option>
@@ -150,8 +148,8 @@
                 <hr>
             </div>
             <div class="col-xs-12 col-sm-6">
-                <h3>Map</h3>
-                <iframe class="map-iframe" src="./embed/map.html?embed=true&id={{_id}}"></iframe>
+                <h3 class="h-inline">Map</h3>
+                <div id="map-time" class="map-iframe" data-reading="{{_id}}"></div>
                 <br><br>
             </div>
         {{/reading}}
@@ -159,6 +157,7 @@
     </div>
 
     <!--scripts-->
+    <!--scripts_map-->
 </body>
 {{/query.marker}}
 {{#query.marker}}

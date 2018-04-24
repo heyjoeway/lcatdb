@@ -23,7 +23,7 @@
     <br>
     <div class="container text-center js">
         <h5 class="h-inline">View readings from the last&nbsp;</h5>
-        <select id="map-time-picker online_only_disable" class="selectpicker">
+        <select id="map-time-picker" class="online_only_disable selectpicker">
             <option value="86400">24 Hours</option>
             <option value="172800">48 Hours</option>
             <option value="604800" selected="selected">1 Week</option>
@@ -33,7 +33,7 @@
             <option value="31557600">1 Year</option>
         </select>
         <br>
-        <iframe id="map-time" class="map-iframe" src="./embed/map.html?embed=true&timeAgo=604800"></iframe>
+        <div id="map-time" class="map-iframe" src="./embed/map.html?embed=true&timeAgo=604800"></div>
 </div>
     <br>
     <div class="container text-center">
@@ -47,8 +47,11 @@
     </div>
 
     <!--footer-->
-    <!--scripts-->
 
+    <!--scripts-->
+    <!--scripts_map-->
+    
     <script src="./js/lib/jquery.backstretch.min.js"></script>
+        
     <script src="./js/pages/home.js"></script>
 </body>

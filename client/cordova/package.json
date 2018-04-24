@@ -12,7 +12,6 @@
     "dependencies": {
         "cordova-android": "^7.1.0",
         "cordova-plugin-geolocation": "^4.0.1",
-        "cordova-plugin-googlemaps": "^2.1.1",
         "cordova-plugin-inappbrowser": "^2.0.1",
         "cordova-plugin-remote-injection": "^0.5.2",
         "cordova-plugin-splashscreen": "^5.0.1",
@@ -25,9 +24,6 @@
             "cordova-plugin-inappbrowser": {},
             "cordova-plugin-remote-injection": {},
             "cordova-plugin-geolocation": {},
-            "cordova-plugin-googlemaps": {
-                "API_KEY_FOR_ANDROID": "AIzaSyApkxIIDBDeimqgSG1-zGRAca6KvhWBXBo"
-            },
             "cordova-plugin-splashscreen": {},
             "cordova-plugin-statusbar": {}
         },

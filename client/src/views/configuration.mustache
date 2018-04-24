@@ -9,10 +9,9 @@
     <div class="container">
     {{#configuration}}
         <div class="hide" id="configuration">{{_id}}</div>
-
+        <br>
         <h2 class="h-inline">Configuration</h2>
         {{#canEdit}}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a role="button" class="btn btn-primary btn-lg" href="/newReading.html?configuration={{_id}}">Submit Reading</a>
         <br class="visible-xxs">
         {{/canEdit}}
@@ -84,7 +83,6 @@
         <hr>
 
         <h3 class="h-inline">Map</h3>
-        &nbsp;&nbsp;
         <select id="map-time-picker" class="selectpicker">
             <option value="86400">Last 24 Hours</option>
             <option value="172800">Last 48 Hours</option>
@@ -95,7 +93,7 @@
             <option value="31557600">Last 1 Year</option>
         </select>
         <br>
-        <iframe id="map-time" class="map-iframe" src="./embed/map.html?embed=true&configuration={{_id}}&timeAgo=604800"></iframe>
+        <div id="map-time" class="map-iframe" data-configuration="{{_id}}"></div>
 
         <hr>
 
@@ -117,6 +115,7 @@
     </div>
 
     <!--scripts-->
+    <!--scripts_map-->    
 
     <script src="/js/modals.js"></script>
 </body>

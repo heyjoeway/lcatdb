@@ -137,6 +137,29 @@ function setProps(selector, props) {
     });
 }
 
+class CallbackChannel {
+    constructor() {
+        this.callbacks = {};
+        this.callbackCtr = 0;
+    }
+
+    add(callback) {
+        this.callbacks[this.callbackCtr] = callback;
+        return this.callbackCtr++;
+    }
+
+    remove(key) {
+        delete this.callbacks[key];
+    }
+
+    run(status, data) {
+        Object.keys(this.callbacks).forEach((key) => {
+            this.callbacks[key](status, data);
+        });
+    }
+}
+
+
 class DataSet {
     defaultProps() {
         return {
@@ -183,23 +206,7 @@ class DataSet {
             data.props
         );
 
-        this.callbacks = {};
-        this.callbackCtr = 0;
-    }
-
-    addCallback(callback) {
-        this.callbacks[this.callbackCtr] = callback;
-        return this.callbackCtr++;
-    }
-
-    removeCallback(key) {
-        delete this.callbacks[key];
-    }
-
-    runCallbacks(status) {
-        Object.keys(this.callbacks).forEach((key) => {
-            this.callbacks[key](this, status);
-        });
+        this.callbacks = new CallbackChannel();
     }
 
     toJSON() {
@@ -216,7 +223,7 @@ class DataSet {
 
     controlsToProps() {
         let newProps = getProps('.set-control', this.props);
-        this.runCallbacks("props");
+        this.callbacks.run("DataSet.props");
     }
 
     propsToControls() {
@@ -321,7 +328,9 @@ class DataSet {
     }
 
     destroy() {
-        this.runCallbacks("destroy");
+        this.callbacks.run("DataSet.destroy", {
+            set: this
+        });
     }
 }
 
@@ -349,25 +358,8 @@ class DataSetManager {
         });
 
         this.setUidMap = {};
-        this.callbacks = {};
-        this.callbackCtr = 0;
-
+        this.callbacks = new CallbackChannel();
         this.load();
-    }
-
-    addCallback(callback) {
-        this.callbacks[this.callbackCtr] = callback;
-        return this.callbackCtr++;
-    }
-
-    removeCallback(key) {
-        delete this.callbacks[key];
-    }
-
-    runCallbacks(status) {
-        Object.keys(this.callbacks).forEach((key) => {
-            this.callbacks[key](this, status);
-        });
     }
 
     clear() {
@@ -394,17 +386,14 @@ class DataSetManager {
         this.nameCounter = jsonObj.nameCounter || 0;
     }
 
-
     store() {
         localStorage["visualize.DataSetManager"] = JSON.stringify(this.toJSON());
     }
 
     load() {
-        // try {
-            this.fromJSON(JSON.parse(
-                localStorage["visualize.DataSetManager"] || "{}"
-            ));
-        // } catch(e) { }
+        this.fromJSON(JSON.parse(
+            localStorage["visualize.DataSetManager"] || "{}"
+        ));
     }
 
     populateMenu() {
@@ -429,14 +418,16 @@ class DataSetManager {
 
         this.addSet(set);
 
-        this.runCallbacks("new");
+        this.callbacks.run("DataSetManager.new");
         this.switchSet(this.sets.length - 1);
 
         this.store();
     }
 
     addSet(set) {
-        set.addCallback(this.runCallbacks.bind(this));
+        set.callbacks.add(status => {
+            this.callbacks.run(status);
+        });
         this.sets.push(set);
         if (typeof set.uid != 'undefined')    
            this.setUidMap[set.uid] = set;
@@ -453,11 +444,9 @@ class DataSetManager {
 
         if (this.setCurrent == -1) {
             $('#section_properties').hide();
-            // $('#view_graphs').hide();
             $('#section_description').show();
         } else {
             $('#section_properties').show();
-            // $('#view_graphs').show();
             $('#section_description').hide();
             this.sets[this.setCurrent].propsToControls();
         }
@@ -466,8 +455,7 @@ class DataSetManager {
     }
 
     removeSet(i) {
-        if (this.sets.length == 0)
-            return;
+        if (this.sets.length == 0) return;
     
         if (typeof i == 'undefined')
             i = this.setCurrent;
@@ -516,8 +504,12 @@ class Graph {
             data.props // src
         );
 
+        this.callbacks = new CallbackChannel();
+
         this.type = "none";
-        this.sets = data.sets || [];
+
+        this.sets = [];
+        data.sets.forEach(set => this.addSet(set));
     }
 
     toJSON() {
@@ -530,30 +522,32 @@ class Graph {
     }
 
     addSet(dataSet) {
-        dataSet.addCallback((set, status) => {
-            if (status == "destroy") this.removeSet(set);
+        dataSet.callbacks.add((status, data) => {
+            if (status == "DataSet.destroy")
+                this.removeSet(data.set);
         });
         this.sets.push(dataSet);
     }
 
-    getSetID(dataSet) {
-        let id;
+    getSetIndex(dataSet) {
+        let index;
         this.sets.some((dataSetIn, i) => {
             if (dataSet === dataSetIn) {
-                id = i;
+                index = i;
                 return true;
             }
-            return false;
         });
-        return id;
+        return index;
     }
 
     removeSet(dataSet) {
         let i;
         if (typeof dataSet == 'number') i = dataSet;
-        else i = this.getSetID(dataSet);
+        else i = this.getSetIndex(dataSet);
 
         this.sets.splice(i, 1);
+
+        this.callbacks.run("Graph.removeSet");
     }
 
     propsToControls() {
@@ -962,7 +956,7 @@ class GraphManager {
         this.graphCurrent = -1;
         this.nameCounter = 1;
         this.dataSetManager = dataSetManager;
-        this.dataSetManager.addCallback(this.callback.bind(this));
+        this.dataSetManager.callbacks.add(this.callback.bind(this));
 
         this.setsAvailable = [];
 
@@ -998,7 +992,7 @@ class GraphManager {
         this.load();
     }
 
-    callback(set, status) {
+    callback(status) {
         this.updateSets();
     }
 
@@ -1036,6 +1030,12 @@ class GraphManager {
 
     addGraph(graph) {
         this.graphs.push(graph);
+        graph.callbacks.add(status => {
+            if (status == "Graph.removeSet") {
+                this.updateSets();
+                this.store();
+            }
+        });
     }
 
     switchGraph(i) {
@@ -1109,6 +1109,7 @@ class GraphManager {
 
     addSet() {
         let i = parseInt($("#list_setsgraphavail").val());
+        if (isNaN(i)) return;
         let set = this.setsAvailable[i];
         this.graphs[this.graphCurrent].addSet(set);
 

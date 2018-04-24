@@ -6,7 +6,7 @@
 .dashboard-map-container {
     flex-grow: 1;
     position: relative;
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
 }
 
 .dashboard-mapcontrols {
@@ -14,6 +14,7 @@
     bottom: 16px;
     left: 16px;
     padding-right: 64px;
+    z-index: 999;
 }
 
 .dashboard-container {

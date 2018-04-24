@@ -42,10 +42,6 @@
     
     <plugin name="cordova-plugin-geolocation" spec="^4.0.1" />
     
-    <plugin name="cordova-plugin-googlemaps" spec="^2.2.9">
-        <variable name="API_KEY_FOR_ANDROID" value="AIzaSyApkxIIDBDeimqgSG1-zGRAca6KvhWBXBo" />
-    </plugin>
-    
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.1" />
     <preference name="SplashScreenDelay" value="3000" />
     <preference name="ShowSplashScreenSpinner" value="false" />

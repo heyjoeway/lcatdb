@@ -1,0 +1,22 @@
+window.mapConfig = {
+    url: 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',
+    options: {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1Ijoiam9zZXBoMTQwNzgiLCJhIjoiY2pnNnZhYmc3MXRyeTJ4bGpmcnF3ZjU5YyJ9.sYOiRq8431qdgT3ZCCp3bQ',
+        useCache: true,
+        crossOrigin: true
+    }
+};
+
+$('document').ready(() => {
+    if (document.getElementById("map-time")) {
+        let map = new QueryMap({
+            selector: 'map-time',
+            useElementData: true,
+            timePicker: '#map-time-picker',
+            userPicker: '#map-user-picker'
+        });
+    }
+})

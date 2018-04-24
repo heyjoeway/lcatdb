@@ -4,6 +4,7 @@
 @import "./lib/bootstrap/bootstrap-datetimepicker";
 @import "./lib/spinner";
 @import "./lib/vis.min";
+@import "./lib/leaflet";
 
 $large-screen-width: 1200px;
 
@@ -20,7 +21,7 @@ $large-screen-width: 1200px;
 
 @media (max-width: 1199px) {
     body:not(.no-nav) {
-        padding-top: 70px;
+        padding-top: 64px;
     }
 }
 
@@ -37,6 +38,10 @@ $large-screen-width: 1200px;
     display: inline-block;
     vertical-align: middle;
     margin-top: 0;
+}
+
+h2, h3 {
+    padding-right: 16px;
 }
 
 .btn-img {
@@ -171,6 +176,10 @@ a.disabled {
 }
 
 .btn {
+    margin-bottom: 12px;
+}
+
+.btn-sm {
     margin-bottom: 8px;
 }
 

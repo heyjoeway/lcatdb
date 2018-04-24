@@ -1,153 +1,5 @@
-let queries, map, markers, data, mapLoaded = false, dataLoaded = false;
-
-let markerImages = [
-    '/img/map/markerRed.png',
-    '/img/map/markerYellow.png',
-    '/img/map/markerBlue.png',
-    '/img/map/markerGreen.png',
-    '/img/map/markerPurple.png',
-    '/img/map/markerOrange.png',
-    '/img/map/markerCyan.png',
-    '/img/map/markerBrown.png',
-    '/img/map/markerWhite.png',
-    '/img/map/markerGrey.png',
-    '/img/map/markerBlack.png'
-];
-
-function initBuoy() {
-    let marker = new google.maps.Marker({
-        "map": map,
-        "icon": '/img/map/markerBlack.png'
-    });
-
-    let markerInfoContent = `
-<a href="https://leibensperger.github.io/buoy.html">
-    For information on the SUNY Plattsburgh Lake Champlain Data Buoy, click here.
-</a>`;
-
-    let markerInfo = new google.maps.InfoWindow({
-        "content": markerInfoContent,
-        "maxWidth": 1000
-    });
-
-    marker.addListener('click', function() {
-        markerInfo.open(map, marker);
-    });
-
-    let location = new google.maps.LatLng(
-        44.60317,
-        -73.39378
-    );
-
-    marker.setPosition(location);
-}
-
-function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        "zoom": 11,
-        "center": {
-            "lat": 44.57670853058025,
-            "lng": -73.32539651979982
-        },
-        "streetViewControl": false,
-        "mapTypeId": "terrain",
-        "scrollwheel": false
-    });
-
-    mapLoaded = true;
-
-    let queryObj = urlQueryObj(window.location.toString());
-
-    if (queryObj.buoy) initBuoy();
-
-    updateMap();
-}
-
-function initData() {
-    dataLoaded = false;
-    data = [];
-    let queriesLeft = queries.length;
-
-    queries.forEach((query, arr, i) => {
-
-        $.post(`${serverUrl}/api/readings`, query, function(dataSet, textStatus) {        
-            if (textStatus == 'success') {
-                data.push(dataSet);
-                queriesLeft--;
-                if (queriesLeft == 0) {
-                    dataLoaded = true;
-                    updateMap();
-                }
-            }
-        });
-    });
-}
-
-function updateMap() {
-    if (!dataLoaded || !mapLoaded) return;
-
-    markers = markers || [];
-    markers.forEach((marker) => {
-        marker.setMap(null);
-    });
-    markers = [];
-
-    // ----
-
-    if (!data || !mapLoaded) return;
-
-    let bounds = new google.maps.LatLngBounds();
-
-    let markerImageIndex = 0;
-
-    let dataEmpty = true;
-
-    data.forEach((dataSet) => {
-        dataSet.forEach((reading) => {
-            let marker = new google.maps.Marker({
-                "map": map,
-                "icon": markerImages[markerImageIndex]
-            });
-
-            let markerInfoContent = `
-<iframe class="map-marker-iframe"
-    src="/readings/${reading['_id']}?marker=true">
-</iframe>`;
-
-            let markerInfo = new google.maps.InfoWindow({
-                "content": markerInfoContent,
-                "maxWidth": 1000
-            });
-
-            marker.addListener('click', function() {
-                markerInfo.open(map, marker);
-            });
-
-            let location = new google.maps.LatLng(
-                reading.location.lat,
-                reading.location.long
-            );
-
-            marker.setPosition(location);
-            bounds.extend(location);
-
-            markers.push(marker);
-
-            dataEmpty = false;
-        });
-        markerImageIndex = (markerImageIndex + 1) % markerImages.length;
-    });
-
-    if (dataEmpty) return;
-
-    map.fitBounds(bounds);
-    let zoomInterval = setTimeout(() => {
-        if (map.getZoom() > 12) map.setZoom(12);
-        else clearInterval(zoomInterval);
-    }, 100);
-}
-
-function init() {
+$(() => {
+    let queries;
     let queryObj = urlQueryObj(window.location.toString());
 
     if (queryObj.queries) {
@@ -197,7 +49,10 @@ function init() {
 
         queries = [query];
     }
-    initData();
-}
 
-window.onload = init;
+    window.map = new QueryMap({
+        selector: 'map',
+        queries: queries,
+        buoy: queryObj.buoy
+    });
+});

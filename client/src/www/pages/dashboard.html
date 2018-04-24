@@ -36,7 +36,7 @@
             <div class="dashboard-mapcontrols">
                 <select id="map-user-picker" class="selectpicker">
                     <option value="all">All Users</option>
-                    <option value="{{_id}}">Just Me</option>
+                    <option value="me">Just Me</option>
                 </select>
                 &nbsp;&nbsp;
                 <select id="map-time-picker" class="selectpicker">
@@ -50,11 +50,12 @@
                 </select>
                 <br>
             </div>
-            <iframe id="map-time" class="map-iframe" src="./embed/map.html?embed=true&timeAgo=604800"></iframe>
+            <div id="map-time" class="map-iframe"></div>
         </div>
     </div>
 
     <!--scripts-->
+    <!--scripts_map-->
 
     <script src="./js/lib/mustache.min.js"></script>    
     <script src="./js/pages/dashboard.js"></script>

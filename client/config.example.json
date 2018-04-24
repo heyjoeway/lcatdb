@@ -1,5 +1,4 @@
 {
     "email": true,
-    "url": "http://localhost:3000",
-    "map": "https://maps.googleapis.com/maps/api/js?key=AIzaSyAsPFPL4ttV7hbmVIF-BELdB9WD_c5SjJA&callback=initMap"
+    "url": "http://localhost:3000"
 }

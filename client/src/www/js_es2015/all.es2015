@@ -1,68 +1,28 @@
 let serverUrl = '<!--url-->';
 
 $('document').ready(() => {
-    function initMap() {
-        // window.mapTime = new Map('#map-time');
 
-        $('#map-time-picker').change(function() {
-            let queryObj = urlQueryObj($('#map-time').attr('src'));
-            queryObj.timeAgo = $(this).val();
-            let newUrl = './embed/map.html?';
+    $('.js').removeClass('js');
+    $('.no-js').hide();
     
-            Object.keys(queryObj).forEach((key) => {
-                newUrl += key + '=' + queryObj[key] + '&';
-            });
+    // ------------------------------------------------------------------------
     
-            newUrl = newUrl.substring(0, newUrl.length - 1);
+    let unitSystem = localStorage.unitSystem;
     
-            $('#map-time').attr('src', newUrl);
-        });
-    
-        $('#map-user-picker').change(function() {
-            let queryObj = urlQueryObj($('#map-time').attr('src'));
-            let creator = $(this).val();
-            if (creator == 'all') delete queryObj.creator;
-            else queryObj.creator = creator;
-            let newUrl = './embed/map.html?';
-    
-            Object.keys(queryObj).forEach((key) => {
-                newUrl += key + '=' + queryObj[key] + '&';
-            });
-    
-            newUrl = newUrl.substring(0, newUrl.length - 1);
-    
-            $('#map-time').attr('src', newUrl);
-        });
+    if (!unitSystem) {
+        unitSystem = 'imperial';
+        localStorage.unitSystem = 'imperial';
     }
+    
+    changeUnitSystem(unitSystem);
+    
+    $('#unit-system-picker').change(function() {
+        let system = $(this).val();
+        changeUnitSystem(system);
+    });
 
     // ------------------------------------------------------------------------
     
-    function initJs() {
-        $('.js').removeClass('js');
-        $('.no-js').hide();
-    }
-    
-    // ------------------------------------------------------------------------
-
-    function initUnitSystem() {
-        let unitSystem = localStorage.unitSystem;
-        
-        if (!unitSystem) {
-            unitSystem = 'imperial';
-            localStorage.unitSystem = 'imperial';
-        }
-    
-        changeUnitSystem(unitSystem);
-    
-        $('#unit-system-picker').change(function() {
-            let system = $(this).val();
-            changeUnitSystem(system);
-        });
-    }
-
-    initJs();
-    initMap();
-    initUnitSystem();
     initSidebar();
 
     handleOnline();
@@ -221,9 +181,6 @@ function handleOnline() {
     $(".offline_only_disable")
         .prop('disabled', navigator.onLine)
         [navigator.onLine ? 'addClass' : 'removeClass']('disabled');
-
-    if (navigator.onLine && $('#map-time')[0])
-        $('#map-time')[0].contentWindow.location.reload();
 }
 
 // ----------------------------------------------------------------------------
@@ -298,19 +255,27 @@ function modal(title, url, callback) {
     window.addEventListener('message', (e) => {
         let msg = e.data;
 
-        if (msg == 'modal.hide') {
-            $element.modal('hide');
-        } else if (msg == 'modal.lock') {
-            $element.find('.close').hide();
-            $element.find('.btn-close').hide();
-        } else if (msg == 'modal.unlock') {
-            $element.find('.close').show();
-            $element.find('.btn-close').show();
-        } else if (msg == 'modal.done') {
-            callback($element);
-        } else if (msg == 'modal.reload') {
-            window.location.reload();
-        }
+        let msgFunctions = {
+            'modal.hide': () => {
+                $element.modal('hide');
+            },
+            'modal.lock': () => {
+                $element.find('.close').hide();
+                $element.find('.btn-close').hide();
+            },
+            'modal.unlock': () => {
+                $element.find('.close').show();
+                $element.find('.btn-close').show();
+            },
+            'modal.done': () => {
+                callback($element);
+            },
+            'modal.reload': () => {
+                window.location.reload();
+            }
+        };
+
+        msgFunctions[msg]();
     }, false);
 
     $element.on('hidden.bs.modal', function() {
@@ -405,7 +370,7 @@ function showSidebar() {
         $("#sidebar").addClass("sidebar_show");
         $("#sidebar-overlay").removeClass("disabled");
         sidebarOpen = true;
-    }, 10);
+    }, 20);
 }
 
 function hideSidebar() {
@@ -416,5 +381,5 @@ function hideSidebar() {
     setTimeout(function() {
         $("#sidebar").hide();
         $("#sidebar-overlay").addClass("hide");
-    }, 150);
+    }, 250);
 }

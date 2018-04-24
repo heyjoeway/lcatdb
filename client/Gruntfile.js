@@ -10,7 +10,6 @@ const TITLE = "lcatDB";
 // const URL = "http://joeybob.ddns.net:3000";
 const URL = CONFIG.url;
 const CORDOVA_BASE = '<base href="file:///android_asset/www/">';
-const MAP_URL = CONFIG.map;
 
 const SRC_DIR = "./src";
 const BUILD_DIR = "./build";
@@ -98,8 +97,8 @@ let replacements = [{
     match: "<!--scripts-->",
     replacement: fs.readFileSync(`${TEMPLATES_DIR}/scripts.html`, "utf8")
 }, {
-    match: "<!--map_url-->",
-    replacement: MAP_URL
+    match: "<!--scripts_map-->",
+    replacement: fs.readFileSync(`${TEMPLATES_DIR}/scripts_map.html`, "utf8")
 }, {
     match: "<!--title-->",
     replacement: TITLE
