@@ -40,6 +40,8 @@
 
     <plugin name="cordova-plugin-remote-injection" spec="^0.5.2" />
     
+    <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
+    
     <plugin name="cordova-plugin-geolocation" spec="^4.0.1" />
     
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.1" />
