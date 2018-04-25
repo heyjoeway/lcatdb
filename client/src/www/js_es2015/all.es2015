@@ -138,7 +138,7 @@ function updateNavbar() {
             $("#sidebar_btn").click(function() {
                 setTimeout(showSidebar, 1);
             });
-            handleOnline();
+            handleOnline(true);
             appUrls();
         });
     });
@@ -167,8 +167,8 @@ function finishInputBlock() {
 
 // ----------------------------------------------------------------------------
 
-function handleOnline() {
-    if (window.onLinePrevious == navigator.onLine) return;
+function handleOnline(force) {
+    if (!force && (window.onLinePrevious == navigator.onLine)) return;
 
     window.onLinePrevious = navigator.onLine;
 

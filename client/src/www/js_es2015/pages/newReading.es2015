@@ -90,7 +90,9 @@ function initMap() {
         -73.32539651979982
     ];
 
-    map = L.map('map');
+    map = L.map('map', {
+        preferCanvas: true
+    });
     map.on('load', () => {
         setInterval(() => {
             map.invalidateSize();
@@ -167,14 +169,12 @@ function initSensorBtns() {
 
 function getLocation(auto) {
     if (!mobileDetect.phone()) return;
-    if (!navigator.geolocation) {
-        $.notify({
+    if (!navigator.geolocation)
+        return $.notify({
             "message": 'Could not retrieve location. Geolocation is not supported by this browser.'
         }, {
             "type": 'warning'
         });
-        return;
-    }
 
     navigator.geolocation.getCurrentPosition(
         (pos) => { // Success
@@ -193,7 +193,7 @@ function getLocation(auto) {
             $('input[name="location[altRange]"]')
                 .val(pos.coords.altitudeAccuracy)
                 .change();
-            updateMapWeb();
+            updateMap();
         },
         getLocationFail,
         { // Options

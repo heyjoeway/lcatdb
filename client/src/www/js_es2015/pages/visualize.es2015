@@ -366,7 +366,7 @@ class DataSetManager {
         while (this.sets.length)
             this.removeSet();
 
-        this.nameCounter = 0;
+        this.nameCounter = 1;
     }
 
     toJSON() {
@@ -379,11 +379,15 @@ class DataSetManager {
 
     fromJSON(jsonObj) {
         this.clear();
-        jsonObj.sets.forEach((setData) => {
+
+        let sets = jsonObj.sets || [];
+
+        sets.forEach((setData) => {
             this.addSet(new DataSet(setData));
         });
-        this.switchSet(jsonObj.setCurrent);
-        this.nameCounter = jsonObj.nameCounter || 0;
+        this.switchSet(jsonObj.setCurrent || -1);
+
+        this.nameCounter = jsonObj.nameCounter || 1;
     }
 
     store() {
@@ -509,7 +513,9 @@ class Graph {
         this.type = "none";
 
         this.sets = [];
-        data.sets.forEach(set => this.addSet(set));
+
+        let dataSets = data.sets || [];
+        dataSets.forEach(set => this.addSet(set));
     }
 
     toJSON() {
@@ -965,6 +971,7 @@ class GraphManager {
         });
 
         $('.new_graph').click((e) => {
+            console.log(e);
             this.newGraph($(e.target).data('type'));
         });
 
@@ -1153,7 +1160,9 @@ class GraphManager {
     fromJSON(jsonObj) {
         this.clear();
 
-        jsonObj.graphs.forEach(graph => {
+        let graphs = jsonObj.graphs || [];
+
+        graphs.forEach(graph => {
             let graphType = graphTypeDict[graph.type];
 
             this.addGraph(new graphType({
@@ -1165,8 +1174,8 @@ class GraphManager {
             }));
         });
 
-        this.switchGraph(jsonObj.graphCurrent);
-        this.nameCounter = jsonObj.nameCounter;
+        this.switchGraph(jsonObj.graphCurrent || -1);
+        this.nameCounter = jsonObj.nameCounter || 1;
     }
 
     store() {
