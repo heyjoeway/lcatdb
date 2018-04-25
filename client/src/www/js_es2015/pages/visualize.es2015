@@ -105,7 +105,6 @@ function getPropertyByPath(obj, path) {
 
         if (typeof obj == 'undefined') {
             console.log("ERROR: Couldn't find value.")
-            console.log($element);
             return true;
         }
 
@@ -385,9 +384,11 @@ class DataSetManager {
         sets.forEach((setData) => {
             this.addSet(new DataSet(setData));
         });
-        this.switchSet(jsonObj.setCurrent || -1);
-
         this.nameCounter = jsonObj.nameCounter || 1;
+        if (typeof jsonObj.setCurrent == "undefined")
+            this.switchSet(-1);
+        else
+            this.switchSet(jsonObj.setCurrent);
     }
 
     store() {
@@ -438,6 +439,8 @@ class DataSetManager {
     }
 
     switchSet(i) {
+        console.log(i);
+
         if (typeof i != 'undefined')
             this.setCurrent = i;
         
@@ -456,6 +459,8 @@ class DataSetManager {
         }
 
         this.populateMenu();
+
+        this.store();
     }
 
     removeSet(i) {
@@ -576,7 +581,7 @@ class Graph {
 
         this.sets.forEach((set) => {
             let query = set.propsToQuery();
-            query.fields = fields;
+            // query.fields = fields;
 
             $.post(`${serverUrl}/api/readings`, query, (data, status) => {
                 if (status == 'success') gotData(data);
@@ -608,12 +613,7 @@ class GraphMap extends Graph {
     }
 
     getData(callback) {
-        this.data = [];
-
-        this.sets.forEach((set) => {
-            let query = set.propsToQuery();
-            this.data.push(query);
-        });
+        this.data = this.sets.map(set => set.propsToQuery());
 
         callback(this.data);
     }
@@ -647,12 +647,7 @@ class GraphQuery extends Graph {
     }
 
     getData(callback) {
-        this.data = [];
-
-        this.sets.forEach((set) => {
-            let query = set.propsToQuery();
-            this.data.push(query);
-        });
+        this.data = this.sets.map(set => set.propsToQuery());
 
         callback(this.data);
     }
@@ -780,7 +775,7 @@ class Graph2d extends Graph {
         if (!props.y.var.startsWith('values'))
             fields[props.y.var] = 1;
 
-        super.getData((dataRaw) => {
+        super.getData(dataRaw => {
             this.data = this.organizeData(dataRaw);
             callback(this.data);
         }, fields);
@@ -860,6 +855,8 @@ class Graph3d extends Graph {
                     let valueVar = props[axis].var;
                     let isValue = valueVar.startsWith('values');
                     if (!isValue) {
+                        console.log(readingRaw);
+                        console.log(valueVar);
                         valueOrganized = getPropertyByPath(readingRaw, valueVar);
                     } else {
                         let valueType = valueVar.split('.')[1];
@@ -907,7 +904,7 @@ class Graph3d extends Graph {
         if (!props.y.var.startsWith('values'))
             fields[props.y.var] = 1;
 
-        super.getData((dataRaw) => {
+        super.getData(dataRaw => {
             this.data = this.organizeData(dataRaw);
             callback(this.data);
         }, fields);
@@ -1067,6 +1064,8 @@ class GraphManager {
 
         this.populateMenu();
         this.updateSets();
+
+        this.store();
     }
 
     removeGraph(i) {
@@ -1174,8 +1173,11 @@ class GraphManager {
             }));
         });
 
-        this.switchGraph(jsonObj.graphCurrent || -1);
         this.nameCounter = jsonObj.nameCounter || 1;
+        if (typeof jsonObj.graphCurrent == "undefined")
+            this.switchGraph(-1);
+        else
+            this.switchGraph(jsonObj.graphCurrent);
     }
 
     store() {

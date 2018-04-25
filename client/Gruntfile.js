@@ -5,9 +5,7 @@ module.exports = function(grunt) {
 const PACKAGE = require("./package.json");
 const CONFIG = require("./config.json");
 
-
 const TITLE = "lcatDB";
-// const URL = "http://joeybob.ddns.net:3000";
 const URL = CONFIG.url;
 const CORDOVA_BASE = '<base href="file:///android_asset/www/">';
 
@@ -37,9 +35,6 @@ const CORDOVA_BUILD = BUILD_DIR + "/www_cordova";
 const CORDOVA_TMP = TMP_DIR + "/www_cordova";
 const CORDOVA_ROOT = "./cordova";
 const CORDOVA_FINAL = CORDOVA_ROOT + "/www";
-
-
-const ENABLE_EMAIL = CONFIG.email;
 
 var config = {};
 
@@ -110,10 +105,25 @@ let replacements = [{
     replacement: URL
 }, {
     match: "<!--requires_email_start-->",
-    replacement: ENABLE_EMAIL ? "" : "<!--"
+    replacement: CONFIG.email ? "" : "<!--"
 }, {
     match: "<!--requires_email_end-->",
-    replacement: ENABLE_EMAIL ? "" : "-->"    
+    replacement: CONFIG.email ? "" : "-->"    
+}, {
+    match: "<!--map_url-->",
+    replacement: CONFIG.map.url
+}, {
+    match: "<!--map_attribution-->",
+    replacement: CONFIG.map.attribution
+}, {
+    match: "<!--map_id-->",
+    replacement: CONFIG.map.id
+}, {
+    match: "<!--map_token-->",
+    replacement: CONFIG.map.token
+}, {
+    match: "<!--email_bot-->",
+    replacement: CONFIG.emailAddressBot
 }];
 
 config.replace = {
@@ -279,8 +289,8 @@ config.babel.cordova = {
 
 config.uglify = {
     options: {
-        mangle: false,
-        beautify: true
+        mangle: true,
+        beautify: false
     }
 };
 config.uglify.www = {

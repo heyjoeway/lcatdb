@@ -1,4 +1,10 @@
 {
     "email": true,
-    "url": "http://localhost:3000"
+    "url": "http://localhost:3000",
+    "map": {
+        "url": "",
+        "token": "",
+        "attribution": "",
+        "id": ""
+    }
 }
