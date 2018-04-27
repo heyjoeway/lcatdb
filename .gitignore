@@ -15,6 +15,7 @@
 /client/cordova/node_modules/**
 /client/cordova/plugins/**
 /client/cordova/www/**
+/client/cordova/signing/**
 /client/cordova/config.xml
 
 .eslintrc.json

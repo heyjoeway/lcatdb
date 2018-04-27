@@ -72,7 +72,10 @@ class QueryMap {
             -73.39378
         ], {
                 icon: L.icon({
-                    iconUrl: './img/map/markerBlack.png'
+                    iconUrl: './img/map/markerBlack.png',
+                    iconAnchor: [12, 41],
+                    shadowUrl: './img/map/markerShadow.png',
+                    popupAnchor: [0, -41]
                 })
             }).addTo(this.map);
 
@@ -119,7 +122,10 @@ class QueryMap {
                     reading.location.long
                 ], {
                         icon: L.icon({
-                            iconUrl: mapMarkerImages[markerImageIndex]
+                            iconUrl: mapMarkerImages[markerImageIndex],
+                            iconAnchor: [12, 41],
+                            shadowUrl: './img/map/markerShadow.png',
+                            popupAnchor: [0, -41]
                         })
                     }).addTo(this.map);
 

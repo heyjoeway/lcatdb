@@ -105,7 +105,11 @@ function initMap() {
         draggable: true,
         autoPan: true,
         icon: L.icon({
-            iconUrl: './img/map/markerRed.png'
+            iconUrl: './img/map/markerRed.png',
+            shadowUrl: './img/map/markerRed.png',
+            iconAnchor: [12, 41],
+            shadowUrl: './img/map/markerShadow.png',
+            popupAnchor: [0, -41]
         })
     }).addTo(map);
     
@@ -166,7 +170,11 @@ function initSensorBtns() {
 // ----------------------------------------------------------------------------
 
 function getLocation(auto) {
+    if (auto && (localStorage['location.auto'] != 'true'))
+        return;
+
     if (!mobileDetect.phone()) return;
+
     if (!navigator.geolocation)
         return $.notify({
             "message": 'Could not retrieve location. Geolocation is not supported by this browser.'
@@ -193,7 +201,13 @@ function getLocation(auto) {
                 .change();
             updateMap();
         },
-        getLocationFail,
+        () => { // Failure
+            $.notify({
+                "message": 'Could not retrieve location. Please allow location on your device.'
+            }, {
+                "type": 'warning'
+            });
+        },
         { // Options
             "enableHighAccuracy": true,
             "maximumAge": 3 * 60 * 1000, // 3 minutes
@@ -202,13 +216,6 @@ function getLocation(auto) {
     );
 }
 
-function getLocationFail() {
-    $.notify({
-        "message": 'Could not retrieve location. Please allow location on your device.'
-    }, {
-        "type": 'warning'
-    });
-}
 
 // ----------------------------------------------------------------------------
 

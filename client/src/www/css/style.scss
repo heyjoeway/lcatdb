@@ -91,6 +91,7 @@ h2, h3 {
 
 #loading-overlay {
     transition: opacity 0.2s;
+    transition-delay: 0.5s;
 
     opacity: 0.75;
     position: fixed;
@@ -104,9 +105,9 @@ h2, h3 {
     background: #333;
 
     &.disabled {
-
         opacity: 0;
         pointer-events: none;
+        transition-delay: 0s;
     }
 }
 
