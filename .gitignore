@@ -12,11 +12,11 @@
 
 /client/cordova/platforms/**
 /client/cordova/config.xml
+/client/cordova/build.json
 /client/cordova/node_modules/**
 /client/cordova/plugins/**
 /client/cordova/www/**
 /client/cordova/signing/**
-/client/cordova/config.xml
 
 .eslintrc.json
 package-lock.json
