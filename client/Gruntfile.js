@@ -364,6 +364,45 @@ config.folder_list.www = {
     }]
 };
 
+config.concurrent = {};
+config.concurrent.www = [
+    'sass:www',
+    'htmlmin:www',
+    'www_js'
+];
+config.concurrent['cordova-www'] = [
+    'htmlmin:cordova',
+    'cordova-www_js'
+];
+config.concurrent['watch-all'] = [
+    "watch:views",
+    "watch:emails",
+    "watch:cordova"
+];
+
+config.watch = {};
+config.watch.www = {
+    files: WWW_SRC + "/**/*",
+    tasks: ["www-clean"]
+};
+config.watch.views = {
+    files: VIEWS_SRC + "/**/*",
+    tasks: ["views-clean"]
+};
+config.watch.emails = {
+    files: EMAILS_SRC + "/**/*",
+    tasks: ["emails-clean"]
+};
+config.watch.cordova = {
+    files: [
+        CORDOVA_SRC + "/**/*",
+        WWW_SRC + "/**/*"
+    ],
+    tasks: [
+        "cordova-clean"
+    ]
+};
+
 grunt.initConfig(config);
 
 require('load-grunt-tasks')(grunt); // Automatically loads all grunt tasks.
@@ -376,15 +415,20 @@ grunt.registerTask('default', [
     "emails-clean"
 ]);
 
+
+
 grunt.registerTask('cordova-www', [
     'www',
     'copy:cordova',
     'replace:cordova',
-    'babel:cordova',
-    'uglify:cordova',
-    'htmlmin:cordova',
+    'concurrent:cordova-www',
     'replace:cordova_final',
     'copy:cordova_final'
+]);
+
+grunt.registerTask('cordova-www_js', [
+    'babel:cordova',
+    'uglify:cordova',
 ]);
 
 grunt.registerTask('cordova', [
@@ -397,21 +441,27 @@ grunt.registerTask('cordova-clean', [
     'cordova-www'
 ]);
 
+
+
 grunt.registerTask('www-clean', [
     'clean:www',
     'www'
 ]);
 
 grunt.registerTask('www', [
-    'sass:www',
     'replace:www',
     'replace:www_recursive',
-    'htmlmin:www',
-    'babel:www',
-    'uglify:www',
+    'concurrent:www',
     'copy:www',
     'folder_list:www'
 ]);
+
+grunt.registerTask('www_js', [
+    'babel:www',
+    'uglify:www',
+]);
+
+
 
 grunt.registerTask('views-clean', [
     'clean:views',
@@ -424,6 +474,8 @@ grunt.registerTask('views', [
     'htmlmin:views'
 ]);
 
+
+
 grunt.registerTask('emails-clean', [
     'clean:emails',
     'emails'
@@ -432,6 +484,15 @@ grunt.registerTask('emails-clean', [
 grunt.registerTask('emails', [
     'replace:emails',
     'htmlmin:emails'
+]);
+
+
+
+grunt.registerTask('watch-all', [
+    "cordova-www",
+    "views-clean",
+    "emails-clean",
+    "concurrent:watch-all"
 ]);
 
 };

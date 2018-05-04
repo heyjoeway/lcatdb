@@ -10,10 +10,12 @@
             <h3 class="home-description">An easy to use database for Lake Champlain citizen science observations.</h3>
             <h5 class="home-description">Share your observations of water temperature and other data, or view recent submissions.</h5>
             <br>
+            <div class="appBanner appBanner-google">
+                <img style="width:100%;max-width:240px;margin-top:-38px" src="./img/app/google.png" />
+            </div>
             <a role="button" class="btn btn-primary btn-lg" href="./anonymous.html">Quick Submit</a>
             &nbsp;&nbsp;
             <a role="button" class="btn btn-primary btn-lg" href="./visualize.html">Quick View</a>
-            <br>
             <br>
             <a role="button" class="btn btn-default btn-lg" href="./login.html">Login</a>
             &nbsp;&nbsp;
@@ -33,7 +35,7 @@
             <option value="31557600">1 Year</option>
         </select>
         <br>
-        <div id="map-time" class="map-iframe" src="./embed/map.html?embed=true&timeAgo=604800"></div>
+        <div id="map-time" class="map-iframe" data-buoy="true"></div>
 </div>
     <br>
     <div class="container text-center">
@@ -44,6 +46,11 @@
         <a href="https://www.uvm.edu/seagrant/node/1">
             <img class="home-org" src="./img/home/seagrant.png">
         </a>
+
+        <div class="appBanner appBanner-google">
+             <span>Google Play and the Google Play logo are trademarks of Google LLC.</span>
+             <br><br>
+        </div>
     </div>
 
     <!--footer-->
