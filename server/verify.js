@@ -1,6 +1,6 @@
 const hat = require('hat');
 const Db = require('./db.js');
-const Bcrypt = require('bcrypt');
+const Bcrypt = require('bcryptjs');
 const Winston = require('winston');
 
 const Auth = require('./auth.js');

@@ -4,7 +4,7 @@
 
 const ObjectId = require('mongodb').ObjectId;
 const Winston = require('winston');
-const Bcrypt = require('bcrypt');
+const Bcrypt = require('bcryptjs');
 const deepmerge = require('deepmerge');
 const hat = require('hat');
 

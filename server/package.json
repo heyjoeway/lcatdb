@@ -21,7 +21,7 @@
   "homepage": "https://github.com/Joseph14078/champy-db#readme",
   "dependencies": {
     "ajv": "^5.1.4",
-    "bcrypt": "^1.0.3",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
     "client-sessions": "^0.8.0",
     "deepcopy": "^0.6.3",
