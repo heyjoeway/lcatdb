@@ -34,7 +34,7 @@ const CORDOVA_SRC = SRC_DIR + "/www_cordova";
 const CORDOVA_BUILD = BUILD_DIR + "/www_cordova";
 const CORDOVA_TMP = TMP_DIR + "/www_cordova";
 const CORDOVA_ROOT = "./cordova";
-const CORDOVA_FINAL = CORDOVA_ROOT + "/www";
+const CORDOVA_FINAL_ANDROID = CORDOVA_ROOT + "/merges/android/www";
 
 var config = {};
 
@@ -342,12 +342,12 @@ config.copy.cordova = {
         dest: CORDOVA_BUILD
     }]
 };
-config.copy.cordova_final = {
+config.copy.cordova_final_android = {
     files: [{
         expand: true,
         cwd: CORDOVA_BUILD,
         src: "**/*",
-        dest: CORDOVA_FINAL
+        dest: CORDOVA_FINAL_ANDROID
     }]
 };
 
@@ -423,7 +423,7 @@ grunt.registerTask('cordova-www', [
     'replace:cordova',
     'concurrent:cordova-www',
     'replace:cordova_final',
-    'copy:cordova_final'
+    'copy:cordova_final_android'
 ]);
 
 grunt.registerTask('cordova-www_js', [

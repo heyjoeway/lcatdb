@@ -15,7 +15,7 @@
 /client/cordova/build.json
 /client/cordova/node_modules/**
 /client/cordova/plugins/**
-/client/cordova/www/**
+/client/cordova/merges/android/www/**
 /client/cordova/signing/**
 
 .eslintrc.json
