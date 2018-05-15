@@ -15,8 +15,10 @@
 /client/cordova/build.json
 /client/cordova/node_modules/**
 /client/cordova/plugins/**
-/client/cordova/merges/android/www/**
+/client/cordova/merges/**
 /client/cordova/signing/**
 
 .eslintrc.json
 package-lock.json
+
+.DS_Store

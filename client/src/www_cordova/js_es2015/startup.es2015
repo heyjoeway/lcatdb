@@ -1,4 +1,4 @@
-$('document').ready(()=> {
+$('document').ready(() => {
     offlineInfo.get(true, function(gotNewInfo) {
         if (localStorage.offlineInfo)
             history.replaceState({}, '<!--title--> - Dashboard', './dashboard.html');

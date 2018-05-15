@@ -6,8 +6,5 @@ $(() => {
         './img/home/bg4.jpg'
     ], {duration: 5000, fade: 750});
 
-    if (isWebsite) {
-        let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (!iOS) $(".appBanner-google").show();
-    }
+    if (isWebsite && !isiOS) $(".appBanner-google").show();
 });

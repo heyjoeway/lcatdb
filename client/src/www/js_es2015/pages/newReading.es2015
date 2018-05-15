@@ -98,6 +98,7 @@ function initMap() {
     });
     map.setView(pos, 11);
 
+    let mapConfig = getMapConfig();
     let layer = L.tileLayer(mapConfig.url, mapConfig.options);
     layer.addTo(map);
 

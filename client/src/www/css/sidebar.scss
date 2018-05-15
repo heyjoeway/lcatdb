@@ -28,6 +28,8 @@
 
     display: none;
 
+    user-select: none;
+
 	&:before {
 		transition: opacity 0.2s;
 
@@ -65,7 +67,6 @@
 #sidebar_logo {
     position: relative;
     width: 256px;
-    height: 136px;
     fill: inherit;
     background-color: #2196f3;
     padding: 28px;
@@ -125,7 +126,10 @@
 @media (min-width: 1200px) {
     body:not(.no-nav) {
         padding-left: 256px;
-        padding-top: 32px;
+        
+        & > .container {
+            padding-top: 32px;
+        }
     }
 
     .container {
@@ -141,7 +145,7 @@
         }
     }
     
-    #navbar {
+    #navbar, #navbar-top-bg {
         display: none;
     }
 }
@@ -165,7 +169,7 @@
 
     z-index: 9997;
     background: #333;
-    pointer-events: none;
+    // pointer-events: none;
 
     &.disabled {
         opacity: 0;

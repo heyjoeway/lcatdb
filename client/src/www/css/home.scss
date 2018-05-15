@@ -3,6 +3,11 @@
     width: 100%;
     min-height: 60vh;
     padding: 16px 0;
+    padding-top: calc(constant(safe-area-inset-top) + 16px);
+    /* iOS 11.0 */
+    padding-top: calc(env(safe-area-inset-top) + 16px);
+    /* iOS 11.2 */
+
     background: #212121;
 
     display: flex;

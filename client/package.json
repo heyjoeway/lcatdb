@@ -1,6 +1,6 @@
 {
   "name": "champy-db-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "grunt-contrib-uglify": "~1.0.1",
     "grunt-contrib-watch": "^1.0.1",
     "grunt-folder-list": "^1.1.0",
+    "grunt-gitinfo": "^0.1.8",
     "grunt-replace": "^1.0.1",
     "load-grunt-tasks": "^3.5.2"
   }

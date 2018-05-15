@@ -7,7 +7,8 @@ const CONFIG = require("./config.json");
 
 const TITLE = "lcatDB";
 const URL = CONFIG.url;
-const CORDOVA_BASE = '<base href="file:///android_asset/www/">';
+const CORDOVA_ANDROID_BASE = '<base href="file:///android_asset/www/">';
+const CORDOVA_IOS_BASE = '<base href="./">';
 
 const SRC_DIR = "./src";
 const BUILD_DIR = "./build";
@@ -33,16 +34,24 @@ const EMAILS_TMP = TMP_DIR + "/emails";
 const CORDOVA_SRC = SRC_DIR + "/www_cordova";
 const CORDOVA_BUILD = BUILD_DIR + "/www_cordova";
 const CORDOVA_TMP = TMP_DIR + "/www_cordova";
+
 const CORDOVA_ROOT = "./cordova";
-const CORDOVA_FINAL_ANDROID = CORDOVA_ROOT + "/merges/android/www";
+
+const CORDOVA_ANDROID_FINAL = CORDOVA_ROOT + "/merges/android";
+const CORDOVA_IOS_FINAL = CORDOVA_ROOT + "/merges/ios";
 
 var config = {};
 
 config.clean = {};
 config.clean.cordova = [
-    "./build/www_cordova/**/*.*",
-    "./tmp/www_cordova/**/*.*",
-    "./cordova/www/**/*.*"
+    CORDOVA_BUILD + "/**/*.*",
+    CORDOVA_TMP + "/**/*.*"
+];
+config.clean.cordova_android = [
+    CORDOVA_ANDROID_FINAL + "/**/*.*"
+];
+config.clean.cordova_ios = [
+    CORDOVA_IOS_FINAL + "/**/*.*"
 ];
 config.clean.www = [
     "./build/www/**/*.*",
@@ -68,32 +77,38 @@ config.sass.www = {
     }]
 };
 
+config.gitinfo = {};
+
 // <!--nav--> must come before <!--nav_nouser--> and <!--nav_user-->!!!!!
+
+function readTemplate(template) {
+    return fs.readFileSync(`${TEMPLATES_DIR}/${template}`, "utf8");
+};
 
 let replacements = [{
     match: "<!--head-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/head.html`, "utf8")
+    replacement: readTemplate(`head.html`)
 }, {
     match: "<!--nav_user-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_user.html`, "utf8")
+    replacement: readTemplate(`nav_user.html`)
 }, {
     match: "<!--nav_nouser-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_nouser.html`, "utf8")
+    replacement: readTemplate(`nav_nouser.html`)
 }, {
     match: "<!--nav_auto-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_auto.html`, "utf8")
+    replacement: readTemplate(`nav_auto.html`)
 }, {
     match: "<!--nav_blank-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/nav_blank.html`, "utf8")
+    replacement: readTemplate(`nav_blank.html`)
 }, {
     match: "<!--footer-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/footer.html`, "utf8")
+    replacement: readTemplate(`footer.html`)
 }, {
     match: "<!--scripts-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/scripts.html`, "utf8")
+    replacement: readTemplate(`scripts.html`)
 }, {
     match: "<!--scripts_map-->",
-    replacement: fs.readFileSync(`${TEMPLATES_DIR}/scripts_map.html`, "utf8")
+    replacement: readTemplate(`scripts_map.html`)
 }, {
     match: "<!--title-->",
     replacement: TITLE
@@ -124,6 +139,11 @@ let replacements = [{
 }, {
     match: "<!--email_bot-->",
     replacement: CONFIG.emailAddressBot
+}, {
+    match: "<!--commit-->",
+    replacement: function() {
+        return grunt.config.data.gitinfo.local.branch.current.shortSHA;
+    }
 }];
 
 config.replace = {
@@ -169,11 +189,26 @@ config.replace.cordova = {
         dest: CORDOVA_ROOT + "/config.xml"
     }]
 };
-config.replace.cordova_final = {
+config.replace.cordova_android_final = {
     options: {
         patterns: [{
             match: "<!--base_cordova-->",
-            replacement: CORDOVA_BASE
+            replacement: CORDOVA_ANDROID_BASE
+        }],
+        prefix: ""
+    },
+    files: [{
+        expand: true,
+        cwd: CORDOVA_BUILD,
+        src: ["**/*.html", "**/*.mustache"],
+        dest: CORDOVA_BUILD
+    }]
+};
+config.replace.cordova_ios_final = {
+    options: {
+        patterns: [{
+            match: "<!--base_cordova-->",
+            replacement: CORDOVA_IOS_BASE
         }],
         prefix: ""
     },
@@ -342,12 +377,20 @@ config.copy.cordova = {
         dest: CORDOVA_BUILD
     }]
 };
-config.copy.cordova_final_android = {
+config.copy.cordova_android_final = {
     files: [{
         expand: true,
         cwd: CORDOVA_BUILD,
         src: "**/*",
-        dest: CORDOVA_FINAL_ANDROID
+        dest: CORDOVA_ANDROID_FINAL
+    }]
+};
+config.copy.cordova_ios_final = {
+    files: [{
+        expand: true,
+        cwd: CORDOVA_BUILD,
+        src: "**/*",
+        dest: CORDOVA_IOS_FINAL
     }]
 };
 
@@ -393,13 +436,22 @@ config.watch.emails = {
     files: EMAILS_SRC + "/**/*",
     tasks: ["emails-clean"]
 };
-config.watch.cordova = {
+config.watch.cordova_android = {
     files: [
         CORDOVA_SRC + "/**/*",
         WWW_SRC + "/**/*"
     ],
     tasks: [
-        "cordova-clean"
+        "cordova_android-clean"
+    ]
+};
+config.watch.cordova_ios = {
+    files: [
+        CORDOVA_SRC + "/**/*",
+        WWW_SRC + "/**/*"
+    ],
+    tasks: [
+        "cordova_ios-clean"
     ]
 };
 
@@ -416,15 +468,25 @@ grunt.registerTask('default', [
 ]);
 
 
-
 grunt.registerTask('cordova-www', [
     'www',
     'copy:cordova',
     'replace:cordova',
-    'concurrent:cordova-www',
-    'replace:cordova_final',
-    'copy:cordova_final_android'
+    'concurrent:cordova-www'
 ]);
+
+grunt.registerTask('cordova_android-www', [
+    'cordova-www',
+    'replace:cordova_android_final',
+    'copy:cordova_android_final'
+]);
+
+grunt.registerTask('cordova_ios-www', [
+    'cordova-www',
+    'replace:cordova_ios_final',
+    'copy:cordova_ios_final'
+]);
+
 
 grunt.registerTask('cordova-www_js', [
     'babel:cordova',
@@ -435,10 +497,18 @@ grunt.registerTask('cordova', [
     'cordova-www'
 ]);
 
-grunt.registerTask('cordova-clean', [
+grunt.registerTask('cordova_android-clean', [
     'clean:www',    
     'clean:cordova',
-    'cordova-www'
+    'clean:cordova_android',
+    'cordova_android-www'
+]);
+
+grunt.registerTask('cordova_ios-clean', [
+    'clean:www',    
+    'clean:cordova',
+    'clean:cordova_ios',
+    'cordova_ios-www'
 ]);
 
 
@@ -449,6 +519,7 @@ grunt.registerTask('www-clean', [
 ]);
 
 grunt.registerTask('www', [
+    'gitinfo',
     'replace:www',
     'replace:www_recursive',
     'concurrent:www',

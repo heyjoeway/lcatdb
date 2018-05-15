@@ -66,6 +66,7 @@ class QueryMap {
             11 // zoom
         );
 
+        let mapConfig = getMapConfig();
         let layer = L.tileLayer(mapConfig.url, mapConfig.options);
         layer.addTo(this.map);
     }
@@ -84,7 +85,8 @@ class QueryMap {
         }).addTo(this.map);
 
         marker.bindPopup(`
-            <a href="https://leibensperger.github.io/buoy.html">
+            <a  href="https://leibensperger.github.io/buoy.html"
+                onclick="event.preventDefault();window.open(this.href,'_system')">
                 For information on the SUNY Plattsburgh Lake Champlain Data Buoy, click here.
             </a>
         `, {
@@ -222,21 +224,3 @@ class QueryMap {
         this.$userPicker.change(this._onUserPickerChange.bind(this));
     }
 }
-
-// function initMap() {
-//     $('#map-user-picker').change(function () {
-//         let queryObj = urlQueryObj($('#map-time').attr('src'));
-//         let creator = $(this).val();
-//         if (creator == 'all') delete queryObj.creator;
-//         else queryObj.creator = creator;
-//         let newUrl = './embed/map.html?';
-
-//         Object.keys(queryObj).forEach((key) => {
-//             newUrl += key + '=' + queryObj[key] + '&';
-//         });
-
-//         newUrl = newUrl.substring(0, newUrl.length - 1);
-
-//         $('#map-time').attr('src', newUrl);
-//     });
-// }

@@ -20,7 +20,7 @@ $large-screen-width: 1200px;
 @import "dashboard";
 
 @media (max-width: 1199px) {
-    body:not(.no-nav) {
+    body:not(.no-nav) > .container {
         padding-top: 64px;
     }
 }
@@ -59,10 +59,7 @@ h2, h3 {
     padding: 24px;
     color: white;
     background: #2196f3;
-    // position: absolute;
-    // bottom: 0;
-    // height: 64px;
-    // line-height: 64px;
+
 }
 
 
@@ -126,9 +123,22 @@ a.disabled {
 .navbar-toggle > svg {
     position: absolute;
     left: 0;
-    top: 0;
+    bottom: 0;
     fill: #fff;
+    -webkit-animation: navbar-toggle-fade 0.2s ease-out both;
+    animation: navbar-toggle-fade 0.2s ease-out both;
 }
+
+@-webkit-keyframes navbar-toggle-fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes navbar-toggle-fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+  
 
 .container-flex {
     height: 100%;
@@ -170,6 +180,10 @@ a.disabled {
         box-shadow: none;
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 1));
     }
+
+    #navbar-top-bg {
+        display: none;
+    }
 }
 
 .body-darkbg {
@@ -196,4 +210,38 @@ a.disabled {
 
 .appBanner {
     display: none;
+}
+
+body, .navbar, #navbar-top-bg  {
+    padding-top: constant(safe-area-inset-top);
+    /* iOS 11.0 */
+    padding-top: env(safe-area-inset-top);
+    /* iOS 11.2 */
+}
+
+#sidebar_logo {
+    padding-top: calc(constant(safe-area-inset-top) + 28px);
+    /* iOS 11.0 */
+    padding-top: calc(env(safe-area-inset-top) + 28px);
+    /* iOS 11.2 */ 
+}
+
+.no-pad {
+    padding: 0 !important;
+}
+
+#navbar-top-bg {
+    background: #2196f3;
+    position: absolute;
+    top: 0;
+    height: 64px;
+    width: 100%;
+    box-sizing: content-box;
+}
+
+
+body.ios:not(.body-transparentnavbar) .navbar {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background-color: rgba(33, 150, 243, 0.6);
 }

@@ -1,14 +1,14 @@
-window.mapConfig = {
+function getMapConfig() { return {
     url: '<!--map_url-->',
     options: {
         attribution: '<!--map_attribution-->',
         maxZoom: 18,
         id: '<!--map_id-->',
         accessToken: '<!--map_token-->',
-        useCache: true,
+        useCache: inApp(),
         crossOrigin: true
     }
-};
+}};
 
 $('document').ready(() => {
     if (document.getElementById("map-time")) {

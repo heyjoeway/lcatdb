@@ -52,8 +52,9 @@ if (!Array.prototype.includes) {
     });
 };
 
-$('document').ready(() => {
+let isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
+$('document').ready(() => {
     $('.js').removeClass('js');
     $('.no-js').hide();
     
@@ -86,6 +87,8 @@ $('document').ready(() => {
         window.offlineInfo = new OfflineInfoManager();
 
     appUrls();
+
+    if (isiOS) $('body').addClass('ios');
 
     document.addEventListener("deviceready", function() {
         appUrls(true);
@@ -153,7 +156,6 @@ class OfflineInfoManager {
     }
 
     finish(gotNewInfo) {
-        console.log("offlineInfo: gotNewInfo = " + gotNewInfo);
         this.callbacks.forEach((callback) => {
             callback(gotNewInfo);
         });
@@ -184,9 +186,12 @@ function updateNavbar() {
     
             let configurationId = $("#configuration-picker").val();
 
+            let navbarRender = Mustache.render(template, offlineInfo.info());
             $('#navbar').remove();
             $('#sidebar').remove();
-            $('body').append(Mustache.render(template, offlineInfo.info()));
+            $('#navbar-top-bg').remove();
+            $('body').append(navbarRender);
+
             $("#sidebar_btn").click(function() {
                 setTimeout(showSidebar, 1);
             });
@@ -349,36 +354,43 @@ function appUrls(force) {
         dataType: 'json',
         cache: true,
         success: function(data) {
-            let filelist = data.map((obj) => { return obj.location; })
-    
+            let filelist = data.map(obj => obj.location);
+            // fileList is a list of files that can be accessed locally.
+            
+            // Get all links and process them.
             $('a').each(function() {
                 let href = $(this).attr('href');
     
                 if (typeof href == 'undefined') return;
     
+                // Trim leading dot.
                 if (href.substr(0, 1) == '.')
                     href = href.substr(1);
     
+                // Trim leading slash. (if no slash then it's not valid)
                 if (href.substr(0, 1) == '/')
                     href = href.substr(1);
                 else return;
                     
-                let query = href.split('?')[1];
+                // Trim query.
                 href = href.split('?')[0];
                 
+                // If this url exists in the file list, it's local.
                 let isLocal = filelist.indexOf(href) != -1;
                 
-                let hrefFinal;
-                if (isLocal) {
-                    hrefFinal = 'file:///android_asset/www/' + href;
-                    $(this).click((e) => {
-                        e.preventDefault();
-                        window.open($(this).attr('href'));
-                    });
+                $(this).off('click.appurl').on('click.appurl', e => {
+                    e.preventDefault();
 
-                } else hrefFinal = `${serverUrl}/${href}`;
-    
-                $(this).attr('href', hrefFinal);
+                    let hrefFinal;
+                    if (isLocal) {
+                        if (isiOS)
+                            hrefFinal = `${cordova.file.applicationDirectory}www/${href}`;
+                        else
+                            hrefFinal = `file:///android_asset/www/${href}`;
+                    } else hrefFinal = `${serverUrl}/${href}`;
+
+                    window.open(hrefFinal);
+                });
             });
         }
     });
