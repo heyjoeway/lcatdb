@@ -285,13 +285,12 @@ function updateSubmit() {
 }
 
 function submit() {
-    if (typeof cordova == 'undefined') submitWeb();
-    else submitCordova();
+    if (inApp()) submitCordova();
+    else submitWeb();
 }
 
 function submitWeb(failCallback) {
     function finish(success, data) {
-        
         if (success)
             location.href = `${serverUrl}/readings/${data.rid}`;
         else {
@@ -308,6 +307,7 @@ function submitWeb(failCallback) {
     startInputBlock();
 
     let formData = $('#form').serializeArray();
+    // Add extra attribute to request that sends back data in JSON
     formData.push({
         "name": "infoOnly",
         "value": true
@@ -316,15 +316,39 @@ function submitWeb(failCallback) {
     $.post(
         `${serverUrl}/configurations/${configurationId}/readingDo`,
         formData,
-        (data, status) => {
-            finish(status == "success", data);
-        }
+        (data, status) => { finish(status == "success", data); }
     ).fail(() => {
         finish(false);
     });
 }
 
 function submitCordova() {
+    // iOS webkit doesn't support field validation because apple is fantastic
+    // so we have to do it manually
+    if (isiOS) {
+        let $form = $('#form');
+        let hasFailed = $("#form").find("input").toArray().some(input => {
+            let $input = $(input);
+
+            let isRequired = input.required;
+            let isEmpty = $input.val() == "";
+            let isValid = input.checkValidity();
+            
+            return !isValid || (isRequired && isEmpty);
+        });  
+
+        if (hasFailed) {
+            $.notify({
+                "message": "Please make sure all fields are properly filled out."
+            }, {
+                "type": "danger"
+            });
+            return;
+        }       
+    }
+
+    // Try to submit normally over the internet, and if that doesn't work
+    // then just cache it and go to the queue
     submitWeb(function(data) {
         offlineEventQueue.addEvent(new OfflineEventPost({
             "data": {
@@ -334,7 +358,7 @@ function submitCordova() {
             "name": "Reading"
         }));
         location.href = './queue.html';
-    })
+    });
 }
 // ----------------------------------------------------------------------------
 
