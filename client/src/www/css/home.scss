@@ -21,6 +21,17 @@
     }
 }
 
+body.is-ios.in-app {
+    #home-slideshow  {
+        padding-top: 32px;
+        /* < iOS 11.0 */
+        padding-top: calc(constant(safe-area-inset-top) + 16px);
+        /* iOS 11.0 */
+        padding-top: calc(env(safe-area-inset-top) + 16px);
+        /* iOS 11.2 */ 
+    }
+}
+
 .home-description {
     color: white;
     text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);

@@ -8,6 +8,25 @@
 
 $large-screen-width: 1200px;
 
+body, .navbar, #navbar-top-bg  {
+    padding-top: constant(safe-area-inset-top);
+    /* iOS 11.0 */
+    padding-top: env(safe-area-inset-top);
+    /* iOS 11.2 */
+}
+
+body.is-ios.in-app {
+    &, .navbar, #navbar-top-bg  {
+        padding-top: 16px;
+        /* < iOS 11.0 */
+        padding-top: constant(safe-area-inset-top);
+        /* iOS 11.0 */
+        padding-top: env(safe-area-inset-top);
+        /* iOS 11.2 */
+    }
+}
+
+
 @import "fonts";
 @import "home";
 @import "spoiler";
@@ -212,20 +231,6 @@ a.disabled {
     display: none;
 }
 
-body, .navbar, #navbar-top-bg  {
-    padding-top: constant(safe-area-inset-top);
-    /* iOS 11.0 */
-    padding-top: env(safe-area-inset-top);
-    /* iOS 11.2 */
-}
-
-#sidebar_logo {
-    padding-top: calc(constant(safe-area-inset-top) + 28px);
-    /* iOS 11.0 */
-    padding-top: calc(env(safe-area-inset-top) + 28px);
-    /* iOS 11.2 */ 
-}
-
 .no-pad {
     padding: 0 !important;
 }
@@ -240,7 +245,7 @@ body, .navbar, #navbar-top-bg  {
 }
 
 
-body.ios:not(.body-transparentnavbar) .navbar {
+body.is-ios:not(.body-transparentnavbar) .navbar {
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     background-color: rgba(33, 150, 243, 0.6);

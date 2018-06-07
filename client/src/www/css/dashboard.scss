@@ -28,7 +28,7 @@
 }
 
 @media (min-width: 1200px) {
-    .page-dashboard > .container {
+    .dashboard-container, .page-dashboard {
         padding-top: 0 !important;
     }
 }
