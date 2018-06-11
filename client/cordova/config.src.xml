@@ -25,6 +25,10 @@
         <preference name="DisallowOverscroll" value="true" />
         <preference name="SuppressesLongPressGesture" value="true" />
 
+        <edit-config target="NSLocationWhenInUseUsageDescription" file="*-Info.plist" mode="merge">
+            <string>lcatDB is requesting your location.</string>
+        </edit-config>
+
         <icon height="57" platform="ios" src="res/icon/ios/icon.png" width="57" />
         <icon height="114" platform="ios" src="res/icon/ios/icon@2x.png" width="114" />
         <icon height="40" platform="ios" src="res/icon/ios/icon-40.png" width="40" />
