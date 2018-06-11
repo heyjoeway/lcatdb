@@ -1,4 +1,6 @@
-$(function() {
+LcatDB.pages.configurationTutorial = {};
+
+LcatDB.pages.configurationTutorial.init = function() {
     let hasTemperature = false;
     let hasDepth = false;
 
@@ -17,4 +19,6 @@ $(function() {
             `/newReading.html?configuration=${configurationId},quick=true`
         );
     }
-});
+};
+
+$('document').ready(function() { LcatDB.pages.configurationTutorial.init() });

@@ -1,6 +1,10 @@
-$(() => {
+LcatDB.pages.configurationAddSensor = {};
+
+LcatDB.pages.configurationAddSensor.init = function() {
     $('.sensor').click(function() {
         $('#sid').val($(this).attr('id'));
         $('#form').submit();
     });
-});
+};
+
+$('document').ready(function() { LcatDB.pages.configurationAddSensor.init() });

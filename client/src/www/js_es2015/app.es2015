@@ -1,1 +1,1 @@
-let isWebsite = true;
+LcatDB.isWebsite = true;

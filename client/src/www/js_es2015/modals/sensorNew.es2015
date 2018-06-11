@@ -9,15 +9,13 @@ $(function() {
 
         window.parent.postMessage('modal.lock', '*');
 
-        $.post(`${serverUrl}/sensors/newDo`,
+        $.post(`${LcatDB.serverUrl}/sensors/newDo`,
             {
                 "type": $this.data('type'),
                 "model": $this.data('model'),
                 "configuration": $('#configuration').text()
             },
-            (data, success) => {
-                window.parent.postMessage('modal.done', '*');
-            }
+            () => window.parent.postMessage('modal.done', '*')
         );
     });
 });

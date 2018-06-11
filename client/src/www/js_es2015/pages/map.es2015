@@ -1,6 +1,10 @@
-$(() => {
+LcatDB.pages.mapEmbed = {};
+
+LcatDB.pages.mapEmbed.init = function() {
+    LcatDB.pages.mapEmbed.session = {};
+
     let queries;
-    let queryObj = urlQueryObj(window.location.toString());
+    let queryObj = LcatDB.urlQueryObj(window.location.toString());
 
     if (queryObj.queries) {
         queries = JSURL.parse(queryObj.queries);
@@ -50,9 +54,11 @@ $(() => {
         queries = [query];
     }
 
-    window.map = new QueryMap({
+    LcatDB.pages.mapEmbed.session.map = new LcatDB.QueryMap({
         selector: 'map',
         queries: queries,
         buoy: queryObj.buoy
     });
-});
+};
+
+$('document').ready(function() { LcatDB.pages.login.init() });

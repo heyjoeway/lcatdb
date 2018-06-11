@@ -1,0 +1,450 @@
+let serverUrl = '<!--url-->';
+
+// https://tc39.github.io/ecma262/#sec-array.prototype.includes
+if (!Array.prototype.includes) {
+    Object.defineProperty(Array.prototype, 'includes', {
+        value: function (searchElement, fromIndex) {
+
+            if (this == null) {
+                throw new TypeError('"this" is null or not defined');
+            }
+
+            // 1. Let O be ? ToObject(this value).
+            var o = Object(this);
+
+            // 2. Let len be ? ToLength(? Get(O, "length")).
+            var len = o.length >>> 0;
+
+            // 3. If len is 0, return false.
+            if (len === 0) {
+                return false;
+            }
+
+            // 4. Let n be ? ToInteger(fromIndex).
+            //    (If fromIndex is undefined, this step produces the value 0.)
+            var n = fromIndex | 0;
+
+            // 5. If n ≥ 0, then
+            //  a. Let k be n.
+            // 6. Else n < 0,
+            //  a. Let k be len + n.
+            //  b. If k < 0, let k be 0.
+            var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+            function sameValueZero(x, y) {
+                return x === y || (typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y));
+            }
+
+            // 7. Repeat, while k < len
+            while (k < len) {
+                // a. Let elementK be the result of ? Get(O, ! ToString(k)).
+                // b. If SameValueZero(searchElement, elementK) is true, return true.
+                if (sameValueZero(o[k], searchElement)) {
+                    return true;
+                }
+                // c. Increase k by 1. 
+                k++;
+            }
+
+            // 8. Return false
+            return false;
+        }
+    });
+};
+
+let isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+$('document').ready(() => {
+    $('.js').removeClass('js');
+    $('.no-js').hide();
+    
+    // ------------------------------------------------------------------------
+    
+    let unitSystem = localStorage.unitSystem;
+    
+    if (!unitSystem) {
+        unitSystem = 'imperial';
+        localStorage.unitSystem = 'imperial';
+    }
+    
+    changeUnitSystem(unitSystem);
+    
+    $('#unit-system-picker').change(function() {
+        let system = $(this).val();
+        changeUnitSystem(system);
+    });
+
+    // ------------------------------------------------------------------------
+    
+    initSidebar();
+
+    handleOnline();
+    setInterval(handleOnline, 1000);
+
+    window.activeInputBlock = 0;
+
+    if (window.parent == window)
+        window.offlineInfo = new OfflineInfoManager();
+
+    appUrls();
+
+    if (isiOS) $('body').addClass('is-ios');
+
+    document.addEventListener("deviceready", function() {
+        appUrls(true);
+    }, false);
+});
+    
+// ----------------------------------------------------------------------------
+
+class OfflineInfoManager {
+    constructor() {
+        this.block = false;
+        this.callbacks = [];
+        this.get();
+    }
+
+    /**
+     * Gets info necessary for offline operation
+     * 
+     * @param force 
+     * @param {function} callback Params: gotNewInfo {boolean}
+     */
+    get(force = false, callback) {
+        const OFFLINE_CACHE_TIME = 5 * 60 * 1000; // milliseconds
+    
+        if (callback) this.callbacks.push(callback);
+    
+        if (this.block) return;
+        this.block = true;
+        
+        let infoCurrent = this.info();
+        if (infoCurrent && !force) {
+            let timeCurrent = new Date().getTime();
+            let cacheExpired = infoCurrent.time - timeCurrent >= OFFLINE_CACHE_TIME;
+            if (!cacheExpired)
+                return this.finish(false);
+        }
+    
+        if (!navigator.onLine) return this.finish(false);
+    
+        startInputBlock();
+        
+        $.ajax({
+            "url": `${serverUrl}/api/offlineData`,
+            "dataType": "json",
+            "cache": false,
+            "timeout": 4500,
+            "method": "POST",
+            "success": (data, status) => {
+                if (status != 'success')
+                    return this.finish(false);
+
+                if (data.error) {
+                    if (data.error.errorName == 'noSession')
+                        localStorage.offlineInfo = '';
+                    return this.finish(false);
+                }
+
+                localStorage.offlineInfo = JSON.stringify(data);
+                this.finish(true);
+            },
+            "error": () => {
+                this.finish(false);
+            }
+        });
+    }
+
+    finish(gotNewInfo) {
+        this.callbacks.forEach((callback) => {
+            callback(gotNewInfo);
+        });
+        this.callbacks = [];
+    
+        this.block = false;
+        finishInputBlock();
+    }
+    
+    info() {
+        if (localStorage.offlineInfo)
+            return JSON.parse(localStorage.offlineInfo);
+    }
+
+    expire() {
+        let info = this.info();
+        info.time = 0;
+        localStorage.offlineInfo = JSON.stringify(info);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+function updateNavbar() {
+    offlineInfo.get(false, function(gotNewInfo) {
+        $.get('./templates/navUser.mustache', function(template, status) {
+            if (status != 'success') return;
+    
+            let configurationId = $("#configuration-picker").val();
+
+            let navbarRender = Mustache.render(template, offlineInfo.info());
+            $('#navbar').remove();
+            $('#sidebar').remove();
+            $('#navbar-top-bg').remove();
+            $('body').append(navbarRender);
+
+            $("#sidebar_btn").click(function() {
+                setTimeout(showSidebar, 1);
+            });
+            handleOnline(true);
+            appUrls();
+        });
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+function startInputBlock() {
+    $('#loading-overlay').removeClass('hide');
+    setTimeout(function() {
+        $('#loading-overlay').removeClass('disabled');
+    }, 10);
+    window.activeInputBlock++;
+}
+
+function finishInputBlock() {
+    if (--window.activeInputBlock <= 0) {
+        window.activeInputBlock = 0;
+        
+        $('#loading-overlay').addClass('disabled');
+        setTimeout(function() {
+            $('#loading-overlay').addClass('hide');
+        }, 250);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+function handleOnline(force) {
+    if (!force && (window.onLinePrevious == navigator.onLine)) return;
+
+    window.onLinePrevious = navigator.onLine;
+
+    $(".online_only_hide")[navigator.onLine ? 'show' : 'hide']();
+    $(".online_only_disable")
+        .prop('disabled', !navigator.onLine)
+        [navigator.onLine ? 'removeClass' : 'addClass']('disabled');
+
+    $(".offline_only_hide")[navigator.onLine ? 'hide' : 'show']();
+    $(".offline_only_disable")
+        .prop('disabled', navigator.onLine)
+        [navigator.onLine ? 'addClass' : 'removeClass']('disabled');
+}
+
+// ----------------------------------------------------------------------------
+
+function changeUnitSystem(system) {
+    if (!system)
+        system = localStorage.unitSystem;
+
+    let $normalize = $('.normalize');
+    $normalize.unitnorm('deinit');
+    $normalize.each(function() {
+        let $this = $(this);
+        let currentSystem = $this.data('unitprefsystem');
+        if (currentSystem)
+            $this.attr('data-unitprefsystem', system);
+    });
+    $normalize.unitnorm();
+    localStorage.unitSystem = system;
+    $('#unit-system-picker').val(system);
+}
+
+// ----------------------------------------------------------------------------
+
+function urlQueryObj(url) {
+    let query = url.split('?')[1];
+    let obj = {};
+    if (query) {
+        let querySplit = query.split('&');
+        querySplit.forEach((item) => {
+            let itemSplit = item.split('=');
+            let key = itemSplit[0];
+            let val = undefined; 
+            
+            if (itemSplit.length > 1)
+                val = itemSplit.splice(1).join('=');
+
+            obj[key] = val;
+        });
+    }
+
+    return obj;
+}
+
+// ----------------------------------------------------------------------------
+
+function modal(title, url, callback) {
+    let $element = $('<div></div>');
+    $element.addClass('modal fade').html(`\
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body">
+            <iframe src="${url}" scrolling="no"></iframe>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Cancel</button>
+        </div>
+    </div>
+</div>`);
+
+    $('body').append($element);
+    $element.modal('show');
+
+    let $iframe = $($element.find('iframe'));
+    
+    if (window.iFrameResize)
+        $iframe.iFrameResize();
+
+    window.addEventListener('message', (e) => {
+        let msg = e.data;
+
+        let msgFunctions = {
+            'modal.hide': () => {
+                $element.modal('hide');
+            },
+            'modal.lock': () => {
+                $element.find('.close').hide();
+                $element.find('.btn-close').hide();
+            },
+            'modal.unlock': () => {
+                $element.find('.close').show();
+                $element.find('.btn-close').show();
+            },
+            'modal.done': () => {
+                callback($element);
+            },
+            'modal.reload': () => {
+                window.location.reload();
+            }
+        };
+
+        msgFunctions[msg]();
+    }, false);
+
+    $element.on('hidden.bs.modal', function() {
+        $element.remove();
+    });
+}
+
+function inApp() {
+    return typeof cordova != 'undefined';
+}
+
+function appUrls(force) {
+    if (!force && !inApp()) return;
+
+    $(".cordova_only_hide").show();
+    $("body").addClass("in-app");
+
+    $.ajax({
+        url: './files.json',
+        dataType: 'json',
+        cache: true,
+        success: function(data) {
+            let filelist = data.map(obj => obj.location);
+            // fileList is a list of files that can be accessed locally.
+            
+            // Get all links and process them.
+            $('a').each(function() {
+                let href = $(this).attr('href');
+    
+                if (typeof href == 'undefined') return;
+    
+                // Trim leading dot.
+                if (href.substr(0, 1) == '.')
+                    href = href.substr(1);
+    
+                // Trim leading slash. (if no slash then it's not valid)
+                if (href.substr(0, 1) == '/')
+                    href = href.substr(1);
+                else return;
+                    
+                // Trim query.
+                href = href.split('?')[0];
+                
+                // If this url exists in the file list, it's local.
+                let isLocal = filelist.indexOf(href) != -1;
+                
+                $(this).off('click.appurl').on('click.appurl', e => {
+                    e.preventDefault();
+
+                    let hrefFinal;
+                    if (isLocal) {
+                        if (isiOS)
+                            hrefFinal = `${cordova.file.applicationDirectory}www/${href}`;
+                        else
+                            hrefFinal = `file:///android_asset/www/${href}`;
+                    } else hrefFinal = `${serverUrl}/${href}`;
+
+                    window.open(hrefFinal);
+                });
+            });
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+
+function testCordova(callback) {
+    if (typeof cordova != 'undefined') return callback(true);
+
+    const cordovaTimerMax = 1000;
+
+    let cordovaTimer = 1000;
+    let cordovaInterval = setInterval(() => {
+        cordovaTimer += 10;
+        if (typeof cordova != 'undefined') {
+            callback(true);
+            clearInterval(cordovaInterval);
+        } else if (cordovaTimer >= cordovaTimerMax) {
+            callback(false);
+            clearInterval(cordovaInterval);
+        }
+    }, 10);
+}
+
+// ----------------------------------------------------------------------------
+
+let sidebarOpen = false;
+
+function initSidebar() {
+    $(window).click(hideSidebar);
+    $("#sidebar_btn").click(function() {
+        setTimeout(showSidebar, 1);
+    });
+}
+
+function showSidebar() {
+    $("#sidebar").show();
+    $("#sidebar-overlay").removeClass("hide");
+    setTimeout(function() {
+        $("#sidebar").addClass("sidebar_show");
+        $("#sidebar-overlay").removeClass("disabled");
+        sidebarOpen = true;
+    }, 20);
+}
+
+function hideSidebar() {
+    if (!sidebarOpen) return;
+    sidebarOpen = false;
+    $("#sidebar").removeClass("sidebar_show");
+    $("#sidebar-overlay").addClass("disabled");    
+    setTimeout(function() {
+        $("#sidebar").hide();
+        $("#sidebar-overlay").addClass("hide");
+    }, 250);
+}

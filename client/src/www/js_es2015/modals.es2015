@@ -1,4 +1,4 @@
-let modalsData = [{
+LcatDB.modalsData = [{
     selector: '#sensor-new',
     title: 'Add New Sensor',
     url: () => {
@@ -25,13 +25,13 @@ let modalsData = [{
     callback: () => { window.location.reload(); }
 }];
 
-function initModals() {
-    modalsData.forEach(data => {
+LcatDB.initModals = function() {
+    LcatDB.modalsData.forEach(data => {
         $(data.selector).off('click').click(function(e) {
             e.preventDefault();            
-            modal(data.title, data.url(this), data.callback);
+            LcatDB.modal(data.title, data.url(this), data.callback);
         });
     });
 }
 
-$(window).ready(initModals);
+$(window).ready(LcatDB.initModals);

@@ -1,9 +1,13 @@
-$(function() {
-    let queryObj = urlQueryObj(window.location.href);
+LcatDB.pages.dashboard = {};
+
+LcatDB.pages.dashboard.init = function() {
+    let queryObj = LcatDB.urlQueryObj(window.location.href);
 
     ["verifySuccess", "verifyFailure"].forEach(function(key) {
         if (queryObj[key]) $('#' + key).show();
     });
 
-    updateNavbar();
-});
+    LcatDB.updateNavbar();
+};
+
+$('document').ready(function() { LcatDB.pages.dashboard.init() });

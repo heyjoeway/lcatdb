@@ -1,21 +1,15 @@
-let configurationId, map, marker, mobileDetect;
+LcatDB.pages.newReading = {};
 
-function initConfigList() {
-    updateConfigList(true);
-
-    $("#configuration-picker").change(changeConfig);
-}
-
-function updateConfigList(init) {
-    offlineInfo.get(true, function(gotNewInfo) {
+LcatDB.pages.newReading.updateConfigList = function(init) {
+    LcatDB.offlineInfo.get(function(gotNewInfo) {
         let html = '';
 
         let configurationIndex = $('#configuration-picker').val() || 0;
 
-        offlineInfo.info().configurations.forEach(function(configuration, i) {
+        LcatDB.offlineInfo.info().configurations.forEach(function(configuration, i) {
             html += `<option value="${i}">${configuration.name}</option>`;
 
-            if (init && configuration['_id'] == configurationId)
+            if (init && configuration['_id'] == LcatDB.pages.newReading.session.configurationId)
                 configurationIndex = i;
         });
 
@@ -24,19 +18,19 @@ function updateConfigList(init) {
             .selectpicker('refresh')
             .val(configurationIndex);
 
-        changeConfig();
-    });
-}
+        LcatDB.pages.newReading.changeConfig();
+    }, true);
+};
 
-function changeConfig() {
+LcatDB.pages.newReading.changeConfig = function() {
     $.get('./templates/configurationSensors.mustache', function(template, status) {
         if (status != 'success') return;
 
         let configurationIndex = $("#configuration-picker").val();
 
-        let data = offlineInfo.info();
+        let data = LcatDB.offlineInfo.info();
         let configuration = data.configurations[configurationIndex]; 
-        configurationId = configuration['_id'];
+        LcatDB.pages.newReading.session.configurationId = configuration['_id'];
 
         configuration.sensors.forEach(function(sensor, i) {
             sensor.index = i;
@@ -53,21 +47,21 @@ function changeConfig() {
         );
         $('#configuration-link').prop(
             'href',
-            `${serverUrl}/configurations/${configuration['_id']}`
+            `${LcatDB.serverUrl}/configurations/${configuration['_id']}`
         );
         $('.configuration-chosen').show();
         $('.configuration-notchosen').hide();
 
         $('#configuration-sensors .spoiler').spoiler();
-        changeUnitSystem();
-        initSensorBtns();
-        updateSubmit();
+        LcatDB.changeUnitSystem();
+        LcatDB.pages.newReading.initSensorBtns();
+        LcatDB.pages.newReading.updateSubmit();
     });
 }
 
 // ----------------------------------------------------------------------------
 
-function updateMap() {
+LcatDB.pages.newReading.updateMap = function() {
     let lat = $('input[name="location[lat]"]').val();
     let long = $('input[name="location[long]"]').val();
 
@@ -78,80 +72,37 @@ function updateMap() {
     
     let pos = [lat, long];
 
-    marker.setLatLng(pos);
-    map.panTo(pos);
-}
+    LcatDB.pages.newReading.session.marker.setLatLng(pos);
+    LcatDB.pages.newReading.session.map.panTo(pos);
+};
 
-// ----------------------------------------------------------------------------
-
-function initMap() {
-    let pos = [
-        44.57670853058025,
-        -73.32539651979982
-    ];
-
-    map = L.map('map');
-    map.on('load', () => {
-        setInterval(() => {
-            map.invalidateSize();
-        }, 1000);
-    });
-    map.setView(pos, 11);
-
-    let mapConfig = getMapConfig();
-    let layer = L.tileLayer(mapConfig.url, mapConfig.options);
-    layer.addTo(map);
-
-    marker = L.marker(pos, {
-        draggable: true,
-        autoPan: true,
-        icon: L.icon({
-            iconUrl: './img/map/markerRed.png',
-            shadowUrl: './img/map/markerRed.png',
-            iconAnchor: [12, 41],
-            shadowUrl: './img/map/markerShadow.png',
-            popupAnchor: [0, -41]
-        })
-    }).addTo(map);
-    
-    marker.on('dragend', () => {
-        var pos = marker.getLatLng();
-        $('input[name="location[lat]"]').val(pos.lat).change();
-        $('input[name="location[long]"]').val(pos.lng).change();
-        updateMap();
-    });
-
-    $('input[name="location[lat]"]').change(updateMap);
-    $('input[name="location[long]"]').change(updateMap);
-
-    getLocation(true);
-}
-
-// ----------------------------------------------------------------------------
-
-function modalFinish($element) {
-    updateConfigList();
+LcatDB.pages.newReading.modalFinish = function($element) {
+    LcatDB.pages.newReading.updateConfigList();
     $element.modal('hide');
-}
+};
 
-function initSensorBtns() {
+LcatDB.pages.newReading.initSensorBtns = function() {
     $('#sensor-new').off('click').click(function(e) {
         e.preventDefault();
 
-        modal(
+        let cid = LcatDB.pages.newReading.session.configurationId;
+
+        LcatDB.modal(
             'Add New Sensor',
-            `${serverUrl}/sensors/new?configuration=${configurationId}&modal=true`,
-            modalFinish
+            `${LcatDB.serverUrl}/sensors/new?configuration=${cid}&modal=true`,
+            LcatDB.pages.newReading.modalFinish
         );
     });
 
     $('#sensor-existing').off('click').click(function(e) {
         e.preventDefault();
 
-        modal(
+        let cid = LcatDB.pages.newReading.session.configurationId;
+
+        LcatDB.modal(
             'Add Existing Sensor',
-            `${serverUrl}/configurations/${configurationId}/addSensor?modal=true`,
-            modalFinish
+            `${LcatDB.serverUrl}/configurations/${cid}/addSensor?modal=true`,
+            LcatDB.pages.newReading.modalFinish
         );
     });
 
@@ -159,19 +110,21 @@ function initSensorBtns() {
         e.preventDefault();
 
         let sid = $(this).data('sid');
+        let cid = LcatDB.pages.newReading.session.configurationId;
 
-        modal(
+
+        LcatDB.modal(
             'Remove Sensor',
-            `${serverUrl}/configurations/${configurationId}/removeSensor?modal=true&sid=${sid}`,
-            modalFinish
+            `${LcatDB.serverUrl}/configurations/${cid}/removeSensor?modal=true&sid=${sid}`,
+            LcatDB.pages.newReading.modalFinish
         );
     });
-}
+};
 
 // ----------------------------------------------------------------------------
 
-function getLocation(auto) {
-    if (auto && (localStorage['location.auto'] != 'true'))
+LcatDB.pages.newReading.getLocation = function(auto) {
+    if (auto && (localStorage['LcatDB.location.auto'] != 'true'))
         return;
 
     if (!mobileDetect.phone()) return;
@@ -215,96 +168,53 @@ function getLocation(auto) {
             "timeout": 15 * 1000 // 15 sec (may increase)
         }
     );
-}
+};
 
-
-// ----------------------------------------------------------------------------
-
-function initMobile() {
-    mobileDetect = new MobileDetect(window.navigator.userAgent);
-    
-    if (mobileDetect.phone())
-        $('#location_mobile').show();
-    else
-        $('#location_desktop').show();
-}
-
-// ----------------------------------------------------------------------------
-
-function preventEnterKey() {
-    // https://stackoverflow.com/a/895231
-    $(window).keydown(function(event){
-        if(event.keyCode == 13) {
-            event.preventDefault();
-            return false;
-        }
-    });
-}
-
-// ----------------------------------------------------------------------------
-
-function initDatetime() {
-    if(!Modernizr.inputtypes['datetime-local']) {
-        $('input[type=datetime-local]').datetimepicker({
-            "showMeridian": true,
-            "format": "yyyy-mm-ddThh:ii",
-            "startView": 2,
-            "minView": 0,
-            "todayBtn": true,
-            "todayHighlight": true
-        });
-    }
-}
-
-// ----------------------------------------------------------------------------
 
 // https://stackoverflow.com/a/1186309
-function objectifyForm(formArray) {//serialize data function
+LcatDB.pages.newReading.objectifyForm = function(formArray) {
     var returnArray = {};
     for (var i = 0; i < formArray.length; i++)
        returnArray[formArray[i]['name']] = formArray[i]['value'];
 
     return returnArray;
-}
+};
 
-function queueReading() {
+LcatDB.pages.newReading.queueReading = function() {
     if (typeof cordova == 'undefined') return;
 
-    let formData = objectifyForm($('form').serializeArray());
-}
+    let formData = LcatDB.pages.newReading.objectifyForm(
+        $('form').serializeArray()
+    );
+};
 
-// ----------------------------------------------------------------------------
-
-function updateSubmit() {
+LcatDB.pages.newReading.updateSubmit = function() {
     $(document).on('submit', 'form', function(e) {
         e.preventDefault();
-        submit();
-     });
-    // $('#publish').off('click').click(function(e) {
-    // });
-}
+        LcatDB.pages.newReading.submit();
+    });
+};
 
-function submit() {
-    if (inApp()) submitCordova();
-    else submitWeb();
-}
+LcatDB.pages.newReading.submit = function() {
+    if (LcatDB.inApp()) LcatDB.pages.newReading.submitCordova();
+    else LcatDB.pages.newReading.submitWeb();
+};
 
-function submitWeb(failCallback) {
+LcatDB.pages.newReading.submitWeb = function(failCallback) {
     function finish(success, data) {
         if (success)
-            location.href = `${serverUrl}/readings/${data.rid}`;
-        else {
-            if (failCallback) return failCallback(data);
-            $.notify({
-                "message": "Could not submit reading. Make sure you're online and that all of the fields are properly filled out."
-            }, {
-                "type": 'danger'
-            });
-            finishInputBlock();
-        }
+            return location.href = `${LcatDB.serverUrl}/readings/${data.rid}`;
+
+        if (failCallback) return failCallback(data);
+        $.notify({
+            "message": "Could not submit reading. Make sure you're online and that all of the fields are properly filled out."
+        }, {
+            "type": 'danger'
+        });
+        LcatDB.finishInputBlock();
     }
 
-    startInputBlock();
+    LcatDB.startInputBlock();
 
     let formData = $('#form').serializeArray();
     // Add extra attribute to request that sends back data in JSON
@@ -313,64 +223,164 @@ function submitWeb(failCallback) {
         "value": true
     });
 
+    let cid = LcatDB.pages.newReading.session.configurationId;
+
     $.post(
-        `${serverUrl}/configurations/${configurationId}/readingDo`,
+        `${LcatDB.serverUrl}/configurations/${cid}/readingDo`,
         formData,
         (data, status) => { finish(status == "success", data); }
     ).fail(() => {
         finish(false);
     });
-}
+};
 
-function submitCordova() {
+LcatDB.pages.newReading.validateInput = function() {
+    let $form = $('#form');
+    let hasFailed = $("#form").find("input").toArray().some(input => {
+        let $input = $(input);
+
+        let isRequired = input.required;
+        let isEmpty = $input.val() == "";
+        let isValid = input.checkValidity();
+        
+        return !isValid || (isRequired && isEmpty);
+    });  
+
+    if (hasFailed)
+        $.notify({
+            "message": "Please make sure all fields are properly filled out."
+        }, {
+            "type": "danger"
+        });
+
+    return !hasFailed;
+};
+
+LcatDB.pages.newReading.submitCordova = function() {
     // iOS webkit doesn't support field validation because apple is fantastic
     // so we have to do it manually
-    if (isiOS) {
-        let $form = $('#form');
-        let hasFailed = $("#form").find("input").toArray().some(input => {
-            let $input = $(input);
-
-            let isRequired = input.required;
-            let isEmpty = $input.val() == "";
-            let isValid = input.checkValidity();
-            
-            return !isValid || (isRequired && isEmpty);
-        });  
-
-        if (hasFailed) {
-            $.notify({
-                "message": "Please make sure all fields are properly filled out."
-            }, {
-                "type": "danger"
-            });
-            return;
-        }       
-    }
+    if (LcatDB.isiOS && !LcatDB.pages.newReading.validateInput()) return;
 
     // Try to submit normally over the internet, and if that doesn't work
     // then just cache it and go to the queue
-    submitWeb(function(data) {
-        offlineEventQueue.addEvent(new OfflineEventPost({
+    let cid = LcatDB.pages.newReading.session.configurationId;
+
+    LcatDB.pages.newReading.submitWeb(function(data) {
+        LcatDB.offlineEventQueue.addEvent(new OfflineEventPost({
             "data": {
-                "formUrl": `${serverUrl}/configurations/${configurationId}/readingDo`,
+                "formUrl": `${LcatDB.serverUrl}/configurations/${cid}/readingDo`,
                 "formData": $('#form').serializeArray()
             },
             "name": "Reading"
         }));
         location.href = './queue.html';
     });
-}
-// ----------------------------------------------------------------------------
+};
 
-function init() {
-    let queryObj = urlQueryObj(location.href);
-    configurationId = queryObj.configuration;    
+LcatDB.pages.newReading.initMap = function() {
+    let session = LcatDB.pages.newReading.session;
 
-    initConfigList();
-    initMobile();
-    initDatetime();
-    preventEnterKey();
-    updateNavbar();
+    let pos = [
+        44.57670853058025,
+        -73.32539651979982
+    ];
+
+    let map = L.map('map');
+    session.map = map;
+    map.on('load', () => {
+        setInterval(() => {
+            map.invalidateSize();
+        }, 1000);
+    });
+    map.setView(pos, 11);
+
+    let mapConfig = LcatDB.getMapConfig();
+    let layer = L.tileLayer(mapConfig.url, mapConfig.options);
+    layer.addTo(map);
+
+    let marker = L.marker(pos, {
+        draggable: true,
+        autoPan: true,
+        icon: L.icon({
+            iconUrl: './img/map/markerRed.png',
+            shadowUrl: './img/map/markerRed.png',
+            iconAnchor: [12, 41],
+            shadowUrl: './img/map/markerShadow.png',
+            popupAnchor: [0, -41]
+        })
+    }).addTo(map);
+
+    session.marker = marker;
+    
+    marker.on('dragend', () => {
+        var pos = marker.getLatLng();
+        $('input[name="location[lat]"]').val(pos.lat).change();
+        $('input[name="location[long]"]').val(pos.lng).change();
+        LcatDB.pages.newReading.updateMap();
+    });
+
+    $('input[name="location[lat]"]').change(
+        LcatDB.pages.newReading.updateMap
+    );
+    $('input[name="location[long]"]').change(
+        LcatDB.pages.newReading.updateMap
+    );
+
+    LcatDB.pages.newReading.getLocation(true);
+};
+
+LcatDB.pages.newReading.preventEnterKey = function() {
+    // https://stackoverflow.com/a/895231
+    $(window).keydown(function(event){
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
+};
+
+LcatDB.pages.newReading.initDatetime = function() {
+    if(!Modernizr.inputtypes['datetime-local'])
+        $('input[type=datetime-local]').datetimepicker({
+            "showMeridian": true,
+            "format": "yyyy-mm-ddThh:ii",
+            "startView": 2,
+            "minView": 0,
+            "todayBtn": true,
+            "todayHighlight": true
+        });
+};
+
+LcatDB.pages.newReading.initMobile = function() {
+    let session = LcatDB.pages.newReading.session;
+
+    session.mobileDetect = new MobileDetect(window.navigator.userAgent);
+    
+    if (session.mobileDetect.phone())
+        $('#location_mobile').show();
+    else
+        $('#location_desktop').show();
+};
+
+LcatDB.pages.newReading.initConfigList = function() {
+    LcatDB.pages.newReading.updateConfigList(true);
+
+    $("#configuration-picker").change(
+        LcatDB.pages.newReading.changeConfig
+    );
+};
+
+LcatDB.pages.newReading.init = function() {
+    let session = LcatDB.pages.newReading.session = {};
+
+    let queryObj = LcatDB.urlQueryObj(location.href);
+    session.configurationId = queryObj.configuration;    
+
+    LcatDB.pages.newReading.initConfigList();
+    LcatDB.pages.newReading.initMobile();
+    LcatDB.pages.newReading.initDatetime();
+    LcatDB.pages.newReading.preventEnterKey();
+    LcatDB.updateNavbar();
 
     $('.normalize').unitnorm();
     $('.spoiler').spoiler();
@@ -379,12 +389,12 @@ function init() {
         .val((new Date).getTime())
         .change();
 
-    $("#location_auto").prop('checked', localStorage['location.auto'] == 'true');
+    $("#location_auto").prop('checked', localStorage['LcatDB.location.auto'] == 'true');
     $("#location_auto").change(function() {
-        localStorage['location.auto'] = $(this).prop('checked').toString();
+        localStorage['LcatDB.location.auto'] = $(this).prop('checked').toString();
     });
 
-    initMap();
-}
+    LcatDB.pages.newReading.initMap();
+};
 
-$(window).ready(init);
+$('document').ready(function() { LcatDB.pages.newReading.init() });

@@ -1,4 +1,6 @@
-$(() => {
+LcatDB.pages.home = {};
+
+LcatDB.pages.home.init = function() {
     $('#home-slideshow').backstretch([
         './img/home/bg1.jpg',
         './img/home/bg2.jpg',
@@ -6,5 +8,8 @@ $(() => {
         './img/home/bg4.jpg'
     ], {duration: 5000, fade: 750});
 
-    if (isWebsite && !isiOS) $(".appBanner-google").show();
-});
+    if (LcatDB.isWebsite && !LcatDB.isiOS) $(".appBanner-google").show();
+    if (LcatDB.isWebsite) $(".appBanner-apple").show();
+};
+
+$('document').ready(function() { LcatDB.pages.home.init() });

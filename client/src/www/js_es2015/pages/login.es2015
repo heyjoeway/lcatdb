@@ -1,6 +1,12 @@
-$(function() {
+LcatDB.pages.login = {};
+
+LcatDB.pages.login.init = function() {
+
+    // If in modal, session must be invalid.
+    // Refresh parent to kick it back to login screen.
     window.parent.postMessage('modal.reload', '*');
 
+    // Slideshow
     $('body').backstretch([
         './img/home/bg1.jpg',
         './img/home/bg2.jpg',
@@ -8,7 +14,7 @@ $(function() {
         './img/home/bg4.jpg'
     ], {duration: 5000, fade: 750});
 
-    let queryObj = urlQueryObj(window.location.href);
+    let queryObj = LcatDB.urlQueryObj(window.location.href);
 
     ["forgotSent", "invalid", "reset"].forEach(function(key) {
         if (queryObj[key]) $('#' + key).show();
@@ -17,9 +23,9 @@ $(function() {
     $('input[type=submit]').click(function(e) {
         e.preventDefault();
 
-        startInputBlock();
+        LcatDB.startInputBlock();
 
-        $.post(`${serverUrl}/loginDo`, {
+        $.post(`${LcatDB.serverUrl}/loginDo`, {
             "username": $('input[name=username]').val(),
             "password": $('input[name=password]').val(),
             "infoOnly": true
@@ -30,11 +36,13 @@ $(function() {
                     $('#' + key).hide();
                 });
                 $(`#${data.errorName}`).show();
-                finishInputBlock();
+                LcatDB.finishInputBlock();
             }
         }).fail(function() {
             $(`#server`).show();
-            finishInputBlock();
+            LcatDB.finishInputBlock();
         });
     });
-});
+};
+
+$('document').ready(function() { LcatDB.pages.login.init() });

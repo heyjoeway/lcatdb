@@ -1,18 +1,4 @@
-let mapMarkerImages = [
-    './img/map/markerRed.png',
-    './img/map/markerYellow.png',
-    './img/map/markerBlue.png',
-    './img/map/markerGreen.png',
-    './img/map/markerPurple.png',
-    './img/map/markerOrange.png',
-    './img/map/markerCyan.png',
-    './img/map/markerBrown.png',
-    './img/map/markerWhite.png',
-    './img/map/markerGrey.png',
-    './img/map/markerBlack.png'
-];
-
-class QueryMap {
+LcatDB.QueryMap = class {
     constructor(obj) {
         this.selector = obj.selector;
         this.$element = $(`#${this.selector}`);
@@ -66,7 +52,7 @@ class QueryMap {
             11 // zoom
         );
 
-        let mapConfig = getMapConfig();
+        let mapConfig = LcatDB.getMapConfig();
         let layer = L.tileLayer(mapConfig.url, mapConfig.options);
         layer.addTo(this.map);
     }
@@ -100,7 +86,7 @@ class QueryMap {
         let queriesLeft = this.queries.length;
 
         this.queries.forEach((query, arr, i) => {
-            $.post(`${serverUrl}/api/readings`, query, (dataSet, textStatus) => {
+            $.post(`${LcatDB.serverUrl}/api/readings`, query, (dataSet, textStatus) => {
                 if (textStatus == 'success') {
                     this.data.push(dataSet);
                     queriesLeft--;
@@ -128,7 +114,7 @@ class QueryMap {
                     reading.location.long
                 ], {
                         icon: L.icon({
-                            iconUrl: mapMarkerImages[markerImageIndex],
+                            iconUrl: LcatDB.QueryMap.mapMarkerImages[markerImageIndex],
                             iconAnchor: [12, 41],
                             shadowUrl: './img/map/markerShadow.png',
                             popupAnchor: [0, -41]
@@ -137,7 +123,7 @@ class QueryMap {
 
                 marker.bindPopup(`
                     <iframe class="map-marker-iframe"
-                        src="${serverUrl}/readings/${reading['_id']}?marker=true">
+                        src="${LcatDB.serverUrl}/readings/${reading['_id']}?marker=true">
                     </iframe>
                 `, {
                         "minWidth": 200,
@@ -148,7 +134,7 @@ class QueryMap {
 
                 dataEmpty = false;
             });
-            markerImageIndex = (markerImageIndex + 1) % mapMarkerImages.length;
+            markerImageIndex = (markerImageIndex + 1) % LcatDB.QueryMap.mapMarkerImages.length;
         });
 
         if (dataEmpty) return;
@@ -223,4 +209,18 @@ class QueryMap {
 
         this.$userPicker.change(this._onUserPickerChange.bind(this));
     }
-}
+};
+
+LcatDB.QueryMap.mapMarkerImages = [
+    './img/map/markerRed.png',
+    './img/map/markerYellow.png',
+    './img/map/markerBlue.png',
+    './img/map/markerGreen.png',
+    './img/map/markerPurple.png',
+    './img/map/markerOrange.png',
+    './img/map/markerCyan.png',
+    './img/map/markerBrown.png',
+    './img/map/markerWhite.png',
+    './img/map/markerGrey.png',
+    './img/map/markerBlack.png'
+];

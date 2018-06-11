@@ -11,7 +11,7 @@ $(() => {
 
         let configurationId = location.pathname.split('/')[2];
 
-        $.post(`${serverUrl}/configurations/${configurationId}/addSensorDo`,
+        $.post(`${LcatDB.serverUrl}/configurations/${configurationId}/addSensorDo`,
             {
                 "sid": $this.attr('id')
             },

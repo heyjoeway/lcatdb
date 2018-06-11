@@ -1,4 +1,6 @@
-let serverUrl = '<!--url-->';
+// ============================================================================
+// POLYFILLS
+// ============================================================================
 
 // https://tc39.github.io/ecma262/#sec-array.prototype.includes
 if (!Array.prototype.includes) {
@@ -52,238 +54,125 @@ if (!Array.prototype.includes) {
     });
 };
 
-let isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+// ============================================================================
+// MAIN NAMESPACE
+// ============================================================================
 
-$('document').ready(() => {
-    $('.js').removeClass('js');
-    $('.no-js').hide();
-    
-    // ------------------------------------------------------------------------
-    
-    let unitSystem = localStorage.unitSystem;
-    
-    if (!unitSystem) {
-        unitSystem = 'imperial';
-        localStorage.unitSystem = 'imperial';
-    }
-    
-    changeUnitSystem(unitSystem);
-    
-    $('#unit-system-picker').change(function() {
-        let system = $(this).val();
-        changeUnitSystem(system);
-    });
+let LcatDB = {};
 
-    // ------------------------------------------------------------------------
-    
-    initSidebar();
+LcatDB.serverUrl = '<!--url-->';
 
-    handleOnline();
-    setInterval(handleOnline, 1000);
+// Sidebar
 
-    window.activeInputBlock = 0;
+LcatDB.sidebarOpen = false;
 
-    if (window.parent == window)
-        window.offlineInfo = new OfflineInfoManager();
-
-    appUrls();
-
-    if (isiOS) $('body').addClass('is-ios');
-
-    document.addEventListener("deviceready", function() {
-        appUrls(true);
-    }, false);
-});
-    
-// ----------------------------------------------------------------------------
-
-class OfflineInfoManager {
-    constructor() {
-        this.block = false;
-        this.callbacks = [];
-        this.get();
-    }
-
-    /**
-     * Gets info necessary for offline operation
-     * 
-     * @param force 
-     * @param {function} callback Params: gotNewInfo {boolean}
-     */
-    get(force = false, callback) {
-        const OFFLINE_CACHE_TIME = 5 * 60 * 1000; // milliseconds
-    
-        if (callback) this.callbacks.push(callback);
-    
-        if (this.block) return;
-        this.block = true;
-        
-        let infoCurrent = this.info();
-        if (infoCurrent && !force) {
-            let timeCurrent = new Date().getTime();
-            let cacheExpired = infoCurrent.time - timeCurrent >= OFFLINE_CACHE_TIME;
-            if (!cacheExpired)
-                return this.finish(false);
-        }
-    
-        if (!navigator.onLine) return this.finish(false);
-    
-        startInputBlock();
-        
-        $.ajax({
-            "url": `${serverUrl}/api/offlineData`,
-            "dataType": "json",
-            "cache": false,
-            "timeout": 4500,
-            "method": "POST",
-            "success": (data, status) => {
-                if (status != 'success')
-                    return this.finish(false);
-
-                if (data.error) {
-                    if (data.error.errorName == 'noSession')
-                        localStorage.offlineInfo = '';
-                    return this.finish(false);
-                }
-
-                localStorage.offlineInfo = JSON.stringify(data);
-                this.finish(true);
-            },
-            "error": () => {
-                this.finish(false);
-            }
-        });
-    }
-
-    finish(gotNewInfo) {
-        this.callbacks.forEach((callback) => {
-            callback(gotNewInfo);
-        });
-        this.callbacks = [];
-    
-        this.block = false;
-        finishInputBlock();
-    }
-    
-    info() {
-        if (localStorage.offlineInfo)
-            return JSON.parse(localStorage.offlineInfo);
-    }
-
-    expire() {
-        let info = this.info();
-        info.time = 0;
-        localStorage.offlineInfo = JSON.stringify(info);
-    }
-}
-
-// ----------------------------------------------------------------------------
-
-function updateNavbar() {
-    offlineInfo.get(false, function(gotNewInfo) {
-        $.get('./templates/navUser.mustache', function(template, status) {
-            if (status != 'success') return;
-    
-            let configurationId = $("#configuration-picker").val();
-
-            let navbarRender = Mustache.render(template, offlineInfo.info());
-            $('#navbar').remove();
-            $('#sidebar').remove();
-            $('#navbar-top-bg').remove();
-            $('body').append(navbarRender);
-
-            $("#sidebar_btn").click(function() {
-                setTimeout(showSidebar, 1);
-            });
-            handleOnline(true);
-            appUrls();
-        });
+LcatDB.initSidebar = function() {
+    $(window).click(LcatDB.hideSidebar);
+    $("#sidebar_btn").click(function() {
+        setTimeout(LcatDB.showSidebar, 1);
     });
 }
 
-// ----------------------------------------------------------------------------
-
-function startInputBlock() {
-    $('#loading-overlay').removeClass('hide');
+LcatDB.showSidebar = function() {
+    $("#sidebar").show();
+    $("#sidebar-overlay").removeClass("hide");
     setTimeout(function() {
-        $('#loading-overlay').removeClass('disabled');
+        $("#sidebar").addClass("sidebar_show");
+        $("#sidebar-overlay").removeClass("disabled");
+        LcatDB.sidebarOpen = true;
+    }, 20);
+}
+
+LcatDB.hideSidebar = function() {
+    if (!LcatDB.sidebarOpen) return;
+    LcatDB.sidebarOpen = false;
+    $("#sidebar").removeClass("sidebar_show");
+    $("#sidebar-overlay").addClass("disabled");    
+    setTimeout(function() {
+        $("#sidebar").hide();
+        $("#sidebar-overlay").addClass("hide");
+    }, 250);
+};
+
+
+
+LcatDB.testCordova = function(callback) {
+    if (typeof cordova != 'undefined') return callback(true);
+
+    const cordovaTimerMax = 1000;
+
+    let cordovaTimer = 1000;
+    let cordovaInterval = setInterval(() => {
+        cordovaTimer += 10;
+        if (typeof cordova != 'undefined') {
+            callback(true);
+            clearInterval(cordovaInterval);
+        } else if (cordovaTimer >= cordovaTimerMax) {
+            callback(false);
+            clearInterval(cordovaInterval);
+        }
     }, 10);
-    window.activeInputBlock++;
-}
+};
 
-function finishInputBlock() {
-    if (--window.activeInputBlock <= 0) {
-        window.activeInputBlock = 0;
-        
-        $('#loading-overlay').addClass('disabled');
-        setTimeout(function() {
-            $('#loading-overlay').addClass('hide');
-        }, 250);
-    }
-}
+LcatDB.appUrls = function(force) {
+    if (!force && !LcatDB.inApp()) return;
 
-// ----------------------------------------------------------------------------
+    $(".cordova_only_hide").show();
+    $("body").addClass("in-app");
 
-function handleOnline(force) {
-    if (!force && (window.onLinePrevious == navigator.onLine)) return;
-
-    window.onLinePrevious = navigator.onLine;
-
-    $(".online_only_hide")[navigator.onLine ? 'show' : 'hide']();
-    $(".online_only_disable")
-        .prop('disabled', !navigator.onLine)
-        [navigator.onLine ? 'removeClass' : 'addClass']('disabled');
-
-    $(".offline_only_hide")[navigator.onLine ? 'hide' : 'show']();
-    $(".offline_only_disable")
-        .prop('disabled', navigator.onLine)
-        [navigator.onLine ? 'addClass' : 'removeClass']('disabled');
-}
-
-// ----------------------------------------------------------------------------
-
-function changeUnitSystem(system) {
-    if (!system)
-        system = localStorage.unitSystem;
-
-    let $normalize = $('.normalize');
-    $normalize.unitnorm('deinit');
-    $normalize.each(function() {
-        let $this = $(this);
-        let currentSystem = $this.data('unitprefsystem');
-        if (currentSystem)
-            $this.attr('data-unitprefsystem', system);
-    });
-    $normalize.unitnorm();
-    localStorage.unitSystem = system;
-    $('#unit-system-picker').val(system);
-}
-
-// ----------------------------------------------------------------------------
-
-function urlQueryObj(url) {
-    let query = url.split('?')[1];
-    let obj = {};
-    if (query) {
-        let querySplit = query.split('&');
-        querySplit.forEach((item) => {
-            let itemSplit = item.split('=');
-            let key = itemSplit[0];
-            let val = undefined; 
+    $.ajax({
+        url: './files.json',
+        dataType: 'json',
+        cache: true,
+        success: function(data) {
+            let filelist = data.map(obj => obj.location);
+            // fileList is a list of files that can be accessed locally.
             
-            if (itemSplit.length > 1)
-                val = itemSplit.splice(1).join('=');
+            // Get all links and process them.
+            $('a').each(function() {
+                let href = $(this).attr('href');
+    
+                if (typeof href == 'undefined') return;
+    
+                // Trim leading dot.
+                if (href.substr(0, 1) == '.')
+                    href = href.substr(1);
+    
+                // Trim leading slash. (if no slash then it's not valid)
+                if (href.substr(0, 1) == '/')
+                    href = href.substr(1);
+                else return;
+                    
+                // Trim query.
+                href = href.split('?')[0];
+                
+                // If this url exists in the file list, it's local.
+                let isLocal = filelist.indexOf(href) != -1;
+                
+                $(this).off('click.appurl').on('click.appurl', e => {
+                    e.preventDefault();
 
-            obj[key] = val;
-        });
-    }
+                    let hrefFinal;
+                    if (isLocal) {
+                        if (isiOS)
+                            hrefFinal = `${cordova.file.applicationDirectory}www/${href}`;
+                        else
+                            hrefFinal = `file:///android_asset/www/${href}`;
+                    } else hrefFinal = `${serverUrl}/${href}`;
 
-    return obj;
+                    window.open(hrefFinal);
+                });
+            });
+        }
+    });
 }
 
-// ----------------------------------------------------------------------------
 
-function modal(title, url, callback) {
+LcatDB.inApp = function() {
+    return typeof window.cordova != 'undefined';
+};
+
+LcatDB.modal = function(title, url, callback) {
     let $element = $('<div></div>');
     $element.addClass('modal fade').html(`\
 <div class="modal-dialog">
@@ -338,113 +227,278 @@ function modal(title, url, callback) {
     $element.on('hidden.bs.modal', function() {
         $element.remove();
     });
-}
+};
 
-function inApp() {
-    return typeof cordova != 'undefined';
-}
-
-function appUrls(force) {
-    if (!force && !inApp()) return;
-
-    $(".cordova_only_hide").show();
-    $("body").addClass("in-app");
-
-    $.ajax({
-        url: './files.json',
-        dataType: 'json',
-        cache: true,
-        success: function(data) {
-            let filelist = data.map(obj => obj.location);
-            // fileList is a list of files that can be accessed locally.
+/*
+ * Create object from URL query.
+ * ex.
+ * '?foo=bar&lorem=ipsum' ->
+ * { foo: 'bar', lorem: 'ipsum' }
+ *
+ * @param {string} url
+ */
+LcatDB.urlQueryObj = function(url) {
+    let query = url.split('?')[1];
+    let obj = {};
+    if (query) {
+        let querySplit = query.split('&');
+        querySplit.forEach((item) => {
+            let itemSplit = item.split('=');
+            let key = itemSplit[0];
+            let val = undefined; 
             
-            // Get all links and process them.
-            $('a').each(function() {
-                let href = $(this).attr('href');
-    
-                if (typeof href == 'undefined') return;
-    
-                // Trim leading dot.
-                if (href.substr(0, 1) == '.')
-                    href = href.substr(1);
-    
-                // Trim leading slash. (if no slash then it's not valid)
-                if (href.substr(0, 1) == '/')
-                    href = href.substr(1);
-                else return;
-                    
-                // Trim query.
-                href = href.split('?')[0];
-                
-                // If this url exists in the file list, it's local.
-                let isLocal = filelist.indexOf(href) != -1;
-                
-                $(this).off('click.appurl').on('click.appurl', e => {
-                    e.preventDefault();
+            if (itemSplit.length > 1)
+                val = itemSplit.splice(1).join('=');
 
-                    let hrefFinal;
-                    if (isLocal) {
-                        if (isiOS)
-                            hrefFinal = `${cordova.file.applicationDirectory}www/${href}`;
-                        else
-                            hrefFinal = `file:///android_asset/www/${href}`;
-                    } else hrefFinal = `${serverUrl}/${href}`;
+            obj[key] = val;
+        });
+    }
 
-                    window.open(hrefFinal);
-                });
-            });
-        }
+    return obj;
+};
+
+/*
+ * Refresh elements that rely on unit normalization.
+ */
+LcatDB.changeUnitSystem = function(system) {
+    if (!system) system = localStorage.unitSystem;
+
+    let $normalize = $('.normalize');
+    $normalize.unitnorm('deinit');
+    $normalize.each(function() {
+        let $this = $(this);
+        let currentSystem = $this.data('unitprefsystem');
+        if (currentSystem)
+            $this.attr('data-unitprefsystem', system);
     });
-}
+    $normalize.unitnorm();
+    localStorage.unitSystem = system;
+    $('#unit-system-picker').val(system);
+};
 
-// ----------------------------------------------------------------------------
+/*
+ * Toggle elements that rely on the app being online.
+ * @param {boolean} force - Update even if already set to proper state.
+ */
+LcatDB.handleOnline = function(force) {
+    if (!force && (LcatDB.onLinePrevious == navigator.onLine)) return;
 
-function testCordova(callback) {
-    if (typeof cordova != 'undefined') return callback(true);
+    LcatDB.onLinePrevious = navigator.onLine;
 
-    const cordovaTimerMax = 1000;
+    $('body')[navigator.onLine ? 'addClass' : 'removeClass']('is-online');
 
-    let cordovaTimer = 1000;
-    let cordovaInterval = setInterval(() => {
-        cordovaTimer += 10;
-        if (typeof cordova != 'undefined') {
-            callback(true);
-            clearInterval(cordovaInterval);
-        } else if (cordovaTimer >= cordovaTimerMax) {
-            callback(false);
-            clearInterval(cordovaInterval);
-        }
+    $(".online_only_hide")[navigator.onLine ? 'show' : 'hide']();
+    $(".online_only_disable")
+        .prop('disabled', !navigator.onLine)
+        [navigator.onLine ? 'removeClass' : 'addClass']('disabled');
+
+    $(".offline_only_hide")[navigator.onLine ? 'hide' : 'show']();
+    $(".offline_only_disable")
+        .prop('disabled', navigator.onLine)
+        [navigator.onLine ? 'addClass' : 'removeClass']('disabled');
+};
+
+// Input blocking
+
+/*
+ * Begin preventing user input with a full-screen element.
+ */
+LcatDB.startInputBlock = function() {
+    $('#loading-overlay').removeClass('hide');
+    setTimeout(function() {
+        $('#loading-overlay').removeClass('disabled');
     }, 10);
+    LcatDB.activeInputBlock++;
 }
 
-// ----------------------------------------------------------------------------
+/*
+ * Allow user input after blocking.
+ */
+LcatDB.finishInputBlock = function() {
+    if (--LcatDB.activeInputBlock > 0) return;
 
-let sidebarOpen = false;
-
-function initSidebar() {
-    $(window).click(hideSidebar);
-    $("#sidebar_btn").click(function() {
-        setTimeout(showSidebar, 1);
-    });
-}
-
-function showSidebar() {
-    $("#sidebar").show();
-    $("#sidebar-overlay").removeClass("hide");
+    LcatDB.activeInputBlock = 0;
+    
+    $('#loading-overlay').addClass('disabled');
     setTimeout(function() {
-        $("#sidebar").addClass("sidebar_show");
-        $("#sidebar-overlay").removeClass("disabled");
-        sidebarOpen = true;
-    }, 20);
-}
-
-function hideSidebar() {
-    if (!sidebarOpen) return;
-    sidebarOpen = false;
-    $("#sidebar").removeClass("sidebar_show");
-    $("#sidebar-overlay").addClass("disabled");    
-    setTimeout(function() {
-        $("#sidebar").hide();
-        $("#sidebar-overlay").addClass("hide");
+        $('#loading-overlay').addClass('hide');
     }, 250);
 }
+
+// Offline info
+
+LcatDB.OfflineInfoManager = class {
+    constructor() {
+        this.block = false;
+        this.callbacks = [];
+        this.get();
+    }
+
+    /**
+     * Gets info necessary for offline operation
+     * 
+     * @param force 
+     * @param {function} callback Params: gotNewInfo {boolean}
+     */
+    get(callback, force = false) {
+        const OFFLINE_CACHE_TIME = 5 * 60 * 1000; // milliseconds
+    
+        if (callback) this.callbacks.push(callback);
+    
+        if (this.block) return;
+        this.block = true;
+        
+        let infoCurrent = this.info();
+        if (infoCurrent && !force) {
+            let timeCurrent = new Date().getTime();
+            let cacheExpired = infoCurrent.time - timeCurrent >= OFFLINE_CACHE_TIME;
+            if (!cacheExpired)
+                return this.finish(false);
+        }
+    
+        if (!navigator.onLine) return this.finish(false);
+    
+        LcatDB.startInputBlock();
+        
+        $.ajax({
+            "url": `${LcatDB.serverUrl}/api/offlineData`,
+            "dataType": "json",
+            "cache": false,
+            "timeout": 4500,
+            "method": "POST",
+            "success": (data, status) => {
+                if (status != 'success')
+                    return this.finish(false);
+
+                if (data.error) {
+                    if (data.error.errorName == 'noSession')
+                        localStorage["LcatDB.offlineInfo"] = '';
+                    return this.finish(false);
+                }
+
+                localStorage["LcatDB.offlineInfo"]  = JSON.stringify(data);
+                this.finish(true);
+            },
+            "error": () => {
+                this.finish(false);
+            }
+        });
+    }
+
+    finish(gotNewInfo) {
+        this.callbacks.forEach((callback) => {
+            callback(gotNewInfo);
+        });
+        this.callbacks = [];
+    
+        this.block = false;
+        LcatDB.finishInputBlock();
+    }
+    
+    info() {
+        if (localStorage["LcatDB.offlineInfo"])
+            return JSON.parse(localStorage["LcatDB.offlineInfo"]);
+    }
+
+    expire() {
+        let info = this.info();
+        info.time = 0;
+        localStorage["LcatDB.offlineInfo"] = JSON.stringify(info);
+    }
+};
+
+// Pages
+
+LcatDB.pages = {};
+
+// Init Functions
+
+/*
+ * Remove current navbar and re-render (with user info).
+ */
+LcatDB.updateNavbar = function() {
+    LcatDB.offlineInfo.get(function(gotNewInfo) {
+        $.get('./templates/navUser.mustache', function(template, status) {
+            if (status != 'success') return;
+    
+            let configurationId = $("#configuration-picker").val();
+
+            let navbarRender = Mustache.render(
+            	template,
+            	LcatDB.offlineInfo.info()
+            );
+
+            $('#navbar').remove();
+            $('#sidebar').remove();
+            $('#navbar-top-bg').remove();
+            $('body').append(navbarRender);
+
+            $("#sidebar_btn").click(function() {
+                setTimeout(LcatDB.showSidebar, 1);
+            });
+
+            LcatDB.handleOnline(true);
+            LcatDB.appUrls();
+        });
+    });
+};
+
+/*
+ * Show/hide elements tied to JS availability.
+ */
+LcatDB.initJs = function() {
+    $('.js').removeClass('js');
+    $('.no-js').hide();
+};
+
+/*
+ * Initialize elements that use unit normalization.
+ */
+LcatDB.initUnitSystem = function() {
+    let unitSystem = localStorage.unitSystem;
+    
+    if (!unitSystem) {
+        unitSystem = 'imperial';
+        localStorage["LcatDB.unitSystem"] = 'imperial';
+    }
+    LcatDB.changeUnitSystem(unitSystem);
+
+    $('#unit-system-picker').change(function() {
+        let system = $(this).val();
+        LcatDB.changeUnitSystem(system);
+    });
+};
+
+LcatDB.initHandleOnline = function() {
+    LcatDB.handleOnline();
+    setInterval(LcatDB.handleOnline, 1000);
+};
+
+LcatDB.initOfflineInfo = function() {
+    if (window.parent == window)
+        LcatDB.offlineInfo = new LcatDB.OfflineInfoManager();
+};
+
+LcatDB.initDevice = function() {
+	LcatDB.isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (LcatDB.isiOS) $('body').addClass('is-ios');
+
+    document.addEventListener("deviceready", function() {
+        LcatDB.appUrls(true);
+    }, false);
+};
+
+LcatDB.init = function() {
+	LcatDB.initJs();
+	LcatDB.initUnitSystem();
+    LcatDB.initSidebar();
+    LcatDB.initHandleOnline();
+
+    LcatDB.activeInputBlock = 0;
+
+    LcatDB.initOfflineInfo();
+    LcatDB.appUrls();
+};
+
+$('document').ready(function() { LcatDB.init(); });
