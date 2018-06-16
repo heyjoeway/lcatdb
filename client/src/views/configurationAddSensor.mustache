@@ -40,7 +40,7 @@
 
     <div class="container">
         <h2>Add Existing Sensor</h2>
-        {{#canEdit}}
+        {{#configuration.canEdit}}
         <h4>Input the ID in the box below.</h4>
         <form id="form" action="/configurations/{{configuration._id}}/addSensorDo" method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
@@ -78,10 +78,10 @@
             Please enable Javascript to use this feature.
         </div>
 
-        {{/canEdit}}
-        {{^canEdit}}
+        {{/configuration.canEdit}}
+        {{^configuration.canEdit}}
         <p>Sorry, you do not have permission to add a sensor.</p>
-        {{/canEdit}}
+        {{/configuration.canEdit}}
     </div>
 
     <!--scripts-->

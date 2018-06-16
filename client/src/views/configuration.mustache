@@ -59,7 +59,7 @@
                     <div class="col-xs-9 text-right extra-small text-muted">
                         {{_id}}&nbsp;&nbsp;
                         <a  href="/configurations/{{configuration._id}}/removeSensor?sid={{_id}}"
-                            class="sensor-remove btn btn-secondary btn-sm"
+                            class="sensor-remove btn btn-secondary btn-sm appurls-ignore"
                             data-sid="{{_id}}">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
@@ -75,9 +75,9 @@
             {{/sensors}}
         </ul>
         {{#canEdit}}
-        <a id="sensor-new" class="btn btn-primary" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
+        <a class="btn btn-primary appurls-ignore" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
         &nbsp;
-        <a id="sensor-existing" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
+        <a class="btn btn-secondary appurls-ignore" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
         {{/canEdit}} 
 
         <hr>

@@ -88,7 +88,19 @@ $('document').ready(() => {
 
     appUrls();
 
-    if (isiOS) $('body').addClass('is-ios');
+    if (isiOS) {
+        $('body').addClass('is-ios');
+
+        // wow another ios specific fix, how surprising 
+        // https://stackoverflow.com/a/27409350
+        if ('ontouchstart' in window) {
+            $(document).on('focus', 'textarea,input,select', function() {
+                $('.navbar.navbar-fixed-top').css('position', 'absolute');
+            }).on('blur', 'textarea,input,select', function() {
+                $('.navbar.navbar-fixed-top').css('position', '');
+            });
+        }
+    }
 
     document.addEventListener("deviceready", function() {
         appUrls(true);
@@ -360,7 +372,11 @@ function appUrls(force) {
             
             // Get all links and process them.
             $('a').each(function() {
-                let href = $(this).attr('href');
+                let $this = $(this);
+
+                if ($this.hasClass('appurls-ignore')) return;
+
+                let href = $this.attr('href');
     
                 if (typeof href == 'undefined') return;
     

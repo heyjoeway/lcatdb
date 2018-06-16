@@ -27,7 +27,7 @@
             <div id="notExists" style="display:none">
                 <p>Your anonymous identity is as follows:</p>
 
-                <form id="form" class="container" action="/registerdo?quick=true" method="post">
+                <form id="form" class="container" action="<!--url-->/registerdo?quick=true" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
@@ -43,7 +43,7 @@
                         <input class="hidden" type="text" id="passwordRetype" name="passwordRetype" readonly="readonly">
                     </div>
                     <br>
-                    <div>
+                    <div style="display:none">
                         <label class="control-label" for="timezone">
                             Timezone
                         </label>
@@ -91,7 +91,7 @@
             <div id="exists" style="display:none">
                 <p>Your browser has this identity currently stored:</p>
                 
-                <form id="formExists" class="container" action="/loginDo" method="post">
+                <form id="formExists" class="container" action="<!--url-->/loginDo" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
