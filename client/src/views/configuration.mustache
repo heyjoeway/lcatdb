@@ -75,9 +75,9 @@
             {{/sensors}}
         </ul>
         {{#canEdit}}
-        <a class="btn btn-primary appurls-ignore" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
+        <a id="sensor-new" class="btn btn-primary appurls-ignore" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
         &nbsp;
-        <a class="btn btn-secondary appurls-ignore" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
+        <a id="sensor-existing" class="btn btn-secondary appurls-ignore" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
         {{/canEdit}} 
 
         <hr>
