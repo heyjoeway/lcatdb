@@ -1,4 +1,5 @@
 {
+    "title": "lcatDB",
     "email": true,
     "url": "http://localhost:3000",
     "map": {

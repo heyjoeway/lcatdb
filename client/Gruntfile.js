@@ -1,11 +1,10 @@
 const fs = require('fs');
-
 module.exports = function(grunt) {
 
 const PACKAGE = require("./package.json");
 const CONFIG = require("./config.json");
 
-const TITLE = "lcatDB";
+const TITLE = CONFIG.title;
 const URL = CONFIG.url;
 const CORDOVA_ANDROID_BASE = '<base href="file:///android_asset/www/">';
 const CORDOVA_IOS_BASE = '<base href="./">';
@@ -81,9 +80,8 @@ config.gitinfo = {};
 
 // <!--nav--> must come before <!--nav_nouser--> and <!--nav_user-->!!!!!
 
-function readTemplate(template) {
-    return fs.readFileSync(`${TEMPLATES_DIR}/${template}`, "utf8");
-};
+let readTemplate = template =>
+    fs.readFileSync(`${TEMPLATES_DIR}/${template}`, "utf8");
 
 let replacements = [{
     match: "<!--head-->",
@@ -106,9 +104,6 @@ let replacements = [{
 }, {
     match: "<!--scripts-->",
     replacement: readTemplate(`scripts.html`)
-}, {
-    match: "<!--scripts_map-->",
-    replacement: readTemplate(`scripts_map.html`)
 }, {
     match: "<!--title-->",
     replacement: TITLE
@@ -141,9 +136,7 @@ let replacements = [{
     replacement: CONFIG.emailAddressBot
 }, {
     match: "<!--commit-->",
-    replacement: function() {
-        return grunt.config.data.gitinfo.local.branch.current.shortSHA;
-    }
+    replacement: () => grunt.config.data.gitinfo.local.branch.current.shortSHA
 }];
 
 config.replace = {
@@ -297,52 +290,113 @@ config.htmlmin.emails = {
     }]
 };
 
-config.babel = {
-    options: {
-        sourceMap: true,
-        presets: ["env"]
-    }
-};
-config.babel.www = {
-    files: [{
-        "expand": true,
-        "cwd": WWW_TMP + "/js_es2015/",
-        "src": ["**/*.es2015"],
-        "dest": WWW_TMP + "/js/",
-        "ext": ".js"
-    }]
-};
-config.babel.cordova = {
-    files: [{
-        "expand": true,
-        "cwd": CORDOVA_TMP + "/js_es2015/",
-        "src": ["**/*.es2015"],
-        "dest": CORDOVA_TMP + "/js/",
-        "ext": ".js"
-    }]
+let browserifyPrefs = {
+    src: [
+        WWW_SRC + "/js/main.js",
+    ],
+    dest: WWW_BUILD + "/js/common.js",
+    transform: [
+        ["browserify-replace", { replace: [{
+            from: /<!--head-->/,
+            to: readTemplate(`head.html`)
+        }, {
+            from: /<!--nav_user-->/,
+            to: readTemplate(`nav_user.html`)
+        }, {
+            from: /<!--nav_nouser-->/,
+            to: readTemplate(`nav_nouser.html`)
+        }, {
+            from: /<!--nav_auto-->/,
+            to: readTemplate(`nav_auto.html`)
+        }, {
+            from: /<!--nav_blank-->/,
+            to: readTemplate(`nav_blank.html`)
+        }, {
+            from: /<!--footer-->/,
+            to: readTemplate(`footer.html`)
+        }, {
+            from: /<!--scripts-->/,
+            to: readTemplate(`scripts.html`)
+        }, {
+            from: /<!--title-->/,
+            to: TITLE
+        }, {
+            from: /<!--version-->/,
+            to: PACKAGE.version
+        }, {
+            from: /<!--url-->/,
+            to: URL
+        }, {
+            from: /<!--requires_email_start-->/,
+            to: CONFIG.email ? "" : "<!--"
+        }, {
+            from: /<!--requires_email_end-->/,
+            to: CONFIG.email ? "" : "-->"    
+        }, {
+            from: /<!--map_url-->/,
+            to: CONFIG.map.url
+        }, {
+            from: /<!--map_attribution-->/,
+            to: CONFIG.map.attribution
+        }, {
+            from: /<!--map_id-->/,
+            to: CONFIG.map.id
+        }, {
+            from: /<!--map_token-->/,
+            to: CONFIG.map.token
+        }, {
+            from: /<!--email_bot-->/,
+            to: CONFIG.emailAddressBot
+        }, {
+            from: /<!--commit-->/,
+            to: () => grunt.config.data.gitinfo.local.branch.current.shortSHA
+        } ] } ],
+        ["babelify", { "presets": ["env"] }],
+        ["brfs"]
+    ],
+    bundles: {
+        outputs: [
+            WWW_BUILD + "/js/main.js"
+        ]
+    }    
 };
 
-config.uglify = {
+config.browserify = {};
+config.browserify["www-watch"] = {
+    src: browserifyPrefs.src,
+    dest: browserifyPrefs.dest,
     options: {
-        mangle: true,
-        beautify: false
+        browserifyOptions: { debug: true },
+        transform: browserifyPrefs.transform,
+        plugin: [
+            ["factor-bundle", browserifyPrefs.bundles]
+        ],
+        watch: true,
+        keepAlive: true
     }
 };
-config.uglify.www = {
-    files: [{
-        expand: true,
-        cwd: WWW_TMP + "/js/",
-        src: "**/*.js",
-        dest: WWW_BUILD + "/js/"
-    }]
+config.browserify.www_dev = {
+    src: browserifyPrefs.src,
+    dest: browserifyPrefs.dest,
+    options: {
+        browserifyOptions: { debug: true },
+        transform: browserifyPrefs.transform,
+        plugin: [
+            ["factor-bundle", browserifyPrefs.bundles]
+        ]
+    }
 };
-config.uglify.cordova = {
-    files: [{
-        expand: true,
-        cwd: CORDOVA_TMP + "/js/",
-        src: "**/*.js",
-        dest: CORDOVA_BUILD + "/js/"
-    }]
+config.browserify.www_release = {
+    src: browserifyPrefs.src,
+    dest: browserifyPrefs.dest,
+    options: {
+        browserifyOptions: { debug: false },
+        transform: browserifyPrefs.transform,
+        plugin: [
+            ["factor-bundle", browserifyPrefs.bundles],
+            ["minifyify", { map: false }]
+        ]
+    }
 };
 
 config.copy = {};
@@ -411,11 +465,11 @@ config.concurrent = {};
 config.concurrent.www = [
     'sass:www',
     'htmlmin:www',
-    'www_js'
+    'browserify:www_dev'
 ];
 config.concurrent['cordova-www'] = [
     'htmlmin:cordova',
-    'cordova-www_js'
+    'browserify:cordova'
 ];
 config.concurrent['watch-all'] = [
     "watch:views",
@@ -487,12 +541,6 @@ grunt.registerTask('cordova_ios-www', [
     'copy:cordova_ios_final'
 ]);
 
-
-grunt.registerTask('cordova-www_js', [
-    'babel:cordova',
-    'uglify:cordova',
-]);
-
 grunt.registerTask('cordova', [
     'cordova-www'
 ]);
@@ -526,12 +574,6 @@ grunt.registerTask('www', [
     'copy:www',
     'folder_list:www'
 ]);
-
-grunt.registerTask('www_js', [
-    'babel:www',
-    'uglify:www',
-]);
-
 
 
 grunt.registerTask('views-clean', [

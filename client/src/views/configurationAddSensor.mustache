@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+{{#query.modal}}
 <head>
     <!--head-->
     <title><!--title--> - Add Existing Sensor</title>
+    <meta name="app:page" content="configurationAddSensorModal"/>
+    <meta name="app:modal" content="true" />
 </head>
-{{#query.modal}}
 <body class="no-nav">
     <div id="step-1">
         <ul id="sensors" class="list-group">
@@ -31,18 +33,23 @@
     <!--scripts-->
 
     <script src="/js/lib/iframeResizer.contentWindow.min.js"></script>
-    <script src="/js/modals/configurationAddSensor.js"></script>
 </body>
 {{/query.modal}}
 {{^query.modal}}
+<head>
+    <!--head-->
+    <title><!--title--> - Add Existing Sensor</title>
+    <meta name="app:page" content="configurationAddSensor"/>
+</head>
 <body>
     <!--nav_auto-->
 
     <div class="container">
         <h2>Add Existing Sensor</h2>
-        {{#canEdit}}
+        {{#configuration.canEdit}}
         <h4>Input the ID in the box below.</h4>
-        <form id="form" action="/configurations/{{configuration._id}}/addSensorDo" method="post" class="form-horizontal"><fieldset class="container">
+        <form id="form" action="/configurations/{{configuration._id}}/addSensorDo"
+              method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
                 <label class="col-xs-2 control-label">Sensor ID</label>
                 <div class="col-xs-10"><input class="form-control" type="text" id="sid" name="sid"></div>
@@ -78,14 +85,12 @@
             Please enable Javascript to use this feature.
         </div>
 
-        {{/canEdit}}
-        {{^canEdit}}
+        {{/configuration.canEdit}}
+        {{^configuration.canEdit}}
         <p>Sorry, you do not have permission to add a sensor.</p>
-        {{/canEdit}}
+        {{/configuration.canEdit}}
     </div>
 
     <!--scripts-->
-
-    <script src="/js/pages/configurationAddSensor.js"></script>
 </body>
 {{/query.modal}}
