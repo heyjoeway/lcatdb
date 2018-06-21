@@ -133,7 +133,7 @@ class GraphManager {
         if (this.graphCurrent == -1) return;
 
         this.setsCurrent = this.graphs[this.graphCurrent].sets;
-        this.setsAvailable = dataSetManager.sets.xor(this.setsCurrent);
+        this.setsAvailable = this.dataSetManager.sets.xor(this.setsCurrent);
 
         let availableHtml = '';
 

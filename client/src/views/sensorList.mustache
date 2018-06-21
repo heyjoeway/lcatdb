@@ -6,8 +6,9 @@
 </head>
 <body>
     <!--nav_auto-->
-    <br>
-    <div class="container"><div class="col-md-8 col-md-offset-2 col-xs-12">
+    
+    <div id="content"><div class="container"><div class="col-md-8 col-md-offset-2 col-xs-12">
+        <br>
         <h2 class="h-inline">Sensors</h2>
         <br>
         <p>This page lists the sensors that are owned by you. Sensors can not take readings on their own; they must be a part of a <a href="/configurations">configuration</a> in order to be usable.</p>
@@ -28,7 +29,7 @@
         {{^user.sensors.length}}
         <p>No sensors found.</p>
         {{/user.sensors.length}}
-    </div></div>
+    </div></div></div>
 
     <!--scripts-->
 </body>

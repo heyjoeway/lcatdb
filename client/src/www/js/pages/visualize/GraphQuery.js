@@ -1,3 +1,5 @@
+import Graph from "./Graph.js";
+
 class GraphQuery extends Graph {
     static get typeName() { return "Query"; }
 
@@ -27,3 +29,5 @@ class GraphQuery extends Graph {
         return $element;
     }
 }
+
+export default GraphQuery;

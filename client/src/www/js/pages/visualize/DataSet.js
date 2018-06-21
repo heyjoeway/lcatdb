@@ -165,3 +165,5 @@ class DataSet {
         });
     }
 }
+
+export default DataSet;

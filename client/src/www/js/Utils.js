@@ -120,7 +120,7 @@ LcatDB.Utils = class {
         $(selector).each((i, element) => {
             let $element = $(element);
             let propType = $element.prop('type');
-            let propVal = jqValue($element);
+            let propVal = LcatDB.Utils.jqValueGet($element);
 
             if (typeof propVal == 'undefined') return;
 
@@ -184,3 +184,44 @@ LcatDB.Utils.CallbackChannel = class {
 };
 
 
+/**
+ * Class to create a chain of events.
+ * Helps to avoid deep nesting.
+ */
+LcatDB.Utils.Chain = class {
+    /**
+     * Create a chain.
+     * @param {...function} func
+     */
+    constructor() {
+        this.index = -1;
+        this.links = arguments;
+        this.pauseAmt = 0;
+        this.next();
+    }
+
+    /**
+     * Prevents next() from proceeding to the next event in the chain amt times
+     * 
+     * @param {number} [amt=1] 
+     */
+    pause(amt = 1) { this.pauseAmt += amt; }
+
+    /** Removes any pauses that had been created. */
+    resume() {
+        this.pauseAmt = 0;
+    }
+
+    /**
+     * Proceeds to the next event in the chain.
+     * 
+     * @returns {number} pauseAmt
+     * */
+    next() {
+        if (this.pauseAmt) return --this.pauseAmt;
+        
+        this.index++;
+        this.links[this.index].apply(this, arguments);
+        return 0;
+    }
+};

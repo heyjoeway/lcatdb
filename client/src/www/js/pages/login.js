@@ -41,5 +41,14 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
                 LcatDB.InputBlock.finish();
             });
         });
+
+        // body CSS
+        $("body").addClass("body-fullheight body-transparentnavbar body-darkbg");
+    }
+
+    deinit() {
+        $("body").backstretch("destroy");
+        $("body").removeClass("body-fullheight body-transparentnavbar body-darkbg");
+        $("input[type=submit]").off("click");
     }
 }

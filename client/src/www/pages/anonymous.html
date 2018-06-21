@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <head>
     <!--head-->
-    <title><!--title--> - Quick Join</title>
+    <title><!--title--> - Quick Submit</title>
     <meta name="app:page" content="quickJoin"/>
 </head>
 <body>
-    <div class="container">
+    <div id="content"><div class="container">
         <h2>Quick Submit</h2>
         <hr>
 
@@ -22,13 +22,13 @@
 
         <p>As a result, we highly recommend that you join with your own identity and email address. <strong>In the case that you lose your login information as an anonymous user, you will not be able to recover your account due to the lack of an email.</strong></p>
 
-        <p>You can convert any anonymous account to a standard account simply by adding an email address. Anonymous users will also be required to solve a reCaptcha when submitting data.</p>
+        <p>You can convert any anonymous account to a standard account simply by adding an email address. Anonymous users may also be required to solve a reCaptcha when submitting data in the future.</p>
 
         <div class="js">
             <div id="notExists" style="display:none">
                 <p>Your anonymous identity is as follows:</p>
 
-                <form id="form" class="container" action="/registerdo?quick=true" method="post">
+                <form id="form" action="/registerdo?quick=true" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
@@ -44,7 +44,7 @@
                         <input class="hidden" type="text" id="passwordRetype" name="passwordRetype" readonly="readonly">
                     </div>
                     <br>
-                    <div>
+                    <div style="display:none">
                         <label class="control-label" for="timezone">
                             Timezone
                         </label>
@@ -84,15 +84,24 @@
                         </select>
                     </div>
                     <br>
-                    <button type="button" id="register" class="btn btn-primary online_only_disable">Register Anonymously</button>
-                    <br>
+                    <button type="button"
+                        id="register"
+                        class="btn btn-primary online_only_disable">
+                        Register Anonymously
+                    </button>
+                    &nbsp;&nbsp;
+                    <a role="button" 
+                        class="btn btn-secondary online_only_disable" 
+                        href="/register">
+                        Register Normally
+                    </a>
                 </form>
             </div>
 
             <div id="exists" style="display:none">
                 <p>Your browser has this identity currently stored:</p>
                 
-                <form id="formExists" class="container" action="/loginDo" method="post">
+                <form id="formExists" action="/loginDo" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
@@ -107,18 +116,24 @@
                         <input class="form-control" type="password" id="passwordExists" name="password" readonly="readonly" data-toggle="password">
                     </div>
                     <br>
-                    <input type="submit" class="btn btn-primary online_only_disable" value="Log In"></input>
+                    <input type="submit"
+                        class="btn btn-primary online_only_disable"
+                        value="Log In"></input>
                 </form>
             </div>
         </div>
 
         <div class="no-js">
             You must enable Javascript in order to sign up anonymously.
+            <a role="button" 
+                class="btn btn-primary online_only_disable" 
+                href="/register">
+                Register Normally
+            </a>
         </div><br>
 
-        <a role="button" class="btn btn-secondary online_only_disable" href="/register">Register Normally</a>
 
-    </div>
+    </div></div>
 
     <!--nav_nouser-->
 

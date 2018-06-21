@@ -7,7 +7,7 @@
 <body>
     <!--nav_auto-->
 
-    <div class="container">
+    <div id="content"><div class="container">
         {{#user}}
         <h2>Edit User Info</h2>
         <hr>
@@ -136,20 +136,16 @@
                 <br>
             </div>
 
-            <a href="/user/apiKey" class="btn btn-default">
-                View/Change API Key
-            </a><br>
-
-            <br>
-
-            <div class="col-xs-10 col-xxs-12 col-xs-offset-2">
-                <a href="/dashboard.html" class="btn btn-default">Cancel</a>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div><br>
+            &nbsp;&nbsp;
+            <a href="/user/apiKey" class="btn btn-default">View/Change API Key</a>
+            &nbsp;&nbsp;
+            <a href="/dashboard.html" class="btn btn-default">Cancel</a>
+            &nbsp;&nbsp;
+            <button type="submit" class="btn btn-primary">Submit</button>
             <br>
         </form>
         {{/user}}
-    </div>
+    </div></div>
 
     <!--scripts-->
 </body>

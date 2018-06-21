@@ -141,7 +141,7 @@ body.is-ios.in-app {
     body:not(.no-nav) {
         padding-left: 256px;
         
-        & > .container {
+        & #content > .container {
             padding-top: 32px;
         }
     }

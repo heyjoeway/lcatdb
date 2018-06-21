@@ -6,30 +6,32 @@
     <meta name="app:page" content="sensorNewModal"/>
 </head>
 <body class="no-nav">
-    <div class="hide" id="configuration">{{query.configuration}}</div>
+    <div id="content">
+        <div class="hide" id="configuration">{{query.configuration}}</div>
 
-    <div id="step-1">
-        <ul class="nav nav-tabs">
-            {{#sensorTypes}}
-            <li><a data-toggle="tab" href="#{{key}}">{{type.data.name}}</a></li>
-            {{/sensorTypes}}
-        </ul>
+        <div id="step-1">
+            <ul class="nav nav-tabs">
+                {{#sensorTypes}}
+                <li><a data-toggle="tab" href="#{{key}}">{{type.data.name}}</a></li>
+                {{/sensorTypes}}
+            </ul>
 
-        <div class="tab-content">
-            {{#sensorTypes}}
-            <div id="{{key}}" class="tab-pane">
-                <ul id="modal-sensor-models" class="list-group">
-                    {{#type.data.models}}
-                    <li><a data-type="{{key}}" data-model="{{name}}" href="#" class="model list-group-item">{{name}}</a></li>
-                    {{/type.data.models}}
-                </ul>
+            <div class="tab-content">
+                {{#sensorTypes}}
+                <div id="{{key}}" class="tab-pane">
+                    <ul id="modal-sensor-models" class="list-group">
+                        {{#type.data.models}}
+                        <li><a data-type="{{key}}" data-model="{{name}}" href="#" class="model list-group-item">{{name}}</a></li>
+                        {{/type.data.models}}
+                    </ul>
+                </div>
+                {{/sensorTypes}}
             </div>
-            {{/sensorTypes}}
         </div>
-    </div>
 
-    <div id="loading" style="display:none">
-        Loading...
+        <div id="loading" style="display:none">
+            Loading...
+        </div>
     </div>
 
     <!--scripts-->
@@ -47,7 +49,7 @@
 <body>
     <!--nav_auto-->
 
-    <div class="container">
+    <div id="content"><div class="container">
         <h2>New Sensor</h2>
         <form action="/sensors/newDo{{#query.configuration}}?configuration={{.}}{{/query.configuration}}" method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
@@ -73,7 +75,7 @@
                 </div>
             </div>
         </fieldset></form>
-    </div>
+    </div></div>
 
     <!--scripts-->
 </body>

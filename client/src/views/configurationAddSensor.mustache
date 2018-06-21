@@ -7,27 +7,29 @@
     <meta name="app:modal" content="true" />
 </head>
 <body class="no-nav">
-    <div id="step-1">
-        <ul id="sensors" class="list-group">
-            {{#user.sensors}}
-            <li class="list-group-item">
-                <div class="row small">
-                    <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
-                    <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
-                </div>
-                <a href="#" class="sensor" id="{{_id}}">
-                    <span>{{model}} ({{name}})</span>
-                </a>
-            </li>
-            {{/user.sensors}}
-            {{^user.sensors.length}}
-            <p>No sensors found.</p>
-            {{/user.sensors.length}}
-        </ul>
-    </div>
+    <div id="content">
+        <div id="step-1">
+            <ul id="sensors" class="list-group">
+                {{#user.sensors}}
+                <li class="list-group-item">
+                    <div class="row small">
+                        <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
+                        <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
+                    </div>
+                    <a href="#" class="sensor" id="{{_id}}">
+                        <span>{{model}} ({{name}})</span>
+                    </a>
+                </li>
+                {{/user.sensors}}
+                {{^user.sensors.length}}
+                <p>No sensors found.</p>
+                {{/user.sensors.length}}
+            </ul>
+        </div>
 
-    <div id="loading" style="display:none">
-        Loading...
+        <div id="loading" style="display:none">
+            Loading...
+        </div>
     </div>
 
     <!--scripts-->
@@ -44,7 +46,7 @@
 <body>
     <!--nav_auto-->
 
-    <div class="container">
+    <div id="content"><div class="container">
         <h2>Add Existing Sensor</h2>
         {{#configuration.canEdit}}
         <h4>Input the ID in the box below.</h4>
@@ -89,7 +91,7 @@
         {{^configuration.canEdit}}
         <p>Sorry, you do not have permission to add a sensor.</p>
         {{/configuration.canEdit}}
-    </div>
+    </div></div>
 
     <!--scripts-->
 </body>

@@ -1,7 +1,9 @@
 LcatDB.QueryMap = class {
     constructor(obj) {
-        this.selector = obj.selector;
-        this.$element = $(`#${this.selector}`);
+        if (obj.element) this.element = obj.element;
+        else this.element = $(`#${obj.selector}`)[0];
+
+        this.$element = $(this.element);
 
         this.markers = [];
 
@@ -41,7 +43,7 @@ LcatDB.QueryMap = class {
     }
 
     initMap() {
-        this.map = L.map(this.selector);
+        this.map = L.map(this.element);
         this.map.on('load', () => {
             setInterval(() => {
                 this.map.invalidateSize();

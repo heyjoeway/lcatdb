@@ -4,28 +4,24 @@ LcatDB.Navbar = class {
      */
     static update() {
         LcatDB.offlineInfo.get(function(gotNewInfo) {
-            $.get('./templates/navUser.mustache', function(template, status) {
-                if (status != 'success') return;
-        
+            try {
                 let configurationId = $("#configuration-picker").val();
-
                 let navbarRender = Mustache.render(
-                	template,
-                	LcatDB.offlineInfo.info()
+                    `<!--nav_user-->`,
+                    LcatDB.offlineInfo.info()
                 );
-
+    
                 $('#navbar').remove();
                 $('#sidebar').remove();
                 $('#navbar-top-bg').remove();
                 $('body').append(navbarRender);
-
-                $("#sidebar_btn").click(function() {
-                    setTimeout(LcatDB.Sidebar.show, 1);
-                });
-
+    
                 LcatDB.Platform.handleOnline(true);
-                LcatDB.Platform.appUrls();
-            });
+                LcatDB.Platform.initNavigation();
+                
+                LcatDB.Sidebar.init();
+
+            } catch(e) {}
         });
     };
 }

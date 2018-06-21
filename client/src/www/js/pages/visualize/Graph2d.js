@@ -1,3 +1,5 @@
+import Graph from "./Graph.js";
+
 class Graph2d extends Graph {
     static get typeName() { return "2-D Plot" }
 
@@ -106,3 +108,5 @@ class Graph2d extends Graph {
         let graph2d = new vis.Graph2d(container, dataset, options);
     }
 }
+
+export default Graph2d;

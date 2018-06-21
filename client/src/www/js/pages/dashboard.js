@@ -5,7 +5,11 @@ LcatDB.Pages.classes.dashboard = class extends LcatDB.Page {
 	    ["verifySuccess", "verifyFailure"].forEach(function(key) {
 	        if (queryObj[key]) $('#' + key).show();
 	    });
-
-	    LcatDB.Navbar.update();
+		
+		$("body").addClass("body-fullheight page-dashboard");
+	}
+	
+	deinit() {
+		$("body").removeClass("body-fullheight page-dashboard");
 	}
 };

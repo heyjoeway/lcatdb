@@ -7,7 +7,7 @@
 <body>
     <!--nav_nouser-->
     
-    <div class="container">
+    <div id="content"><div class="container">
         {{#query}}
         <h2>Register</h2>
         <hr>
@@ -43,7 +43,7 @@
         {{/taken}}
         {{/query}}
 
-        <form class="container" action="/registerdo" method="post">
+        <form action="/registerdo" method="post">
             <div>
                 <label class="control-label" for="username">
                     Username
@@ -72,7 +72,7 @@
                 <input class="form-control" type="email" name="email">
             </div>
             <br>
-            <div>
+            <div style="display:none">
                 <label class="control-label" for="timezone">
                     Timezone
                 </label>
@@ -118,7 +118,7 @@
             </div>
 
         </form>
-    </div>
+    </div></div>
 
     <!--scripts-->
 </body>

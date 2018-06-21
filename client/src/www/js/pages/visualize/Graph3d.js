@@ -1,3 +1,5 @@
+import Graph from "./Graph.js";
+
 class Graph3d extends Graph {
     static get typeName() { return "3-D Plot"; }
 
@@ -120,3 +122,5 @@ class Graph3d extends Graph {
         $($element.children()[0]).addClass('visualize-graph-3d');
     }
 }
+
+export default Graph3d;

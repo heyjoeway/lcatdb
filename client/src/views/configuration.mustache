@@ -6,8 +6,7 @@
 </head>
 <body>
     <!--nav_auto-->
-
-    <div class="container">
+    <div id="content"><div class="container">
     {{#configuration}}
         <div class="hide" id="configuration">{{_id}}</div>
         <br>
@@ -43,10 +42,18 @@
             </div>
         </div>
         <br>
-        <a role="button" class="btn btn-primary" href="/configurations/{{_id}}/readings">View Readings</a>
+        <a role="button"
+            class="btn btn-primary nav-ignore"
+            href="/configurations/{{_id}}/readings">
+            View Readings
+        </a>
         &nbsp;
         {{#canEdit}}        
-        <a role="button" class="btn btn-secondary" href="/configurations/{{_id}}/edit">Edit Details</a>
+        <a role="button"
+            class="btn btn-secondary nav-ignore"
+            href="/configurations/{{_id}}/edit">
+            Edit Details
+        </a>
         {{/canEdit}}
 
         <hr>
@@ -60,7 +67,7 @@
                     <div class="col-xs-9 text-right extra-small text-muted">
                         {{_id}}&nbsp;&nbsp;
                         <a  href="/configurations/{{configuration._id}}/removeSensor?sid={{_id}}"
-                            class="sensor-remove btn btn-secondary btn-sm"
+                            class="sensor-remove btn btn-secondary btn-sm nav-ignore"
                             data-sid="{{_id}}">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
@@ -76,9 +83,17 @@
             {{/sensors}}
         </ul>
         {{#canEdit}}
-        <a id="sensor-new" class="btn btn-primary" href="/sensors/new?configuration={{_id}}">Add New Sensor</a>
+        <a id="sensor-new"
+            class="btn btn-primary nav-ignore"
+            href="/sensors/new?configuration={{_id}}">
+            Add New Sensor
+        </a>
         &nbsp;
-        <a id="sensor-existing" class="btn btn-secondary" href="/configurations/{{_id}}/addSensor">Add Existing Sensor</a>
+        <a id="sensor-existing"
+            class="btn btn-secondary nav-ignore"
+            href="/configurations/{{_id}}/addSensor">
+            Add Existing Sensor
+        </a>
         {{/canEdit}} 
 
         <hr>
@@ -113,7 +128,7 @@
             {{/edits}}
         </ul>
         {{/configuration}}
-    </div>
+    </div></div>
 
     <!--scripts-->
 </body>

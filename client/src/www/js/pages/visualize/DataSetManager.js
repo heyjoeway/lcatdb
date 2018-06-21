@@ -1,3 +1,5 @@
+import DataSet from "./DataSet.js";
+
 class DataSetManager {
     constructor() {
         this.sets = [];
@@ -157,3 +159,5 @@ class DataSetManager {
         return this.setUidMap[setUid];
     }
 }
+
+export default DataSetManager;

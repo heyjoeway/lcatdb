@@ -6,6 +6,7 @@
     <meta name="app:page" content="configurationRemoveSensorModal"/>
 </head>
 <body class="no-nav">
+    <div id="content">
     {{#configuration.canEdit}}
     <div id="step-1">
         <p>Are you sure you want to remove this sensor from this configuration? The sensor will still exist, and can be re-added at any time.</p>
@@ -24,6 +25,7 @@
     {{^configuration.canEdit}}
     <p>Sorry, you do not have permission to edit this configuration.</p>
     {{/configuration.canEdit}}
+    </div>
 
     <!--scripts-->
     <script src="/js/lib/iframeResizer.contentWindow.min.js"></script>
@@ -39,7 +41,7 @@
 <body>
     <!--nav_auto-->
 
-    <div class="container">
+    <div id="content"><div class="container">
         <h2>Remove Sensor</h2>
         <hr>
         {{#configuration.canEdit}}
@@ -65,7 +67,7 @@
         <p>Sorry, you do not have permission to edit this configuration.</p>
         {{/configuration.canEdit}}
 
-    </div>
+    </div></div>
 
     <!--scripts-->
 </body>

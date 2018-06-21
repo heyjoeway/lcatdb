@@ -37,9 +37,10 @@ body.is-ios.in-app {
 @import "map";
 @import "sidebar";
 @import "dashboard";
+@import "content";
 
 @media (max-width: 1199px) {
-    body:not(.no-nav) > .container {
+    body:not(.no-nav) #content > .container {
         padding-top: 64px;
     }
 }
@@ -144,20 +145,7 @@ a.disabled {
     left: 0;
     bottom: 0;
     fill: #fff;
-    -webkit-animation: navbar-toggle-fade 0.2s ease-out both;
-    animation: navbar-toggle-fade 0.2s ease-out both;
-}
-
-@-webkit-keyframes navbar-toggle-fade {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-@keyframes navbar-toggle-fade {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-}
-  
+}  
 
 .container-flex {
     height: 100%;
@@ -249,4 +237,11 @@ body.is-ios:not(.body-transparentnavbar) .navbar {
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     background-color: rgba(33, 150, 243, 0.6);
+}
+
+.no-nav {
+    & #navbar, & #sidebar, & #navbar-top-bg {
+        opacity: 0;
+        pointer-events: none;
+    }
 }

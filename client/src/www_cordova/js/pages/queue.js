@@ -1,6 +1,5 @@
 LcatDB.Pages.classes.queue = class extends LcatDB.Page {
     init() {
-        LcatDB.Navbar.update();
         this.updateList();
         $('#queue_submit').click(function() {
             LcatDB.App.offlineEventQueue.autoSubmit();

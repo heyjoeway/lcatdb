@@ -3,8 +3,6 @@ import GraphManager from "./visualize/GraphManager.js";
 
 LcatDB.Pages.classes.visualize = class extends LcatDB.Page {
     init() {
-        LcatDB.Navbar.update();
-
         this.dataSetManager = new DataSetManager();
         this.graphManager = new GraphManager(this.dataSetManager);
 

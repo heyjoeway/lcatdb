@@ -94,3 +94,5 @@ class Graph {
 
     createGraph() { return 'Not implemented.' }
 }
+
+export default Graph;

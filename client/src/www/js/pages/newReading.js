@@ -1,3 +1,5 @@
+const fs = require('fs'); // Browserify transform
+
 LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     updateConfigList(init) {
         LcatDB.offlineInfo.get(gotNewInfo => {
@@ -22,40 +24,40 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     }
 
     changeConfig() {
-        $.get('./templates/configurationSensors.mustache', (template, status) => {
-            if (status != 'success') return;
+        let template = fs.readFileSync(
+            __dirname + "/templates/configurationSensors.mustache"
+        ).toString();
 
-            let configurationIndex = $("#configuration-picker").val();
+        let configurationIndex = $("#configuration-picker").val();
 
-            let data = LcatDB.offlineInfo.info();
-            let configuration = data.configurations[configurationIndex]; 
-            this.configurationId = configuration['_id'];
+        let data = LcatDB.offlineInfo.info();
+        let configuration = data.configurations[configurationIndex]; 
+        this.configurationId = configuration['_id'];
 
-            configuration.sensors.forEach(function(sensor, i) {
-                sensor.index = i;
-                sensor.html = Mustache.render(
-                    data.sensorTypes[sensor.type].inputTemplate,
-                    sensor
-                );
-            });
-
-            $('#configuration-sensors').html(
-                Mustache.render(template, {
-                    "configuration": configuration
-                })
+        configuration.sensors.forEach(function(sensor, i) {
+            sensor.index = i;
+            sensor.html = Mustache.render(
+                data.sensorTypes[sensor.type].inputTemplate,
+                sensor
             );
-            $('#configuration-link').prop(
-                'href',
-                `${LcatDB.serverUrl}/configurations/${configuration['_id']}`
-            );
-            $('.configuration-chosen').show();
-            $('.configuration-notchosen').hide();
-
-            $('#configuration-sensors .spoiler').spoiler();
-            LcatDB.UnitSystem.change();
-            this.initSensorBtns();
-            this.updateSubmit();
         });
+
+        $('#configuration-sensors').html(
+            Mustache.render(template, {
+                "configuration": configuration
+            })
+        );
+        $('#configuration-link').prop(
+            'href',
+            `${LcatDB.serverUrl}/configurations/${configuration['_id']}`
+        );
+        $('.configuration-chosen').show();
+        $('.configuration-notchosen').hide();
+
+        $('#configuration-sensors .spoiler').spoiler();
+        LcatDB.UnitSystem.change();
+        this.initSensorBtns();
+        this.updateSubmit();
     }
 
 
@@ -92,9 +94,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
                 e.preventDefault();
 
                 let cid = this.configurationId;
-                // TODO
                 let sid = $(e.target).data('sid');
-                console.log(e);
 
                 new LcatDB.Modal(
                     data.title,
@@ -329,7 +329,6 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         this.initMobile();
         this.initDatetime();
         LcatDB.Utils.preventEnterKey();
-        LcatDB.Navbar.update();
 
         $('.normalize').unitnorm();
         $('.spoiler').spoiler();
@@ -344,5 +343,12 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         });
 
         this.initMap();
+
+        $("body").addClass("page-newReading");
+    }
+    
+    deinit() {
+        $("body").removeClass("page-newReading");
+        $(document).off('submit', 'form');
     }
 };

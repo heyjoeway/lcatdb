@@ -1,3 +1,5 @@
+import Graph from "./Graph.js";
+
 class GraphRaw extends Graph {
     static get typeName() { return "Raw"; }
 
@@ -21,3 +23,5 @@ class GraphRaw extends Graph {
         return $element;
     }
 }
+
+export default GraphRaw;

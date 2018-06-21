@@ -99,9 +99,6 @@ let replacements = [{
     match: "<!--nav_blank-->",
     replacement: readTemplate(`nav_blank.html`)
 }, {
-    match: "<!--footer-->",
-    replacement: readTemplate(`footer.html`)
-}, {
     match: "<!--scripts-->",
     replacement: readTemplate(`scripts.html`)
 }, {
@@ -149,20 +146,15 @@ config.replace.www = {
     files: [{
         expand: true,
         cwd: WWW_SRC + "/pages",
-        src: ["**/*.html", "**/*.mustache"],
+        src: ["**/*.html"],
         dest: WWW_TMP
-    }, {
-        expand: true,
-        cwd: WWW_SRC + "/js_es2015",
-        src: ["**/*.es2015"],
-        dest: WWW_TMP + "/js_es2015"
     }]
 };
 config.replace.www_recursive = {
     files: [{
         expand: true,
         cwd: WWW_TMP,
-        src: ["**/*.html", "**/*.mustache"],
+        src: ["**/*.html"],
         dest: WWW_TMP
     }]
 };
@@ -312,9 +304,6 @@ let browserifyPrefs = {
             from: /<!--nav_blank-->/,
             to: readTemplate(`nav_blank.html`)
         }, {
-            from: /<!--footer-->/,
-            to: readTemplate(`footer.html`)
-        }, {
             from: /<!--scripts-->/,
             to: readTemplate(`scripts.html`)
         }, {
@@ -403,11 +392,6 @@ config.copy = {};
 config.copy.www = {
     files: [{
         expand: true,
-        cwd: WWW_SRC + "/js_ext/",
-        src: "**/*",
-        dest: WWW_BUILD + "/js/"
-    }, {
-        expand: true,
         cwd: WWW_SRC + "/img/",
         src: "**/*.{svg,png,jpg,jpeg,gif,json}",
         dest: WWW_BUILD + "/img/"
@@ -464,8 +448,7 @@ config.folder_list.www = {
 config.concurrent = {};
 config.concurrent.www = [
     'sass:www',
-    'htmlmin:www',
-    'browserify:www_dev'
+    'htmlmin:www'
 ];
 config.concurrent['cordova-www'] = [
     'htmlmin:cordova',
@@ -571,6 +554,7 @@ grunt.registerTask('www', [
     'replace:www',
     'replace:www_recursive',
     'concurrent:www',
+    'browserify:www_dev',
     'copy:www',
     'folder_list:www'
 ]);

@@ -1,3 +1,5 @@
+import Graph from "./Graph.js";
+
 class GraphMap extends Graph {
     static get typeName() { return "Map"; }
 
@@ -20,12 +22,17 @@ class GraphMap extends Graph {
     }
 
     createGraph() {
-        let queries = JSURL.stringify(this.data);
-        let url ="./embed/map.html?queries=" + queries;
-        let $element = $('<iframe></iframe>', {
-            "class": "graph_map map-iframe",
-            "src": url
+        let $element = $('<div></div>', {
+            "class": "graph_map map-iframe"
         });
+        
+        let map = new LcatDB.QueryMap({
+            element: $element[0] ,
+            queries: this.data
+        });
+
         return $element;
     }
 }
+
+export default GraphMap;
