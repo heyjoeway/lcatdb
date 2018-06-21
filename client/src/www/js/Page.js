@@ -56,6 +56,10 @@ LcatDB.Pages = class {
 				$html.find(`meta[name='app:page']`).prop("content")
 			);
 
+			$(`meta[name='app:mustLogin']`).prop("content",
+				$html.find(`meta[name='app:mustLogin']`).prop("content")
+			);
+
 			$("#content").css({
 				opacity: 1,
 				"pointer-events": "unset"
@@ -81,6 +85,7 @@ require("./pages/configurationTutorial.js");
 require("./pages/dashboard.js");
 require("./pages/home.js");
 require("./pages/login.js");
+require("./pages/loginModal.js");
 require("./pages/newReading.js");
 require("./pages/quickJoin.js");
 require("./pages/sensorNewModal.js");

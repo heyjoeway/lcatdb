@@ -42,8 +42,16 @@ LcatDB.OfflineInfoManager = class {
                     return this.finish(false);
 
                 if (data.error) {
-                    if (data.error.errorName == 'noSession')
+                    if (data.error.errorName == 'noSession') {
                         localStorage["LcatDB.offlineInfo"] = '';
+                        LcatDB.InputBlock.finish(-1);
+                        let mustLogin = $(`meta[name='app:mustLogin']`).prop("content") == "true";
+                        if (mustLogin) (new LcatDB.Modal(
+                            "Login",
+                            "./loginModal.html",
+                            modal => location.reload()
+                        )).lock();
+                    }
                     return this.finish(false);
                 }
 
@@ -75,5 +83,9 @@ LcatDB.OfflineInfoManager = class {
         let info = this.info();
         info.time = 0;
         localStorage["LcatDB.offlineInfo"] = JSON.stringify(info);
+    }
+    
+    clear() {
+        localStorage["LcatDB.offlineInfo"] = '';
     }
 };

@@ -6,6 +6,10 @@ LcatDB.Sidebar = class {
         $("#sidebar_btn").click(function() {
             setTimeout(LcatDB.Sidebar.open, 1);
         });
+
+        $(".logout").click(() => {
+            LcatDB.offlineInfo.clear();
+        });
     }
 
     static open() {

@@ -15,8 +15,11 @@ LcatDB.InputBlock = class {
     /*
      * Allow user input after blocking.
      */
-    static finish() {
-        if (--LcatDB.InputBlock.amt > 0) return;
+    static finish(amt = 1) {
+        if (amt < 0) LcatDB.InputBlock.amt = 0;
+        else LcatDB.InputBlock.amt -= amt;
+        
+        if (LcatDB.InputBlock.amt > 0) return;
 
         LcatDB.InputBlock.amt = 0;
         
