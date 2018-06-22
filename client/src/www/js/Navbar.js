@@ -6,9 +6,10 @@ LcatDB.Navbar = class {
         LcatDB.offlineInfo.get(gotNewInfo => {
             let configurationId = $("#configuration-picker").val();
             let info = LcatDB.offlineInfo.info();
-            if (typeof info != "undefined") {
+            let noUser = $(`meta[name='app:noUser']`).prop("content") == "true";
+            if ((typeof info != "undefined") && !noUser) {
                 let navbarRender = Mustache.render(`<!--nav_user-->`, info);
-    
+                
                 $('#navbar').remove();
                 $('#sidebar').remove();
                 $('#navbar-top-bg').remove();

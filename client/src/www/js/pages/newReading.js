@@ -55,7 +55,10 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         $('.configuration-notchosen').hide();
 
         $('#configuration-sensors .spoiler').spoiler();
+        
         LcatDB.UnitSystem.change();
+        LcatDB.Platform.initNavigation();
+
         this.initSensorBtns();
         this.updateSubmit();
     }
