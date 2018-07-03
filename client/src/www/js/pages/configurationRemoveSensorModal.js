@@ -1,5 +1,8 @@
 LcatDB.Pages.classes.configurationRemoveSensorModal = class extends LcatDB.Page {
     init() {
+        $('#step-1').show();
+        $('#loading').hide();
+
         $('#remove').click(function(e) {
             e.preventDefault();
 
@@ -14,7 +17,7 @@ LcatDB.Pages.classes.configurationRemoveSensorModal = class extends LcatDB.Page 
 
             $.post(`${LcatDB.serverUrl}/configurations/${configurationId}/removeSensorDo`,
                 { "sid": queryObj.sid},
-                (data, success) => window.parent.postMessage('modal.done', '*')
+                () => window.parent.postMessage('modal.done', '*')
             );
         });
     }

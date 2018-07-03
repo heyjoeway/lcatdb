@@ -5,7 +5,7 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
         window.parent.postMessage('modal.reload', '*');
 
         // Slideshow
-        $('body').backstretch([
+        $('#content').backstretch([
             './img/home/bg1.jpg',
             './img/home/bg2.jpg',
             './img/home/bg3.jpg',
@@ -18,7 +18,7 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
             if (queryObj[key]) $('#' + key).show();
         });
 
-        $('input[type=submit]').click(function(e) {
+        $('input[type=submit]').click(e => {
             e.preventDefault();
 
             LcatDB.InputBlock.start();
@@ -27,14 +27,16 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
                 "username": $('input[name=username]').val(),
                 "password": $('input[name=password]').val(),
                 "infoOnly": true
-            }, function(data, status) {
-                if (data.success) location.href = "./dashboard.html";
+            }, (data, status) => {
+                LcatDB.InputBlock.finish();
+                
+                if (data.success) LcatDB.Pages.navigate("./dashboard.html");
                 else {
-                    ["forgotSent", "invalid", "reset"].forEach(function(key) {
-                        $('#' + key).hide();
-                    });
+                    ["forgotSent", "invalid", "reset"].forEach(
+                        key => $('#' + key).hide()
+                    );
+
                     $(`#${data.errorName}`).show();
-                    LcatDB.InputBlock.finish();
                 }
             }).fail(function() {
                 $(`#server`).show();
@@ -47,7 +49,7 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
     }
 
     deinit() {
-        $("body").backstretch("destroy");
+        $("#content").backstretch("destroy");
         $("body").removeClass("body-fullheight body-transparentnavbar body-darkbg");
         $("input[type=submit]").off("click");
     }

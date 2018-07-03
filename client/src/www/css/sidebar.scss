@@ -100,6 +100,15 @@ body.is-ios.in-app {
 		padding: 0 !important;
         list-style-type: none;
         position: relative;
+        transition: background-color 0.15s;
+
+        &:hover {
+            background-color: rgba(0,0,0,0.075);
+        }
+
+        &:active {
+            background-color: rgba(0,0,0,0.2);
+        }
 
 		&.current {
 			background-color: rgba(0,0,0,0.2);
@@ -116,7 +125,8 @@ body.is-ios.in-app {
 			text-transform: uppercase;
 			width: 100%;
             padding-left: 72px;
-			color: inherit;
+            color: inherit;
+            text-decoration: none;
 		}
 
 		& > .material-icons {

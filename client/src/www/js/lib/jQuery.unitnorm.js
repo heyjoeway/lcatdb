@@ -87,7 +87,7 @@
                     "inputType": "text",
                     "suffix": "",
                     "from": function(dm) {
-                        var degrees = minutes = seconds = 0;
+                        var degrees = 0, minutes = 0, seconds = 0;
 
                         var negative = dm.substring(0, 1) == '-';
 

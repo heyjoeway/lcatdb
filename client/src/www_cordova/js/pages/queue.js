@@ -1,9 +1,11 @@
+const fs = require('fs'); // Browserify transform
+
 LcatDB.Pages.classes.queue = class extends LcatDB.Page {
     init() {
         this.updateList();
-        $('#queue_submit').click(function() {
-            LcatDB.App.offlineEventQueue.autoSubmit();
-        });
+        $('#queue_submit').click(() =>
+            LcatDB.App.offlineEventQueue.autoSubmit()
+        );
     
         LcatDB.App.offlineEventQueue.addUpdateCallback(
             () => this.updateList()
@@ -11,29 +13,27 @@ LcatDB.Pages.classes.queue = class extends LcatDB.Page {
     }
     
     updateList() {
-        // $('#queue_submit').attr('disabled', 'true');
-        $.get('./templates/queueList.mustache', function(template, status) {
-            if (status != 'success') return;
-            
-            $('#queue_list').html(
-                Mustache.render(template, {
-                    "queueList": LcatDB.App.offlineEventQueue.toArray()
-                })
-            );
-            if (navigator.onLine)
-                $('#queue_submit').removeAttr('disabled');
-            
-            LcatDB.UnitSystem.change();
-    
-            $('.event-submit').off('click').click(function() {
-                let eventId = parseInt($(this).data('eventid'));
-                offlineEventQueue.submitEventId(eventId, true);
-            });
-    
-            $('.event-remove').off('click').click(function() {
-                let eventId = parseInt($(this).data('eventid'));
-                offlineEventQueue.removeEventId(eventId);
-            });
+        let template = fs.readFileSync(
+            __dirname + "/templates/queueList.mustache"
+        ).toString();
+
+        $('#queue_list').html(
+            Mustache.render(template, {
+                "queueList": LcatDB.App.offlineEventQueue.toArray()
+            })
+        );
+
+        LcatDB.Platform.handleOnline(true);
+        LcatDB.UnitSystem.change();
+
+        $('.event-submit').off('click').click(function() {
+            let eventId = parseInt($(this).data('eventid'));
+            LcatDB.App.offlineEventQueue.submitEventId(eventId, true);
+        });
+
+        $('.event-remove').off('click').click(function() {
+            let eventId = parseInt($(this).data('eventid'));
+            LcatDB.App.offlineEventQueue.removeEventId(eventId);
         });
     }
 };

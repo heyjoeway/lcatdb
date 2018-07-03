@@ -9,7 +9,7 @@
 <body class="no-nav">
     <div id="content">
     {{#configuration.canEdit}}
-    <div id="step-1">
+    <div id="step-1" style="display:none">
         <p>Are you sure you want to remove this sensor from this configuration? The sensor will still exist, and can be re-added at any time.</p>
         <div class="text-right">
             <button class="btn btn-danger" id="remove">Remove</button>
@@ -18,7 +18,7 @@
         <br>
     </div>
 
-    <div id="loading" style="display:none">
+    <div id="loading">
         Loading...
     </div>
 
@@ -46,7 +46,7 @@
         <h2>Remove Sensor</h2>
         <hr>
         {{#configuration.canEdit}}
-        <form action="/configurations/{{configuration._id}}/removeSensorDo" method="post" class="container">
+        <form action="<!--url-->/configurations/{{configuration._id}}/removeSensorDo" method="post" class="container">
             <div class="row">
                 <label class="col-xs-12 col-sm-2"><strong>Configuration</strong></label>
                 <div class="col-xs-12 col-sm-10">{{configuration._id}}</div>

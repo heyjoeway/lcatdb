@@ -30,7 +30,7 @@
             <div id="notExists" style="display:none">
                 <p>Your anonymous identity is as follows:</p>
 
-                <form id="form" action="/registerdo?quick=true" method="post">
+                <form id="form" action="<!--url-->/registerdo?quick=true" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
@@ -103,7 +103,7 @@
             <div id="exists" style="display:none">
                 <p>Your browser has this identity currently stored:</p>
                 
-                <form id="formExists" action="/loginDo" method="post">
+                <form id="formExists" action="<!--url-->/loginDo" method="post">
                     <div>
                         <label class="control-label" for="username">
                             Username
@@ -118,9 +118,10 @@
                         <input class="form-control" type="password" id="passwordExists" name="password" readonly="readonly" data-toggle="password">
                     </div>
                     <br>
-                    <input type="submit"
-                        class="btn btn-primary online_only_disable"
-                        value="Log In"></input>
+                    <button type="button" id="login"
+                        class="btn btn-primary online_only_disable">
+                        Log In
+                    </button>
                 </form>
             </div>
         </div>

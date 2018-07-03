@@ -51,6 +51,31 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
         $("#usernameExists").val(localStorage['anon.username']);
         $("#passwordExists").val(localStorage['anon.password']);
         $('#exists').show();
+
+        $('#login').click(e => {
+            e.preventDefault();
+
+            LcatDB.InputBlock.start();
+
+            $.post(`${LcatDB.serverUrl}/loginDo`, {
+                "username": localStorage['anon.username'],
+                "password": localStorage['anon.password'],
+                "infoOnly": true
+            }, (data, status) => {
+                LcatDB.InputBlock.finish();
+                if (data.success) LcatDB.Pages.navigate("./dashboard.html");
+                else {
+                    ["forgotSent", "invalid", "reset"].forEach(
+                        key =>$('#' + key).hide()
+                    );
+
+                    $(`#${data.errorName}`).show();
+                }
+            }).fail(() => {
+                $(`#server`).show();
+                LcatDB.InputBlock.finish();
+            });
+        });
     }
 
     initNotExists() {
@@ -65,7 +90,26 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
         $("#register").click(() => {
             localStorage['anon.username'] = $("#username").val();
             localStorage['anon.password'] = $("#password").val();
-            $("#form").submit();
+
+            LcatDB.InputBlock.start();
+
+			let xhr = new XMLHttpRequest();
+
+			$.ajax({
+				url: `${LcatDB.serverUrl}/registerdo?quick=true`,
+				method: 'POST',
+                data: $('#form').serialize(),
+				dataType: 'html',
+				xhr: () => xhr,
+				success: (data, status) => {
+                    LcatDB.InputBlock.finish();
+
+                    if (status != "success") return;
+
+                    LcatDB.Pages.populateContent(data, xhr.responseURL);
+                },
+                failure: () => LcatDB.InputBlock.finish()
+			});
         });
     }
 

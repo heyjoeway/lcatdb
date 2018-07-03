@@ -1,3 +1,5 @@
+const fs = require('fs'); // Browserify transform
+
 LcatDB.Pages = class {
 	static init() {
 		LcatDB.Pages.initPage();
@@ -17,56 +19,140 @@ LcatDB.Pages = class {
 		LcatDB.Platform.init();
 		LcatDB.MapsCommon.init();
 		LcatDB.ModalsCommon.init();
+        LcatDB.App.initElements();
 
 		$('.selectpicker').selectpicker();
 	}
 
-	static navigate(url, skipHistory) {
+	static reload() {
+		LcatDB.Pages.navigate(location.href, true);
+	}
+
+	static fadeOutContent(callback) {
+		$("#content").css({
+			opacity: 0,
+			"pointer-events": "none"
+		});
+
+		if (callback) setTimeout(callback, 200);
+	}
+
+	static fadeInContent() {
+		$("#content").css({
+			opacity: 1,
+			"pointer-events": "unset"
+		});
+	}
+
+	static showSpinner() {
+        $('#loading-content').removeClass('hide');
+        setTimeout(function() {
+            $('#loading-content').removeClass('disabled');
+        }, 10);
+	}
+
+	static hideSpinner() {
+        $('#loading-content').addClass('disabled');
+        setTimeout(function() {
+            $('#loading-content').addClass('hide');
+        }, 250);
+	}
+
+	static populateContent(htmlString, url, skipHistory, replaceHistory) {
+		$("html").scrollTop(0);
+
+		let $html = $($("<div></div>").html(htmlString));
+
+		if (LcatDB.Pages.current)
+			LcatDB.Pages.current.deinit();
+		
+		let title = $html.find("title").html();
+
+		if (replaceHistory) history.replaceState({}, title,
+			LcatDB.Platform.fixUrlHistoryPushState(url)
+		);
+		else if (!skipHistory) history.pushState({}, title,
+			LcatDB.Platform.fixUrlHistoryPushState(url)
+		);
+
+		document.title = title;
+
+		$("#content").html($html.find("#content").html());
+
+		$(`meta[name='app:page']`).prop("content",
+			$html.find(`meta[name='app:page']`).prop("content")
+		);
+
+		let refreshNav = false;
+		['mustLogin', 'noUser'].forEach(x => {
+			let metaPrev = $(`meta[name='app:${x}']`).prop("content") || "false";
+			let metaNew = $html.find(`meta[name='app:${x}']`).prop("content") || "false";
+
+			refreshNav = refreshNav || (metaPrev != metaNew);
+			$(`meta[name='app:${x}']`).prop("content", metaNew);
+		});
+
+		if (refreshNav) LcatDB.Sidebar.update();
+
+		LcatDB.Pages.initPage();
+		LcatDB.Pages.fadeInContent();
+		LcatDB.Pages.hideSpinner();
+	}
+
+	static navigate(url, skipHistory, replaceHistory) {
 		new LcatDB.Utils.Chain(function() {
-			$("#content").css({
-				opacity: 0,
-				"pointer-events": "none"
-			});
-			this.pause();
+			LcatDB.Platform.resolveAppUrl(url, urlRes => this.next(urlRes));
+		}, function(urlResolution) {
+			url = urlResolution.url;
+
+			// If can't navigate, then url is remote. Open externally
+			if (!urlResolution.canNavigate)
+				return window.open(url, '_system');
+			
+			let isWebsite = LcatDB.Platform.isWebsite;
+			let inApp = LcatDB.Platform.inApp(); 
+			let isLocal = urlResolution.isLocal;
+
+			// Remote URL cannot GET from local files
+			if (isWebsite && inApp && isLocal)
+				return window.open(url);
 
 			// Give time for css anim
-			setTimeout(() => this.next(), 200);
+			this.pause();
+			LcatDB.Pages.fadeOutContent(() => this.next());
 
-			$.get(url, data => {
-				this.html = $("<div></div>").html(data);
-				window.test = this.html;
-				this.next();
-			}, "html");
-		}, function() {
-			$("html").scrollTop(0);
+			LcatDB.Pages.showSpinner();
 
-			let $html = $(this.html);
+			// Load data
+			// xhr is used to capture final url in case of redirect
+			this.xhr = new XMLHttpRequest();
 
-			if (LcatDB.Pages.current)
-				LcatDB.Pages.current.deinit();
-			
-			let title = $html.find("title").html();
-
-			if (!skipHistory) history.pushState({}, title, url);
-			document.title = title;
-
-			$("#content").html($html.find("#content").html());
-
-			$(`meta[name='app:page']`).prop("content",
-				$html.find(`meta[name='app:page']`).prop("content")
-			);
-
-			$(`meta[name='app:mustLogin']`).prop("content",
-				$html.find(`meta[name='app:mustLogin']`).prop("content")
-			);
-
-			$("#content").css({
-				opacity: 1,
-				"pointer-events": "unset"
+			$.ajax({
+				url: url,
+				method: 'GET',
+				dataType: 'html',
+				xhr: () => this.xhr,
+				success: data => {
+					console.log("success");
+					this.htmlString = data;
+					this.next();	
+				},
+				error: () => {
+					console.log("error");
+					this.htmlString = fs.readFileSync(
+						__dirname + "/templates/error.html"
+					).toString();
+					this.next();
+				}
 			});
-
-			LcatDB.Pages.initPage();
-		})
+		}, function() {
+			LcatDB.Pages.populateContent(
+				this.htmlString,
+				this.xhr.responseURL || url,
+				skipHistory,
+				replaceHistory
+			)
+		});
 	}
 };
 
@@ -90,3 +176,5 @@ require("./pages/newReading.js");
 require("./pages/quickJoin.js");
 require("./pages/sensorNewModal.js");
 require("./pages/visualize.js");
+require("./pages/userEdit.js");
+require("./pages/register.js");

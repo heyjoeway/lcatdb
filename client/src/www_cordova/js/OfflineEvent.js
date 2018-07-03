@@ -1,4 +1,4 @@
-class OfflineEvent {
+LcatDB.App.OfflineEvent = class {
     constructor(obj) {
         obj = obj || {};
         this.type = obj.type || "OfflineEvent";
@@ -41,6 +41,14 @@ class OfflineEvent {
         console.log("Please override this function.");
         callback({ "success": "true" });
     }
-}
 
-export default OfflineEvent;
+    fail() {
+        this.status = "failure";
+        this.failures++;
+
+        try {
+            if (this.response.data.errorName == "noUser")
+                LcatDB.Platform.openLoginModal();
+        } catch (e) { }
+    }
+};

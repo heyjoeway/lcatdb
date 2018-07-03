@@ -12,7 +12,7 @@
         {{#configuration}}
         <h2>Edit Configuration</h2>
         {{#canEdit}}
-        <form action="/configurations/{{_id}}/editDo" method="post" class="form-horizontal"><fieldset class="container">
+        <form action="<!--url-->/configurations/{{_id}}/editDo" method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
                 <label class="col-xs-2 control-label" for="name">Name</label>
                 <div class="col-xs-10"><input class="form-control" type="text" name="name" value="{{configuration.name}}"></div>

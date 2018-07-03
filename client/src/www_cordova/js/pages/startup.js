@@ -1,12 +1,11 @@
 LcatDB.Pages.classes.startup = class extends LcatDB.Page {
     init() {
-        LcatDB.offlineInfo.get(true, gotNewInfo => {
+        LcatDB.offlineInfo.get(gotNewInfo => {
+            let navUrl = "./home.html";
             if (localStorage["LcatDB.offlineInfo"])
-                history.replaceState({}, '<!--title--> - Dashboard', './dashboard.html');
-            else
-                history.replaceState({}, '<!--title--> - Home', './home.html');
+                navUrl = './dashboard.html';
 
-            location.reload();
-        });
+            LcatDB.Pages.navigate(navUrl, true, true);
+        }, true);
     }
 };

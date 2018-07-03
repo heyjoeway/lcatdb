@@ -3,13 +3,23 @@ LcatDB.Sidebar = class {
         LcatDB.Sidebar.isOpen = false;
         
         $(window).click(LcatDB.Sidebar.hide);
-        $("#sidebar_btn").click(function() {
+        $("#sidebar_btn").off('click').click(function() {
             setTimeout(LcatDB.Sidebar.open, 1);
         });
 
-        $(".logout").click(() => {
-            LcatDB.offlineInfo.clear();
+        $(".logout").off('click').click(e => {
+            e.preventDefault();
+
+            LcatDB.InputBlock.start();
+            
+            $.post(`${LcatDB.serverUrl}/logout`, () => {
+                LcatDB.InputBlock.finish();
+                LcatDB.offlineInfo.clear();
+                LcatDB.Pages.navigate('./home.html');
+            });
         });
+
+        LcatDB.App.initElements();
     }
 
     static open() {
@@ -31,6 +41,31 @@ LcatDB.Sidebar = class {
             $("#sidebar").hide();
             $("#sidebar-overlay").addClass("hide");
         }, 250);
+    }
+
+    /*
+     * Remove current sidebar and re-render (with user info).
+     */
+    static update() {
+        LcatDB.offlineInfo.get(gotNewInfo => {
+            let configurationId = $("#configuration-picker").val();
+            let info = LcatDB.offlineInfo.info();
+            let noUser = $(`meta[name='app:noUser']`).prop("content") == "true";
+
+            let navRender;
+
+            if ((typeof info != "undefined") && !noUser)
+                navRender = Mustache.render(`<!--nav_user-->`, info);
+            else navRender = `<!--nav_nouser-->`;
+            
+            $('#sidebar').remove();
+            $('body').append(navRender);
+            
+            LcatDB.Platform.handleOnline(true);
+            LcatDB.Platform.initNavigation();
+            
+            LcatDB.Sidebar.init();
+        });
     }
 };
 

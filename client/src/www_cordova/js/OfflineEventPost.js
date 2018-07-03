@@ -1,6 +1,4 @@
-import OfflineEvent from "./OfflineEvent.js";
-
-class OfflineEventPost extends OfflineEvent {
+LcatDB.App.OfflineEventPost = class extends LcatDB.App.OfflineEvent {
     constructor(obj) {
         obj.type = "OfflineEventPost";
         super(obj);
@@ -29,25 +27,25 @@ class OfflineEventPost extends OfflineEvent {
             this.data.formUrl,
             this.data.formData,
             (data, status) => {
-                if (status == "success") {
-                    this.response = {
-                        data: data,
-                        status: status
-                    };
-                    this.status = "success";
-                    finish(true);
-                } else {
-                    this.status = "failure";
-                    this.failures++;
-                    finish(false);
+                this.response = {
+                    data: data,
+                    status: status
+                };
+                
+                this.status = "success";
+                if (status != "success") {
+                    this.fail();
+                    return finish(false);
                 }
+                
+                finish(true);
             }
-        ).fail(() => {
-            this.status = "failure";
-            this.failures++;
+        ).fail(data => {
+            if (data.responseJSON)
+                this.response = { data: data.responseJSON };
+
+            this.fail();
             finish(false);
         });
     }
-}
-
-export default OfflineEventPost;
+};

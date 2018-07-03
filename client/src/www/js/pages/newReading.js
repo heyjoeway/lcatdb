@@ -180,8 +180,10 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
     submitWeb(failCallback) {
         function finish(success, data) {
+            LcatDB.InputBlock.finish();
+            
             if (success)
-                return location.href = `${LcatDB.serverUrl}/readings/${data.rid}`;
+                return LcatDB.Pages.navigate(`${LcatDB.serverUrl}/readings/${data.rid}`);
 
             if (failCallback) return failCallback(data);
             $.notify({
@@ -189,10 +191,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
             }, {
                 "type": 'danger'
             });
-            LcatDB.InputBlock.finish();
         }
-
-        LcatDB.InputBlock.start();
 
         let formData = $('#form').serializeArray();
         // Add extra attribute to request that sends back data in JSON
@@ -200,9 +199,10 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
             "name": "infoOnly",
             "value": true
         });
-
+        
         let cid = this.configurationId;
-
+        
+        LcatDB.InputBlock.start();
         $.post(
             `${LcatDB.serverUrl}/configurations/${cid}/readingDo`,
             formData,
@@ -235,21 +235,21 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     submitCordova() {
         // iOS webkit doesn't support field validation because apple is fantastic
         // so we have to do it manually
-        if (LcatDB.Platform.isiOS && !this.validateInput()) return;
+        if (LcatDB.Platform.isiOS() && !this.validateInput()) return;
 
         // Try to submit normally over the internet, and if that doesn't work
         // then just cache it and go to the queue
         let cid = this.configurationId;
 
-        this.submitWeb(function(data) {
-            LcatDB.offlineEventQueue.addEvent(new OfflineEventPost({
+        this.submitWeb(data => {
+            LcatDB.App.offlineEventQueue.addEvent(new LcatDB.App.OfflineEventPost({
                 "data": {
                     "formUrl": `${LcatDB.serverUrl}/configurations/${cid}/readingDo`,
                     "formData": $('#form').serializeArray()
                 },
                 "name": "Reading"
             }));
-            location.href = './queue.html';
+            LcatDB.Pages.navigate('./queue.html');
         });
     }
 
@@ -326,7 +326,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
     init() {
         let queryObj = LcatDB.Utils.urlQueryObj(location.href);
-        this.configurationId = queryObj.configuration;    
+        this.configurationId = queryObj.configuration;
 
         this.initConfigList();
         this.initMobile();
@@ -348,6 +348,8 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         this.initMap();
 
         $("body").addClass("page-newReading");
+
+        $("#button-getlocation").click(() => this.getLocation());
     }
     
     deinit() {

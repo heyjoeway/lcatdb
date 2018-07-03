@@ -1,9 +1,8 @@
 window.LcatDB = {};
-
 LcatDB.serverUrl = '<!--url-->';
 
 require('./polyfill.js');
-require('./Utils.js')
+require('./Utils.js');
 
 require('./UnitSystem.js');
 require('./Platform.js');
@@ -12,7 +11,6 @@ require('./InputBlock.js');
 require('./Sidebar.js');
 require('./OfflineInfoManager.js');
 
-require('./Navbar.js');
 require('./Page.js');
 
 require('./QueryMap.js');
@@ -49,7 +47,7 @@ require("./lib/jquery.spoiler.min.js")($);
 require("./lib/jQuery.unitnorm.js");
 require("./lib/L.TileLayer.PouchDBCached.js");
 require("./lib/modernizr-custom.js");
-require("./lib/pouchdb-5.4.5.min.js");
+window.PouchDB = require("./lib/pouchdb-5.4.5.min.js");
 
 // ============================================================================
 
@@ -58,9 +56,10 @@ LcatDB.init = function() {
     
     if (window.parent == window) {
         LcatDB.offlineInfo = new LcatDB.OfflineInfoManager();
-        LcatDB.Navbar.update();
+        LcatDB.Sidebar.update();
     }
 
+    LcatDB.App.init();
     LcatDB.Pages.init();
 };
 

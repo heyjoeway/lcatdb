@@ -10,7 +10,7 @@
     <div id="content">
         <div class="hide" id="configuration">{{query.configuration}}</div>
 
-        <div id="step-1">
+        <div id="step-1" style="display:none">
             <ul class="nav nav-tabs">
                 {{#sensorTypes}}
                 <li><a data-toggle="tab" href="#{{key}}">{{type.data.name}}</a></li>
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <div id="loading" style="display:none">
+        <div id="loading">
             Loading...
         </div>
     </div>
@@ -53,7 +53,7 @@
 
     <div id="content"><div class="container">
         <h2>New Sensor</h2>
-        <form action="/sensors/newDo{{#query.configuration}}?configuration={{.}}{{/query.configuration}}" method="post" class="form-horizontal"><fieldset class="container">
+        <form action="<!--url-->/sensors/newDo{{#query.configuration}}?configuration={{.}}{{/query.configuration}}" method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
                 <label class="col-xs-2 control-label" for="sid">Type</label>
                 <div class="col-xs-10">

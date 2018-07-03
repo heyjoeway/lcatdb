@@ -21,128 +21,107 @@ LcatDB.Platform = class {
         return typeof window.cordova != 'undefined';
     }
 
+	/* Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=553418 */
+	static fixUrlHistoryPushState(url) {
+        if (url.startsWith('file:///android_asset/www/'))
+            return '.' + url.substr(25);
+
+        if (window.cordova && url.startsWith(window.cordova.file.applicationDirectory))
+            return '.' + url.substr(window.cordova.file.applicationDirectory.length - 1);
+
+        return url;
+	}
+
+    static resolveAppUrl(url, callback) {
+        let result = {
+            url: url,
+            canNavigate: false
+        };
+
+        if (url == "") return callback(result);;
+        if (url == "#") return callback(result);;
+
+        let inAppPrefixes = [
+            LcatDB.serverUrl,
+            'file:///android_asset/www/',
+            './', '/'
+        ];
+
+        if (window.cordova && window.cordova.file)
+            inAppPrefixes.push(window.cordova.file.applicationDirectory || "");
+
+        console.log(inAppPrefixes);
+
+        result.canNavigate = inAppPrefixes.some(val => {
+            return url.startsWith(val);
+        });
+
+        if (!result.canNavigate) return callback(result);;
+        if (!LcatDB.Platform.inApp()) return callback(result);;
+
+        inAppPrefixes.forEach(e => {
+            console.log(e);
+            if (result.url.substr(0, e.length) == e)
+                result.url = result.url.substr(e.length);
+        });
+            
+        // Trim query.
+        let urlWithoutQuery = result.url.split('?')[0];
+
+        new LcatDB.Utils.Chain(function() {
+            LcatDB.Platform.initLocalFiles(() => this.next());
+        }, function() {
+            // If this url exists in the file list, it's local.
+            result.isLocal = LcatDB.Platform.localFilelist.indexOf(urlWithoutQuery) != -1;
+
+            if (result.isLocal) {
+                if (LcatDB.Platform.isiOS()) {
+                    result.url = `${window.cordova.file.applicationDirectory}www/${result.url}`;
+                    return callback(result);
+                }
+                
+                result.url = `file:///android_asset/www/${result.url}`;
+                return callback(result);
+            }
+            
+            result.url = `${LcatDB.serverUrl}/${result.url}`;
+            return callback(result);
+        });
+    }
+
     static initNavigation(force) {
         if (window.parent != window) return;
         
         $('a').each(function() {
             let $this = $(this);
-            let href = $this.attr('href');
+            let url = $this.attr('href');
             
-            if (typeof href == "undefined") return;
-            if (href == "") return;
-            if (href == "#") return;
+            if (typeof url == "undefined") return;
+            if (url == "") return;
+            if (url == "#") return;
 
-            let canNavigate = [LcatDB.serverUrl, "./", "/"].some(val => {
-                return href.startsWith(val);
-            });
-            if (!canNavigate) return;
             if ($this.hasClass('nav-ignore')) return;
 
-            if (LcatDB.Platform.inApp()) {
-                // Trim leading dot.
-                if (href.substr(0, 1) == '.')
-                    href = href.substr(1);
-    
-                // Trim leading slash. (if no slash then it's not valid)
-                if (href.substr(0, 1) == '/')
-                    href = href.substr(1);
-                else return;
-                    
-                // Trim query.
-                href = href.split('?')[0];
-                
-                // If this url exists in the file list, it's local.
-                let isLocal = LcatDB.Platform.localFilelist.indexOf(href) != -1;
-                
-                $(this).off('click.nav').on('click.nav', e => {
-                    e.preventDefault();
-    
-                    let hrefFinal;
-                    if (isLocal) {
-                        if (LcatDB.Platform.isiOS())
-                            hrefFinal = `${window.cordova.file.applicationDirectory}www/${href}`;
-                        else
-                            hrefFinal = `file:///android_asset/www/${href}`;
-                    } else hrefFinal = `${LcatDB.serverUrl}/${href}`;
-    
-                    LcatDB.Pages.navigate(hrefFinal);
-                });
-            } else {
-                $this.off('click.nav').on('click.nav', e => {
-                    e.preventDefault();
-                    LcatDB.Pages.navigate(href);
-                });
-            }
-
+            $(this).off('click.nav').on('click.nav', e => {
+                e.preventDefault();
+                LcatDB.Pages.navigate($(this).attr("href"));
+            });
         });
     }
 
-    static initLocalFiles() {
-        if (LcatDB.Platform.localFilelist) return;
+    static initLocalFiles(callback) {
+        if (LcatDB.Platform.localFilelist && callback) return callback();
 
         $.ajax({
             url: './files.json',
             dataType: 'json',
             cache: false,
-            success: function(data) {
+            success: data => {
                 LcatDB.Platform.localFilelist = data.map(obj => obj.location);
-                // fileList is a list of files that can be accessed locally.
+                if (callback) callback();
             }
         });
     }
-
-    // static appUrls(force) {
-    //     if (!force && !LcatDB.Platform.inApp()) return;
-
-    //     $(".cordova_only_hide").show();
-    //     $("body").addClass("in-app");
-
-    //     $.ajax({
-    //         url: './files.json',
-    //         dataType: 'json',
-    //         cache: true,
-    //         success: function(data) {
-    //             let filelist = data.map(obj => obj.location);
-    //             // fileList is a list of files that can be accessed locally.
-                
-    //             // Get all links and process them.
-    //             $('a').each(function() {
-    //                 let href = $(this).attr('href');
-        
-    //                 if (typeof href == 'undefined') return;
-        
-    //                 // Trim leading dot.
-    //                 if (href.substr(0, 1) == '.')
-    //                     href = href.substr(1);
-        
-    //                 // Trim leading slash. (if no slash then it's not valid)
-    //                 if (href.substr(0, 1) == '/')
-    //                     href = href.substr(1);
-    //                 else return;
-                        
-    //                 // Trim query.
-    //                 href = href.split('?')[0];
-                    
-    //                 // If this url exists in the file list, it's local.
-    //                 let isLocal = filelist.indexOf(href) != -1;
-                    
-    //                 $(this).off('click.appurl').on('click.appurl', e => {
-    //                     e.preventDefault();
-
-    //                     let hrefFinal;
-    //                     if (isLocal) {
-    //                         if (LcatDB.Platform.isiOS())
-    //                             hrefFinal = `${window.cordova.file.applicationDirectory}www/${href}`;
-    //                         else
-    //                             hrefFinal = `file:///android_asset/www/${href}`;
-    //                     } else hrefFinal = `${LcatDB.serverUrl}/${href}`;
-
-    //                     window.open(hrefFinal);
-    //                 });
-    //             });
-    //         }
-    //     });
-    // }
 
     /*
      * Toggle elements that rely on the app being online.
@@ -179,10 +158,30 @@ LcatDB.Platform = class {
         setInterval(LcatDB.Platform.handleOnline, 1000);
     }
 
+    static isiOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+
     static init() {
         LcatDB.Platform.initLocalFiles();
         LcatDB.Platform.initHandleOnline();
         LcatDB.Platform.initJs();
         LcatDB.Platform.initNavigation();
+        LcatDB.Platform.handleOnline(true);
+    }
+
+    static openLoginModal() {
+        if (LcatDB.Platform.loginModalIsOpen) return;
+
+        LcatDB.Platform.loginModalIsOpen = true;
+        
+        (new LcatDB.Modal(
+            "Login",
+            "./loginModal.html",
+            modal => {
+                LcatDB.Platform.loginModalIsOpen = false;
+                LcatDB.Pages.reload();
+            }
+        )).lock();
     }
 }

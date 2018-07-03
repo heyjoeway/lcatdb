@@ -1,3 +1,6 @@
 LcatDB.Platform.isWebsite = true;
-LcatDB.App = {};
-LcatDB.App.init = function() { };
+
+LcatDB.App = class {
+    static init() { }
+    static initElements() { }
+};

@@ -1,12 +1,14 @@
 LcatDB.Modal = class {
     constructor(title, url, callback) {
         this.title = title;
-        this.url = url;
         this.callback = callback;
-
-        this.initElements();
-        this.initMessages();
-        this.show();
+        LcatDB.Platform.resolveAppUrl(url, urlResolution => {
+            this.url = urlResolution.url;
+            
+            this.initElements();
+            this.initMessages();
+            this.show();
+        });
     }
 
     initElements() {
@@ -40,17 +42,27 @@ LcatDB.Modal = class {
             let msg = e.data;
 
             let msgFunctions = {
-                'modal.hide': this.hide.bind(this),
-                'modal.lock': this.lock.bind(this),
-                'modal.unlock': this.unlock.bind(this),
-                'modal.done': () => this.callback(this),
-                'modal.reload': window.location.reload
+                'modal.hide': () => this.hide(),
+                'modal.lock': () => this.lock(),
+                'modal.unlock': () => this.unlock(),
+                'modal.done': () => this.done(),
+                'modal.reload': () => this.reload()
             };
 
             try { msgFunctions[msg](); } catch(e) {}
         }, false);
     }
 
+    done() {
+        this.callback(this);
+        this.hide();
+        setTimeout(() => this.deinit(), 2000);
+    }
+    reload() {
+        LcatDB.Pages.reload();
+        this.hide();
+        setTimeout(() => this.deinit(), 2000);
+    }
     show() { this.$element.modal('show'); }
     hide() { this.$element.modal('hide'); }
     lock() {

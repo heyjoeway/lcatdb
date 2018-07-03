@@ -38,10 +38,10 @@ app.get('/tutorial/standard', (req, res) => {
             res.redirect('/login');
     }, function(list) {
         if (!Utils.exists(list)) {
-            Configurations.new(data.user, (cid) => {
+            Configurations.new(data.user, cid => {
                 res.redirect(`/configurations/${cid}/tutorial`);
             });
-        } else res.redirect('/configurations?reading=true');
+        } else res.redirect(`/configurations/${list[0]['_id']}/tutorial`);
     });
 });
 
@@ -62,7 +62,7 @@ app.get('/configurations', (req, res) => {
         let reading = typeof data.query.reading != 'undefined';
 
         if (reading && data.configurations && data.configurations.length == 1)
-            res.redirect(`/configurations/${data.configurations[0]['_id']}/reading`);
+            res.redirect(`/newReading.html?configuration=${data.configurations[0]['_id']}`);
         else
             res.render('configurationList', data);
     });

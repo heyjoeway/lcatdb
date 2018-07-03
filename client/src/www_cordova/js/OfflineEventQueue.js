@@ -1,6 +1,4 @@
-import OfflineEventPost from "./OfflineEventPost.js";
-
-class OfflineEventQueue {
+LcatDB.App.OfflineEventQueue = class {
     constructor(name) {
         this.events = [];
         this.name = name || 'default';
@@ -126,8 +124,8 @@ class OfflineEventQueue {
 
         let eventsArray = JSON.parse(eventsString);
         eventsArray.forEach((eventData) => {
-            this.events.push(new OfflineEventPost(eventData)); // TODO
+            this.events.push(new LcatDB.App.OfflineEventPost(eventData)); // TODO
         });
         this.runUpdateCallbacks("load");        
     }
-}
+};

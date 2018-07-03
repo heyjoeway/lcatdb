@@ -13,9 +13,10 @@ LcatDB.OfflineInfoManager = class {
      */
     get(callback, force = false) {
         const OFFLINE_CACHE_TIME = 5 * 60 * 1000; // milliseconds
-    
-        if (callback) this.callbacks.push(callback);
-    
+
+        if (typeof callback == "function")
+            this.callbacks.push(callback);
+        
         if (this.block) return;
         this.block = true;
         
@@ -46,11 +47,7 @@ LcatDB.OfflineInfoManager = class {
                         localStorage["LcatDB.offlineInfo"] = '';
                         LcatDB.InputBlock.finish(-1);
                         let mustLogin = $(`meta[name='app:mustLogin']`).prop("content") == "true";
-                        if (mustLogin) (new LcatDB.Modal(
-                            "Login",
-                            "./loginModal.html",
-                            modal => location.reload()
-                        )).lock();
+                        if (mustLogin) LcatDB.Platform.openLoginModal();
                     }
                     return this.finish(false);
                 }
@@ -65,9 +62,7 @@ LcatDB.OfflineInfoManager = class {
     }
 
     finish(gotNewInfo) {
-        this.callbacks.forEach((callback) => {
-            callback(gotNewInfo);
-        });
+        this.callbacks.forEach(callback => callback(gotNewInfo));
         this.callbacks = [];
     
         this.block = false;

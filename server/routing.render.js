@@ -509,15 +509,6 @@ renderSensor({
 
 let configPattern = '([0-9a-f]{24})';
 
-// renderConfiguration({
-//     "url": `/configurations/${configPattern}/reading`,
-//     "template": "configurationReading",
-//     "mustacheDeps": {
-//         "configuration": ['sensors', 'sensors.typeData', 'sensors.htmlIn'],
-//         "general": ["time"]
-//     }
-// });
-
 renderConfiguration({
     "url": `/configurations/${configPattern}`,
     "template": 'configuration',

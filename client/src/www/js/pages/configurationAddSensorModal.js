@@ -1,5 +1,8 @@
 LcatDB.Pages.classes.configurationAddSensorModal = class extends LcatDB.Page {
     init() {
+        $('#step-1').show();
+        $('#loading').hide();
+
         $('.sensor').click(function(e) {
             e.preventDefault();
 

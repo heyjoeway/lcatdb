@@ -9,7 +9,7 @@
 </head>
 <body class="no-nav">
     <div id="content">
-        <div id="step-1">
+        <div id="step-1" style="display:none">
             <ul id="sensors" class="list-group">
                 {{#user.sensors}}
                 <li class="list-group-item">
@@ -28,7 +28,7 @@
             </ul>
         </div>
 
-        <div id="loading" style="display:none">
+        <div id="loading">
             Loading...
         </div>
     </div>
@@ -52,7 +52,7 @@
         <h2>Add Existing Sensor</h2>
         {{#configuration.canEdit}}
         <h4>Input the ID in the box below.</h4>
-        <form id="form" action="/configurations/{{configuration._id}}/addSensorDo"
+        <form id="form" action="<!--url-->/configurations/{{configuration._id}}/addSensorDo"
               method="post" class="form-horizontal"><fieldset class="container">
             <div class="form-group">
                 <label class="col-xs-2 control-label">Sensor ID</label>

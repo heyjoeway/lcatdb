@@ -20,7 +20,7 @@ LcatDB.ModalsCommon.modalsData = [{
         let cid = $('#configuration').text();        
         return `/sensors/new?configuration=${cid}&modal=true`
     },
-    callback: () => window.location.reload()
+    callback: () => LcatDB.Pages.reload()
 }, {
     selector: '#sensor-existing',
     title: 'Add Existing Sensor',
@@ -28,14 +28,14 @@ LcatDB.ModalsCommon.modalsData = [{
         let cid = $('#configuration').text();
         return `/configurations/${cid}/addSensor?modal=true`
     },
-    callback: () => window.location.reload()
+    callback: () => LcatDB.Pages.reload()
 }, {
     selector: '.sensor-remove',
     title: 'Remove Sensor',
-    url: function(element) {
+    url: element => {
         let cid = $('#configuration').text();
         let sid = $(element).data('sid');
         return `/configurations/${cid}/removeSensor?modal=true&sid=${sid}`;
     },
-    callback: () => window.location.reload()
+    callback: () => LcatDB.Pages.reload()
 }];
