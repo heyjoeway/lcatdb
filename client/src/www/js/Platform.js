@@ -38,8 +38,8 @@ LcatDB.Platform = class {
             canNavigate: false
         };
 
-        if (url == "") return callback(result);;
-        if (url == "#") return callback(result);;
+        if (url == "") return callback(result);
+        if (url == "#") return callback(result);
 
         let inAppPrefixes = [
             LcatDB.serverUrl,
@@ -49,8 +49,6 @@ LcatDB.Platform = class {
 
         if (window.cordova && window.cordova.file)
             inAppPrefixes.push(window.cordova.file.applicationDirectory || "");
-
-        console.log(inAppPrefixes);
 
         result.canNavigate = inAppPrefixes.some(val => {
             return url.startsWith(val);
@@ -76,6 +74,7 @@ LcatDB.Platform = class {
 
             if (result.isLocal) {
                 if (LcatDB.Platform.isiOS()) {
+                    console.log(`${window.cordova.file.applicationDirectory}www/${result.url}`);
                     result.url = `${window.cordova.file.applicationDirectory}www/${result.url}`;
                     return callback(result);
                 }
@@ -162,12 +161,23 @@ LcatDB.Platform = class {
         return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     }
 
+    static initiOSApp() {
+        if (!LcatDB.Platform.inApp() || !LcatDB.Platform.isiOS()) return;
+
+        $('base').each(function(i) {
+            if (i > 0) $(this).remove();
+        });
+
+        $('base').attr("href", `${window.cordova.file.applicationDirectory}www/`);
+    }
+
     static init() {
         LcatDB.Platform.initLocalFiles();
         LcatDB.Platform.initHandleOnline();
         LcatDB.Platform.initJs();
         LcatDB.Platform.initNavigation();
         LcatDB.Platform.handleOnline(true);
+        LcatDB.Platform.initiOSApp();
     }
 
     static openLoginModal() {

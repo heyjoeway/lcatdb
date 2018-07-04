@@ -2,6 +2,8 @@ const fs = require('fs'); // Browserify transform
 
 LcatDB.Pages = class {
 	static init() {
+		LcatDB.Pages.currentUrl = location.href;
+
 		LcatDB.Pages.initPage();
 
 		window.onpopstate = event =>
@@ -25,7 +27,7 @@ LcatDB.Pages = class {
 	}
 
 	static reload() {
-		LcatDB.Pages.navigate(location.href, true);
+		LcatDB.Pages.navigate(LcatDB.Pages.currentUrl, true);
 	}
 
 	static fadeOutContent(callback) {
@@ -59,6 +61,8 @@ LcatDB.Pages = class {
 	}
 
 	static populateContent(htmlString, url, skipHistory, replaceHistory) {
+		LcatDB.Platform.initiOSApp();
+
 		$("html").scrollTop(0);
 
 		let $html = $($("<div></div>").html(htmlString));
@@ -68,12 +72,16 @@ LcatDB.Pages = class {
 		
 		let title = $html.find("title").html();
 
-		if (replaceHistory) history.replaceState({}, title,
-			LcatDB.Platform.fixUrlHistoryPushState(url)
-		);
-		else if (!skipHistory) history.pushState({}, title,
-			LcatDB.Platform.fixUrlHistoryPushState(url)
-		);
+		if (!LcatDB.Platform.inApp || !LcatDB.Platform.isiOS) {
+			if (replaceHistory) history.replaceState({}, title,
+				LcatDB.Platform.fixUrlHistoryPushState(url)
+			);
+			else if (!skipHistory) history.pushState({}, title,
+				LcatDB.Platform.fixUrlHistoryPushState(url)
+			);
+		}
+
+		LcatDB.Pages.currentUrl = url;
 
 		document.title = title;
 
