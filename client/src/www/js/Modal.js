@@ -1,14 +1,22 @@
 LcatDB.Modal = class {
-    constructor(title, url, callback) {
+    constructor(title, content, callback, isIframe = true) {
         this.title = title;
         this.callback = callback;
-        LcatDB.Platform.resolveAppUrl(url, urlResolution => {
-            this.url = urlResolution.url;
-            
-            this.initElements();
-            this.initMessages();
-            this.show();
-        });
+        if (isIframe)
+            LcatDB.Platform.resolveAppUrl(content, urlResolution => {
+                this.content = `<iframe src="${urlResolution.url}" scrolling="no"></iframe>`;
+                this.init();
+            });
+        else {
+            this.content = content;
+            this.init();
+        }
+    }
+        
+    init() {            
+        this.initElements();
+        this.initMessages();
+        this.show();
     }
 
     initElements() {
@@ -21,7 +29,7 @@ LcatDB.Modal = class {
             <h4 class="modal-title">${this.title}</h4>
         </div>
         <div class="modal-body">
-            <iframe src="${this.url}" scrolling="no"></iframe>
+            ${this.content}
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default btn-close" data-dismiss="modal">Cancel</button>

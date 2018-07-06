@@ -16,4 +16,4 @@ LcatDB.Pages.classes.home = class extends LcatDB.Page {
 	deinit() {
 		$("body").removeClass("no-nav no-pad");		
 	}
-}
+};

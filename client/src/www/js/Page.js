@@ -72,7 +72,7 @@ LcatDB.Pages = class {
 		
 		let title = $html.find("title").html();
 
-		if (!LcatDB.Platform.inApp || !LcatDB.Platform.isiOS) {
+		if (!LcatDB.Platform.inApp() || !LcatDB.Platform.isiOS()) {
 			if (replaceHistory) history.replaceState({}, title,
 				LcatDB.Platform.fixUrlHistoryPushState(url)
 			);
@@ -186,3 +186,4 @@ require("./pages/sensorNewModal.js");
 require("./pages/visualize.js");
 require("./pages/userEdit.js");
 require("./pages/register.js");
+require("./pages/about.js");
