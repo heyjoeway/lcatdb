@@ -66,7 +66,7 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
                 if (data.success) LcatDB.Pages.navigate("./dashboard.html");
                 else {
                     ["forgotSent", "invalid", "reset"].forEach(
-                        key =>$('#' + key).hide()
+                        key => $(`#${key}`).hide()
                     );
 
                     $(`#${data.errorName}`).show();
