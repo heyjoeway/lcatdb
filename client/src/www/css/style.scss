@@ -297,3 +297,8 @@ body.is-ios:not(.body-transparentnavbar) .navbar {
         content: "keyboard_arrow_right";
     }
 }
+
+.panel-body-collapse {
+    padding-left: 15px;
+    padding-right: 15px;
+}
