@@ -34,7 +34,7 @@ LcatDB.OfflineEventQueue = class {
     }
 
     removeEvent(event) {
-        this.removeEventIndex(this.events.indexOf(event));
+        this.removeEventId(event.id);
     }
 
     getEventIndexById(id) {
@@ -89,20 +89,17 @@ LcatDB.OfflineEventQueue = class {
     }
 
     saveEvents() {
-        let key = `offlineEvents.${this.name}`;
-        localStorage[key] = JSON.stringify(this.toArray());
+        let path = `offlineEvents.${this.name}`;
+        LcatDB.LocalStorage.put(path, this.toArray(), true);
         this.updateCallbacks.run('save');
     }
 
     loadEvents() {
-        let key = `offlineEvents.${this.name}`;
-        let eventsString = localStorage[key];
+        let path = `offlineEvents.${this.name}`;
+        let eventsArray = LcatDB.LocalStorage.get(path, true) || [];
 
-        if ((typeof eventsString == 'undefined') || (eventsString == ''))
-            return;
-
-        let eventsArray = JSON.parse(eventsString);
-        eventsArray.forEach((eventData) => {
+        this.events = [];        
+        eventsArray.forEach(eventData => {
             this.events.push(new LcatDB.OfflineEventReading(eventData)); // TODO
         });
         this.updateCallbacks.run('load');

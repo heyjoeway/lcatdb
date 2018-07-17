@@ -48,8 +48,8 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
     }
 
     initExists() {
-        $("#usernameExists").val(localStorage['anon.username']);
-        $("#passwordExists").val(localStorage['anon.password']);
+        $("#usernameExists").val(LcatDB.LocalStorage.get('anon.username'));
+        $("#passwordExists").val(LcatDB.LocalStorage.get('anon.password'));
         $('#exists').show();
 
         $('#login').click(e => {
@@ -58,8 +58,8 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
             LcatDB.InputBlock.start();
 
             $.post(`${LcatDB.serverUrl}/loginDo`, {
-                "username": localStorage['anon.username'],
-                "password": localStorage['anon.password'],
+                "username": LcatDB.LocalStorage.get('anon.username'),
+                "password": LcatDB.LocalStorage.get('anon.password'),
                 "infoOnly": true
             }, (data, status) => {
                 LcatDB.InputBlock.finish();
@@ -88,8 +88,8 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
         $("#passwordRetype").val(password);
 
         $("#register").click(() => {
-            localStorage['anon.username'] = $("#username").val();
-            localStorage['anon.password'] = $("#password").val();
+            LcatDB.LocalStorage.put('anon.username', $("#username").val());
+            LcatDB.LocalStorage.put('anon.password', $("#password").val());
 
             LcatDB.InputBlock.start();
 
@@ -114,7 +114,7 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
     }
 
     init() {
-        if (localStorage['anon.username']) this.initExists();
+        if (LcatDB.LocalStorage.get('anon.username')) this.initExists();
         else this.initNotExists();
     }
 };

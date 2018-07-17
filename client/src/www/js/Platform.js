@@ -97,7 +97,7 @@ LcatDB.Platform = class {
             
             if (typeof url == "undefined") return;
             if (url == "") return;
-            if (url == "#") return;
+            if (url.indexOf("#") == 0) return;
 
             if ($this.hasClass('nav-ignore')) return;
 
@@ -194,4 +194,7 @@ LcatDB.Platform = class {
             }
         )).lock();
     }
+
+    static version() { return "<!--version-->"; }
+    static commit() { return "<!--commit-->"; }
 }

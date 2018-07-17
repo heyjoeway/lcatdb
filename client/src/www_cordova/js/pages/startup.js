@@ -1,7 +1,7 @@
 LcatDB.Pages.classes.startup = class extends LcatDB.Page {
     onDeviceReady() {
         let navUrl = "./home.html";
-        if (localStorage["LcatDB.userInfo"])
+        if (LcatDB.LocalStorage.get("userInfo"))
             navUrl = './dashboard.html';
 
         LcatDB.Pages.navigate(navUrl, true, true);

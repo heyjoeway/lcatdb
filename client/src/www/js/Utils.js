@@ -84,13 +84,8 @@ LcatDB.Utils = class {
     static getPropertyByPath(obj, path) {
         let error = path.split('.').some((key, i, arr) => {
             obj = obj[key];
-
-            if (typeof obj == 'undefined') {
-                console.log("ERROR: Couldn't find value.")
-                return true;
-            }
-
-            return false;
+            
+            return typeof obj == 'undefined';
         });
 
         if (!error) return obj;

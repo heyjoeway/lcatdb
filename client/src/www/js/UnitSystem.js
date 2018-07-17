@@ -3,11 +3,11 @@ LcatDB.UnitSystem = class {
      * Initialize elements that use unit normalization.
      */
     static init() {
-        let unitSystem = localStorage.unitSystem;
+        let unitSystem = LcatDB.LocalStorage.get("unitSystem", true);
         
         if (!unitSystem) {
             unitSystem = 'imperial';
-            localStorage["LcatDB.unitSystem"] = 'imperial';
+            LcatDB.LocalStorage.put("unitSystem", 'imperial', true);
         }
         LcatDB.UnitSystem.change(unitSystem);
 
@@ -21,7 +21,7 @@ LcatDB.UnitSystem = class {
      * Refresh elements that rely on unit normalization.
      */
     static change(system) {
-        if (!system) system = localStorage["LcatDB.unitSystem"];
+        if (!system) system = LcatDB.LocalStorage.get("unitSystem", true);
 
         let $normalize = $('.normalize');
         $normalize.unitnorm('deinit');
@@ -32,7 +32,7 @@ LcatDB.UnitSystem = class {
                 $this.attr('data-unitprefsystem', system);
         });
         $normalize.unitnorm();
-        localStorage["LcatDB.unitSystem"] = system;
+        LcatDB.LocalStorage.put("unitSystem", system, true);
         $('#unit-system-picker').val(system);
     }
 };

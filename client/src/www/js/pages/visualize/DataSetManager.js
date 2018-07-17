@@ -57,13 +57,13 @@ class DataSetManager {
     }
 
     store() {
-        localStorage["visualize.DataSetManager"] = JSON.stringify(this.toJSON());
+        LcatDB.LocalStorage.put("visualize.DataSetManager", this.toJSON(), true);
     }
 
     load() {
-        this.fromJSON(JSON.parse(
-            localStorage["visualize.DataSetManager"] || "{}"
-        ));
+        this.fromJSON(
+            LcatDB.LocalStorage.get("visualize.DataSetManager", true) || {}
+        );
     }
 
     populateMenu() {

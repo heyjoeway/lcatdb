@@ -31,14 +31,14 @@ LcatDB.Pages.classes.loginModal = class extends LcatDB.Page {
             }, this.postSuccess).fail(this.postFailure);
         });
 
-        if (localStorage['anon.username']) {
+        if (LcatDB.LocalStorage.get('anon.username')) {
             $("#button-quicklogin").click(() => {
                 $("#step-1").hide();
                 $("#loading").show();
     
                 $.post(`${LcatDB.serverUrl}/loginDo`, {
-                    "username": localStorage['anon.username'],
-                    "password": localStorage['anon.password'],
+                    "username": LcatDB.LocalStorage.get('anon.username'),
+                    "password": LcatDB.LocalStorage.get('anon.password'),
                     "infoOnly": true
                 }, this.postSuccess).fail(this.postFailure);   
             });

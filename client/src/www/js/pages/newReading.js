@@ -1,6 +1,7 @@
 const fs = require('fs'); // Browserify transform
 
 LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
+    // Update the list of configurations trigger a configuration change
     updateConfigList(init) {
         LcatDB.userInfo.get(gotNewInfo => {
             let html = '';
@@ -26,6 +27,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         }, true);
     }
 
+    // Change the current configuration and render the sensors section
     changeConfig() {
         let template = fs.readFileSync(
             __dirname + "/templates/configurationSensors.mustache"
@@ -71,10 +73,10 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         LcatDB.UnitSystem.change();
     }
 
-
+    // Update the map's current position
     updateMap() {
-        let lat = $('input[name="location[lat]"]').val();
-        let long = $('input[name="location[long]"]').val();
+        let lat = $('input[name="location[lat]"]').val() || 0;
+        let long = $('input[name="location[long]"]').val() || 0;
 
         if ((lat == 0) && (long == 0)) {
             lat = 44.57670853058025;
@@ -87,6 +89,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         this.map.panTo(pos);
     }
 
+    // Initialize the buttons that allow add/removing sensors
     initSensorBtns() {
         [{
             selector: '#sensor-new',
@@ -119,9 +122,10 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         });
     }
 
+    // Get current location (mobile only to ensure accuracy)
     getLocation(auto) {
-        let autoEnabled = localStorage['LcatDB.location.auto'] == 'true';
-        if (auto && !autoEnabled)return;
+        let autoEnabled = LcatDB.LocalStorage.get('location.auto', true);
+        if (auto && !autoEnabled) return;
 
         // Location probably not precise on desktop/laptop
         if (!this.mobileDetect.phone()) return;
@@ -168,6 +172,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         );
     }
 
+    // Validate input and display an error message if invalid
     validateInput() {
         let $form = $('#form');
         let hasFailed = $("#form").find("input").toArray().some(input => {
@@ -190,6 +195,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         return !hasFailed;
     }
 
+    // Add reading to queue and reload configuration to clear input
     queue() {
         if (!this.validateInput()) return;
 
@@ -204,6 +210,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         this.changeConfig();
     }
 
+    // Submit reading or queue if offline
     submit() {
         if (!this.validateInput()) return;
 
@@ -221,7 +228,6 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
             LcatDB.InputBlock.finish();
 
             if (data.success) {
-                console.log(event.response);
                 LcatDB.Pages.populateContent(
                     event.response.data,
                     event.response.responseURL
@@ -279,6 +285,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         this.getLocation(true);
     }
 
+    // Initialize the datetime picker on browsers without native support
     initDatetime() {
         if(!Modernizr.inputtypes['datetime-local'])
             $('input[type=datetime-local]').datetimepicker({
@@ -384,16 +391,15 @@ If you don't want to submit the current reading, press the button below to conti
         this.initSubmitBtns();
         LcatDB.Utils.preventEnterKey();
 
-        $('.normalize').unitnorm();
         $('.spoiler').spoiler();
 
         $("input[name=timeCreated]")
             .val((new Date).getTime())
             .change();
 
-        $("#location_auto").prop('checked', localStorage['LcatDB.location.auto'] == 'true');
+        $("#location_auto").prop('checked', LcatDB.LocalStorage.get('location.auto', true));
         $("#location_auto").change(function() {
-            localStorage['LcatDB.location.auto'] = $(this).prop('checked').toString();
+            LcatDB.LocalStorage.put('location.auto', $(this).prop('checked', true));
         });
 
         this.initMap();

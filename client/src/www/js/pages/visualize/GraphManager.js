@@ -217,13 +217,13 @@ class GraphManager {
     }
 
     store() {
-        localStorage["visualize.GraphManager"] = JSON.stringify(this.toJSON());
+        LcatDB.LocalStorage.put("visualize.GraphManager", this.toJSON(), true);
     }
 
     load() {
-        this.fromJSON(JSON.parse(
-            localStorage["visualize.GraphManager"] || "{}"
-        ));
+        this.fromJSON(
+            LcatDB.LocalStorage.get("visualize.GraphManager", true) || {}
+        );
     }
 }
 

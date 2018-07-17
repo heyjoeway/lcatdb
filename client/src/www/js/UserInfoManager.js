@@ -18,6 +18,12 @@ LcatDB.UserInfoManager = class {
         
         if (this.block) return;
         this.block = true;
+
+        let noUser = $(`meta[name='app:noUser']`).prop("content") == "true";
+        if (noUser) {
+            this.clear();
+            this.finish(false);
+        }
         
         let infoCurrent = this.info();
         if (infoCurrent && !force) {
@@ -43,7 +49,7 @@ LcatDB.UserInfoManager = class {
 
                 if (data.error) {
                     if (data.error.errorName == 'noSession') {
-                        localStorage["LcatDB.userInfo"] = '';
+                        this.clear();
                         LcatDB.InputBlock.finish(-1);
                         let mustLogin = $(`meta[name='app:mustLogin']`).prop("content") == "true";
                         if (mustLogin) LcatDB.Platform.openLoginModal();
@@ -51,7 +57,11 @@ LcatDB.UserInfoManager = class {
                     return this.finish(false);
                 }
 
-                localStorage["LcatDB.userInfo"]  = JSON.stringify(data);
+                LcatDB.LocalStorage.put("userInfo", data);
+
+                if (LcatDB.offlineEventQueue)
+                    LcatDB.offlineEventQueue.loadEvents();
+    
                 this.finish(true);
             },
             "error": () => {
@@ -68,16 +78,8 @@ LcatDB.UserInfoManager = class {
         LcatDB.InputBlock.finish();
     }
     
-    info() {
-        if (localStorage["LcatDB.userInfo"])
-            return JSON.parse(localStorage["LcatDB.userInfo"]);
-    }
-
-    expire() {
-        let info = this.info();
-        info.time = 0;
-        localStorage["LcatDB.userInfo"] = JSON.stringify(info);
-    }
-    
-    clear() { localStorage["LcatDB.userInfo"] = ''; }
+    info() { return LcatDB.LocalStorage.get("userInfo"); }
+    getCurrentUserId() { return LcatDB.LocalStorage.get("userInfo.user._id"); }
+    expire() { LcatDB.LocalStorage.put("userInfo.time", 0); }
+    clear() { LcatDB.LocalStorage.delete("userInfo"); }
 };

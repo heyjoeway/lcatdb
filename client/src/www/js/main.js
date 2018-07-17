@@ -10,6 +10,8 @@ require('./InputBlock.js');
 
 require('./Sidebar.js');
 require('./UserInfoManager.js');
+require('./LocalStorage.js');
+require('./Migrate.js');
 
 require('./Page.js');
 
@@ -60,9 +62,13 @@ window.PouchDB = require("./lib/pouchdb-5.4.5.min.js");
 LcatDB.init = function() {
     LcatDB.InputBlock.init();
     
+    if (window.parent == window)
+        LcatDB.Migrate.init();
+    
+    LcatDB.userInfo = new LcatDB.UserInfoManager();
+
     if (window.parent == window) {
         LcatDB.offlineEventQueue = new LcatDB.OfflineEventQueue();
-        LcatDB.userInfo = new LcatDB.UserInfoManager();
         LcatDB.Sidebar.update();
     }
 
