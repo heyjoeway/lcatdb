@@ -187,3 +187,4 @@ require("./pages/visualize.js");
 require("./pages/userEdit.js");
 require("./pages/register.js");
 require("./pages/about.js");
+require("./pages/queue.js");

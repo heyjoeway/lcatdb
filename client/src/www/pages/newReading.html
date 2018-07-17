@@ -7,7 +7,7 @@
 </head>
 <body class="page-newReading">
     <div id="content"><div class="container">
-        <form id="form" method="post">
+        <form id="form">
             <div class="row">
 
                 <div class="col-xs-12 col-md-7">
@@ -25,9 +25,6 @@
                     </div>
 
                     <div class="configuration-chosen" style="display:none">
-
-                        <!-- <a id="configuration-link" class="online_only_hide">View Configuration</a> -->
-
                         <!-- Location + Time -->
                         <div id="location_mobile" style="display:none">
                             <p>Choose a location by using GPS, dragging the marker to the desired spot, or by inputting coordinates in the boxes below.</p>
@@ -142,12 +139,26 @@
                     </div>
                         
                 </div>
-
+                <br>
                 <div id="configuration-sensors"
-                     class="col-xs-12 col-md-5 configuration-chosen"
-                     style="display:none">
+                     class="col-xs-12 col-md-5 configuration-chosen">
                 </div>
 
+                <div>
+                    <a href="./dashboard.html" class="btn btn-default">Cancel</a>
+                    &nbsp;&nbsp;
+                    <button type="button" id="queue" class="btn btn-secondary">Add To Queue</button>
+                    &nbsp;&nbsp;
+                    <button type="button" id="edit" class="btn btn-primary" style="display:none">
+                        Edit and View Queue
+                    </button>
+                    <button type="button" id="viewqueue" class="btn btn-primary" style="display:none">
+                        Save and View Queue
+                    </button>
+                    <button type="button" id="publish" class="btn btn-primary">
+                        Save and Publish
+                    </button>
+                </div>
             </div>
         </form>
     </div></div>

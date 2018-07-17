@@ -4,12 +4,16 @@ LcatDB.Pages.classes.queue = class extends LcatDB.Page {
     init() {
         this.updateList();
         $('#queue_submit').click(() =>
-            LcatDB.App.offlineEventQueue.autoSubmit()
+            LcatDB.offlineEventQueue.autoSubmit()
         );
     
-        LcatDB.App.offlineEventQueue.addUpdateCallback(
+        this.queueCallback = LcatDB.offlineEventQueue.updateCallbacks.add(
             () => this.updateList()
         );
+    }
+
+    deinit() {
+        LcatDB.offlineEventQueue.updateCallbacks.remove(this.queueCallback);
     }
     
     updateList() {
@@ -19,7 +23,7 @@ LcatDB.Pages.classes.queue = class extends LcatDB.Page {
 
         $('#queue_list').html(
             Mustache.render(template, {
-                "queueList": LcatDB.App.offlineEventQueue.toArray()
+                "queueList": LcatDB.offlineEventQueue.toArray()
             })
         );
 
@@ -28,12 +32,12 @@ LcatDB.Pages.classes.queue = class extends LcatDB.Page {
 
         $('.event-submit').off('click').click(function() {
             let eventId = parseInt($(this).data('eventid'));
-            LcatDB.App.offlineEventQueue.submitEventId(eventId, true);
+            LcatDB.offlineEventQueue.submitEventId(eventId, true);
         });
 
         $('.event-remove').off('click').click(function() {
             let eventId = parseInt($(this).data('eventid'));
-            LcatDB.App.offlineEventQueue.removeEventId(eventId);
+            LcatDB.offlineEventQueue.removeEventId(eventId);
         });
     }
 };

@@ -14,7 +14,7 @@ LcatDB.Sidebar = class {
             
             $.post(`${LcatDB.serverUrl}/logout`, () => {
                 LcatDB.InputBlock.finish();
-                LcatDB.offlineInfo.clear();
+                LcatDB.userInfo.clear();
                 LcatDB.Pages.navigate('./home.html');
             });
         });
@@ -47,9 +47,9 @@ LcatDB.Sidebar = class {
      * Remove current sidebar and re-render (with user info).
      */
     static update() {
-        LcatDB.offlineInfo.get(gotNewInfo => {
+        LcatDB.userInfo.get(gotNewInfo => {
             let configurationId = $("#configuration-picker").val();
-            let info = LcatDB.offlineInfo.info();
+            let info = LcatDB.userInfo.info();
             let noUser = $(`meta[name='app:noUser']`).prop("content") == "true";
 
             let navRender;

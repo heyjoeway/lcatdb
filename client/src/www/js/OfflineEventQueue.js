@@ -1,30 +1,9 @@
-LcatDB.App.OfflineEventQueue = class {
+LcatDB.OfflineEventQueue = class {
     constructor(name) {
         this.events = [];
         this.name = name || 'default';
-        this.updateCallbacks = {};
+        this.updateCallbacks = new LcatDB.Utils.CallbackChannel();
         this.loadEvents();
-    }
-
-    runUpdateCallbacks(msg) {
-        Object.keys(this.updateCallbacks).forEach((callbackId) => {
-            let callbackObj = this.updateCallbacks[callbackId];
-            callbackObj.callback(msg);
-            if (callbackObj.once) this.removeUpdateCallback(callbackId);
-        });
-    }
-
-    addUpdateCallback(callback, once) {
-        let callbackId = parseInt(Math.random().toString().replace('.', '')); // lole
-        this.updateCallbacks[callbackId] = {
-            "callback": callback,
-            "once": once
-        };
-        return callbackId;
-    }
-
-    removeUpdateCallback(id) {
-        this.updateCallbacks[id] = undefined;
     }
 
     autoSubmit() {
@@ -40,14 +19,14 @@ LcatDB.App.OfflineEventQueue = class {
         if (!event.autoSubmit && !manual) return;
     
         if ((event.status == 'pending') || manual) {
-            event.submit((result) => {
+            event.submit(result => {
                 if (result.success) 
                     return this.removeEvent(event);
                 this.saveEvents();
             });
         }
 
-        this.runUpdateCallbacks('submit');
+        this.updateCallbacks.run('submit');
     }
 
     submitEventId(id, manual) {
@@ -71,7 +50,7 @@ LcatDB.App.OfflineEventQueue = class {
 
     getEventById(id) {
         let eventFinal;
-        this.events.some((event) => {
+        this.events.some(event => {
             if (event.id == id) {
                 eventFinal = event;
                 return true;
@@ -112,7 +91,7 @@ LcatDB.App.OfflineEventQueue = class {
     saveEvents() {
         let key = `offlineEvents.${this.name}`;
         localStorage[key] = JSON.stringify(this.toArray());
-        this.runUpdateCallbacks("save");
+        this.updateCallbacks.run('save');
     }
 
     loadEvents() {
@@ -124,8 +103,8 @@ LcatDB.App.OfflineEventQueue = class {
 
         let eventsArray = JSON.parse(eventsString);
         eventsArray.forEach((eventData) => {
-            this.events.push(new LcatDB.App.OfflineEventPost(eventData)); // TODO
+            this.events.push(new LcatDB.OfflineEventReading(eventData)); // TODO
         });
-        this.runUpdateCallbacks("load");        
+        this.updateCallbacks.run('load');
     }
 };

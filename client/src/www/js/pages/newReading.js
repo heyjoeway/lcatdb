@@ -2,24 +2,27 @@ const fs = require('fs'); // Browserify transform
 
 LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     updateConfigList(init) {
-        LcatDB.offlineInfo.get(gotNewInfo => {
+        LcatDB.userInfo.get(gotNewInfo => {
             let html = '';
 
             let configurationIndex = $('#configuration-picker').val() || 0;
 
-            LcatDB.offlineInfo.info().configurations.forEach((configuration, i) => {
-                html += `<option value="${i}">${configuration.name}</option>`;
-
-                if (init && configuration['_id'] == this.configurationId)
-                    configurationIndex = i;
-            });
-
-            $('#configuration-picker')
-                .html(html)
-                .selectpicker('refresh')
-                .val(configurationIndex);
-
-            this.changeConfig();
+            // Exception occurs if userinfo.info() does not exist (logged out) 
+            try {
+                LcatDB.userInfo.info().configurations.forEach((configuration, i) => {
+                    html += `<option value="${i}">${configuration.name}</option>`;
+    
+                    if (init && configuration['_id'] == this.configurationId)
+                        configurationIndex = i;
+                });
+    
+                $('#configuration-picker')
+                    .html(html)
+                    .selectpicker('refresh')
+                    .val(configurationIndex);
+    
+                this.changeConfig();
+            } catch(e) { }
         }, true);
     }
 
@@ -30,11 +33,15 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
         let configurationIndex = $("#configuration-picker").val();
 
-        let data = LcatDB.offlineInfo.info();
+        let data = LcatDB.userInfo.info();
         let configuration = data.configurations[configurationIndex]; 
         this.configurationId = configuration['_id'];
 
-        configuration.sensors.forEach(function(sensor, i) {
+        configuration.sensors.sort((a, b) =>
+            a["_id"].localeCompare(b["_id"])
+        );
+
+        configuration.sensors.forEach((sensor, i) => {
             sensor.index = i;
             sensor.html = Mustache.render(
                 data.sensorTypes[sensor.type].inputTemplate,
@@ -56,11 +63,12 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
         $('#configuration-sensors .spoiler').spoiler();
         
-        LcatDB.UnitSystem.change();
         LcatDB.Platform.initNavigation();
-
+        
         this.initSensorBtns();
-        this.updateSubmit();
+        this.initEventForm();
+  
+        LcatDB.UnitSystem.change();
     }
 
 
@@ -112,9 +120,10 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     }
 
     getLocation(auto) {
-        if (auto && (localStorage['LcatDB.location.auto'] != 'true'))
-            return;
+        let autoEnabled = localStorage['LcatDB.location.auto'] == 'true';
+        if (auto && !autoEnabled)return;
 
+        // Location probably not precise on desktop/laptop
         if (!this.mobileDetect.phone()) return;
 
         if (!navigator.geolocation)
@@ -159,57 +168,6 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         );
     }
 
-    queueReading() {
-        if (typeof cordova == 'undefined') return;
-        let formData = LcatDB.Utils.objectifyForm(
-            $('form').serializeArray()
-        );
-    }
-
-    updateSubmit() {
-        $(document).on('submit', 'form', e => {
-            e.preventDefault();
-            this.submit();
-        });
-    };
-
-    submit() {
-        if (LcatDB.Platform.inApp()) this.submitCordova();
-        else this.submitWeb();
-    }
-
-    submitWeb(failCallback) {
-        function finish(success, data) {
-            LcatDB.InputBlock.finish();
-            
-            if (success)
-                return LcatDB.Pages.navigate(`${LcatDB.serverUrl}/readings/${data.rid}`);
-
-            if (failCallback) return failCallback(data);
-            $.notify({
-                "message": "Could not submit reading. Make sure you're online and that all of the fields are properly filled out."
-            }, {
-                "type": 'danger'
-            });
-        }
-
-        let formData = $('#form').serializeArray();
-        // Add extra attribute to request that sends back data in JSON
-        formData.push({
-            "name": "infoOnly",
-            "value": true
-        });
-        
-        let cid = this.configurationId;
-        
-        LcatDB.InputBlock.start();
-        $.post(
-            `${LcatDB.serverUrl}/configurations/${cid}/readingDo`,
-            formData,
-            (data, status) => { finish(status == "success", data); }
-        ).fail(() => { finish(false); });
-    };
-
     validateInput() {
         let $form = $('#form');
         let hasFailed = $("#form").find("input").toArray().some(input => {
@@ -232,24 +190,46 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         return !hasFailed;
     }
 
-    submitCordova() {
-        // iOS webkit doesn't support field validation because apple is fantastic
-        // so we have to do it manually
-        if (LcatDB.Platform.isiOS() && !this.validateInput()) return;
+    queue() {
+        if (!this.validateInput()) return;
 
-        // Try to submit normally over the internet, and if that doesn't work
-        // then just cache it and go to the queue
-        let cid = this.configurationId;
+        LcatDB.offlineEventQueue.addEvent(new LcatDB.OfflineEventReading({
+            data: {
+                cid: this.configurationId,
+                formData: $('#form').serializeArray()
+            },
+            name: "Reading"
+        }));
 
-        this.submitWeb(data => {
-            LcatDB.App.offlineEventQueue.addEvent(new LcatDB.App.OfflineEventPost({
-                "data": {
-                    "formUrl": `${LcatDB.serverUrl}/configurations/${cid}/readingDo`,
-                    "formData": $('#form').serializeArray()
-                },
-                "name": "Reading"
-            }));
-            LcatDB.Pages.navigate('./queue.html');
+        this.changeConfig();
+    }
+
+    submit() {
+        if (!this.validateInput()) return;
+
+        LcatDB.InputBlock.start();
+        
+        let event = new LcatDB.OfflineEventReading({
+            data: {
+                cid: this.configurationId,
+                formData: $('#form').serializeArray()
+            },
+            name: "Reading"
+        });
+
+        event.submit(data => {
+            LcatDB.InputBlock.finish();
+
+            if (data.success) {
+                console.log(event.response);
+                LcatDB.Pages.populateContent(
+                    event.response.data,
+                    event.response.responseURL
+                );
+            } else {
+                LcatDB.offlineEventQueue.addEvent(event);
+                LcatDB.Pages.navigate('./queue.html');
+            }
         });
     }
 
@@ -324,13 +304,84 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         $("#configuration-picker").change(() => this.changeConfig());
     }
 
+    initSubmitBtns() {
+        $("#queue").click(e => {
+            e.preventDefault();
+            if (!this.validateInput()) return;
+
+            this.queue();
+
+            $("#publish").hide();
+            $("#viewqueue").show();
+        });
+
+        $("#publish").click(e => {
+            e.preventDefault();
+            this.submit();
+        });
+
+        $("#viewqueue").click(e => {
+            e.preventDefault();
+            if (!this.validateInput()) {
+                new LcatDB.Modal(
+                    "Warning",
+`The current reading seems to be invalid. Make sure all fields are filled out and try again.<br>
+If you don't want to submit the current reading, press the button below to continue. Your other readings will remain in the queue.
+<br><br>
+<button type="button" class="pull-right btn btn-warning" onclick="window.parent.postMessage('modal.done', '*')">Discard Reading and View Queue</button>
+<br><br>`,
+                    () => LcatDB.Pages.navigate("./queue.html"),
+                    false
+                );
+            } else {
+                this.queue();
+                LcatDB.Pages.navigate("./queue.html");
+            }
+
+        });
+    }
+
+    initEventForm() {
+        if (typeof this.event == "undefined") return;
+
+        $("#form").deserialize(this.event.data.formData);
+        $("#configuration-picker").parent('.bootstrap-select').hide();
+        $("#sensor-new").hide();
+        $("#sensor-existing").hide();
+        $(".sensor-remove").hide();
+    }
+
+    initEvent() {
+        if (typeof this.eventId == "undefined") return;
+
+        this.event = LcatDB.offlineEventQueue.getEventById(this.eventId);
+        this.configurationId = this.event.data.cid;
+
+        $("#publish").hide();
+        $("#queue").hide();
+        $("#edit").show();
+
+        $("#edit").click(e => {
+            e.preventDefault();
+            if (!this.validateInput()) return;
+
+            LcatDB.offlineEventQueue.removeEvent(this.event);
+
+            this.queue();
+            LcatDB.Pages.navigate("./queue.html");
+        });
+    }
+
     init() {
         let queryObj = LcatDB.Utils.urlQueryObj(location.href);
         this.configurationId = queryObj.configuration;
+        this.eventId = queryObj.editqueue;
 
+        this.initEvent();
         this.initConfigList();
         this.initMobile();
         this.initDatetime();
+        this.initSubmitBtns();
         LcatDB.Utils.preventEnterKey();
 
         $('.normalize').unitnorm();
@@ -354,6 +405,5 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     
     deinit() {
         $("body").removeClass("page-newReading");
-        $(document).off('submit', 'form');
     }
 };

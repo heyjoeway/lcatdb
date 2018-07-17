@@ -195,7 +195,7 @@ LcatDB.QueryMap = class {
         if (typeof creator == "undefined" || creator == 'all')
             delete this.queries[0].filter.creator;
         else if (creator == "me") 
-            this.queries[0].filter.creator = offlineInfo.info().user["_id"];
+            this.queries[0].filter.creator = userInfo.info().user["_id"];
         else 
             this.queries[0].filter.creator = creator;
     

@@ -1,0 +1,47 @@
+{{#queueList}}
+<div class="panel">
+    <div class="panel-heading row">
+        <div class="col-xs-6 collapsed"
+                {{#infoHtml}}
+                data-toggle="collapse" data-target="#collapse_{{id}}"
+                aria-expanded="false" aria-controls="collapse_{{id}}"
+                {{/infoHtml}}>
+            <i class="collapse-arrow material-icons"></i>
+            &nbsp;
+            <h5 class="h-inline">{{name}}</h5><br>
+            <span class="text-muted">
+                    (Created <span class="normalize"
+                        data-unittype="time"
+                        data-unit="unix"
+                        data-unitpref="human12hr">
+                        {{timeCreated}}
+                    </span>)
+            </span>
+        </div>
+        <div class="col-xs-6 text-right small text-muted">
+                {{status}}&nbsp;&nbsp;
+                <a  class="event-submit btn btn-secondary btn-sm online_only_disable"
+                    data-eventid="{{id}}">
+                    <span class="glyphicon glyphicon-upload"></span>
+                </a>
+                &nbsp;&nbsp;
+                <a  class="event-remove btn btn-danger btn-sm"
+                    data-eventid="{{id}}">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </a>
+        </div>
+    </div>
+    
+    {{#infoHtml}}
+    <div id="collapse_{{id}}" class="collapse panel-body"
+         data-parent="#queue_list">
+        <div class="card-body">
+            {{{.}}}
+        </div>
+    </div>
+    {{/infoHtml}}
+</div>
+{{/queueList}}
+{{^queueList}}
+The queue is currently empty.
+{{/queueList}}

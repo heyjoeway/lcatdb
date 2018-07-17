@@ -1,4 +1,4 @@
-LcatDB.App.OfflineEvent = class {
+LcatDB.OfflineEvent = class {
     constructor(obj) {
         obj = obj || {};
         this.type = obj.type || "OfflineEvent";
@@ -9,7 +9,7 @@ LcatDB.App.OfflineEvent = class {
         this.autoSubmit = obj.autoSubmit || true;
         this.status = "pending";
         this.failures = 0;
-        this.priority = 0; // Higher priority = processes sooner TODO
+        // this.priority = 0; // Higher priority = processes sooner TODO
         /* 
          * Available states are:
          * - hold: Event is being modified or held in some form, do not submit
@@ -30,7 +30,8 @@ LcatDB.App.OfflineEvent = class {
         "id": this.id,
         "autoSubmit": this.autoSubmit,
         "status": this.status,
-        "priority": this.priority
+        "priority": this.priority,
+        "infoHtml": this.infoHtml()
     } }
 
     randomId() {
@@ -51,4 +52,6 @@ LcatDB.App.OfflineEvent = class {
                 LcatDB.Platform.openLoginModal();
         } catch (e) { }
     }
+
+    infoHtml() { }
 };

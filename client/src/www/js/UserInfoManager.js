@@ -1,7 +1,7 @@
-LcatDB.OfflineInfoManager = class {
+LcatDB.UserInfoManager = class {
     constructor() {
         this.block = false;
-        this.callbacks = [];
+        this.callbacks = new LcatDB.Utils.CallbackChannel();
         this.get();
     }
 
@@ -14,8 +14,7 @@ LcatDB.OfflineInfoManager = class {
     get(callback, force = false) {
         const OFFLINE_CACHE_TIME = 5 * 60 * 1000; // milliseconds
 
-        if (typeof callback == "function")
-            this.callbacks.push(callback);
+        this.callbacks.add(callback);
         
         if (this.block) return;
         this.block = true;
@@ -44,7 +43,7 @@ LcatDB.OfflineInfoManager = class {
 
                 if (data.error) {
                     if (data.error.errorName == 'noSession') {
-                        localStorage["LcatDB.offlineInfo"] = '';
+                        localStorage["LcatDB.userInfo"] = '';
                         LcatDB.InputBlock.finish(-1);
                         let mustLogin = $(`meta[name='app:mustLogin']`).prop("content") == "true";
                         if (mustLogin) LcatDB.Platform.openLoginModal();
@@ -52,7 +51,7 @@ LcatDB.OfflineInfoManager = class {
                     return this.finish(false);
                 }
 
-                localStorage["LcatDB.offlineInfo"]  = JSON.stringify(data);
+                localStorage["LcatDB.userInfo"]  = JSON.stringify(data);
                 this.finish(true);
             },
             "error": () => {
@@ -62,25 +61,23 @@ LcatDB.OfflineInfoManager = class {
     }
 
     finish(gotNewInfo) {
-        this.callbacks.forEach(callback => callback(gotNewInfo));
-        this.callbacks = [];
+        this.callbacks.run(gotNewInfo);
+        this.callbacks.clear();
     
         this.block = false;
         LcatDB.InputBlock.finish();
     }
     
     info() {
-        if (localStorage["LcatDB.offlineInfo"])
-            return JSON.parse(localStorage["LcatDB.offlineInfo"]);
+        if (localStorage["LcatDB.userInfo"])
+            return JSON.parse(localStorage["LcatDB.userInfo"]);
     }
 
     expire() {
         let info = this.info();
         info.time = 0;
-        localStorage["LcatDB.offlineInfo"] = JSON.stringify(info);
+        localStorage["LcatDB.userInfo"] = JSON.stringify(info);
     }
     
-    clear() {
-        localStorage["LcatDB.offlineInfo"] = '';
-    }
+    clear() { localStorage["LcatDB.userInfo"] = ''; }
 };

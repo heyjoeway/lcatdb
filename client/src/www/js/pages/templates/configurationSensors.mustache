@@ -1,5 +1,4 @@
 {{#configuration}}
-<br>
 <h3 class="h-inline">Sensors</h3>
 <a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-sm btn-primary online_only_disable nav-ignore">Add New</a>
 &nbsp;&nbsp;
@@ -33,14 +32,5 @@
     <p id="sensors-none">No sensors found for this configuration.</p>
     <p class="offline_only_hide">Please connect to the internet in order to add sensors.</p>
     {{/sensors}}
-</div>
-
-<div class="form-group">
-    <br>
-    <div>
-        <a href="./dashboard.html" class="btn btn-default">Cancel</a>
-        &nbsp;&nbsp;
-        <button type="submit" id="publish" class="btn btn-primary">Save and Publish</button>
-    </div>
 </div>
 {{/configuration}}

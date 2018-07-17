@@ -283,3 +283,17 @@ body.is-ios:not(.body-transparentnavbar) .navbar {
         pointer-events: none;
     }
 }
+
+.collapse-arrow {
+    vertical-align: top;
+}
+
+.collapse-arrow::before {
+    content: "keyboard_arrow_down";
+}
+
+.collapsed {
+    .collapse-arrow::before {
+        content: "keyboard_arrow_right";
+    }
+}

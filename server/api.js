@@ -129,14 +129,15 @@ app.post(`/api/offlineData`, (req, res) => {
         this.pause(list.length);
         let hasFailed = false;
         
-        list.forEach((configuration) => {
-            Configurations.getSensorList(configuration,
-                (sensors) => {
+        list.forEach(configuration => {
+            Configurations.getSensorList(
+                configuration,
+                sensors => {
                     if (hasFailed) return;                    
                     configuration.sensors = sensors;
                     this.next();
                 },
-                (error) => {
+                error => {
                     if (hasFailed) return;                    
                     fail(req, res, {
                         "errorName": "sensorListError",
@@ -146,7 +147,16 @@ app.post(`/api/offlineData`, (req, res) => {
                         }
                     });
                     hasFailed = true;
-                }
+                },
+                [
+                    "creation",
+                    "description",
+                    "model",
+                    "name",
+                    "owner",
+                    "type",
+                    "_id"
+                ]
             );
         });
 

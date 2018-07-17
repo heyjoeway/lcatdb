@@ -1,6 +1,6 @@
 {
   "name": "champy-db-client",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -37,8 +37,10 @@
     "bootstrap3": ">=3.3.5",
     "form-serializer": ">=2.5.0",
     "iframe-resizer": ">=3.6.1",
+    "jQuery.unserializeForm": "git+https://github.com/cthielen/unserialize-to-form.git",
     "jquery": ">=3.3.1",
     "jquery-backstretch": ">=2.1.16",
+    "jquery-deserialize": "^2.0.0-rc1",
     "jquery-spoiler": "git+https://github.com/le717/jquery-spoiler.git",
     "jquery-unitnorm": "git+https://github.com/Joseph14078/jQuery-unitnorm.git",
     "jquery-validation": ">=1.17.0",

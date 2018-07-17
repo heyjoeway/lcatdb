@@ -164,21 +164,31 @@ LcatDB.Utils = class {
 };
 
 LcatDB.Utils.CallbackChannel = class {
-    constructor() {
+    clear() {
         this.callbacks = {};
+        this.callbackOnceKeys = [];
         this.callbackCtr = 0;
     }
 
-    add(callback) {
+    constructor() { this.clear(); }
+
+    add(callback, once) {
+        if (typeof callback != "function") return;
         this.callbacks[this.callbackCtr] = callback;
+        if (once) this.callbackOnceKeys.push(this.callbackCtr);
         return this.callbackCtr++;
     }
 
-    remove(key) { delete this.callbacks[key] }
+    remove(key) {
+        let onceKeysIndex = this.callbackOnceKeys.indexOf(key);
+        if (onceKeysIndex > -1) this.callbackOnceKeys.splice(onceKeysIndex, 1);
+        delete this.callbacks[key];
+    }
 
     run(status, data) {
-        Object.keys(this.callbacks).forEach((key) => {
+        Object.keys(this.callbacks).forEach(key => {
             this.callbacks[key](status, data);
+            if (this.callbackOnceKeys.indexOf(key) > -1) this.remove(key);
         });
     }
 };

@@ -9,7 +9,7 @@ require('./Platform.js');
 require('./InputBlock.js');
 
 require('./Sidebar.js');
-require('./OfflineInfoManager.js');
+require('./UserInfoManager.js');
 
 require('./Page.js');
 
@@ -18,6 +18,11 @@ require('./MapsCommon.js');
 
 require('./Modal.js');
 require('./ModalsCommon.js');
+
+require("./OfflineEvent.js");
+require("./OfflineEventPost.js");
+require("./OfflineEventReading.js");
+require("./OfflineEventQueue.js");
 
 require('./app.js');
 
@@ -32,6 +37,7 @@ require('jquery-validation');
 require('iframe-resizer');
 require('jquery-unitnorm');
 require("jquery-spoiler")($);
+require('jquery-deserialize');
 
 window.MobileDetect = require("mobile-detect");
 
@@ -55,7 +61,8 @@ LcatDB.init = function() {
     LcatDB.InputBlock.init();
     
     if (window.parent == window) {
-        LcatDB.offlineInfo = new LcatDB.OfflineInfoManager();
+        LcatDB.offlineEventQueue = new LcatDB.OfflineEventQueue();
+        LcatDB.userInfo = new LcatDB.UserInfoManager();
         LcatDB.Sidebar.update();
     }
 

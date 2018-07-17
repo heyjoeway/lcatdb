@@ -1,4 +1,4 @@
-LcatDB.App.OfflineEventPost = class extends LcatDB.App.OfflineEvent {
+LcatDB.OfflineEventPost = class extends LcatDB.OfflineEvent {
     constructor(obj) {
         obj.type = "OfflineEventPost";
         super(obj);
@@ -23,29 +23,43 @@ LcatDB.App.OfflineEventPost = class extends LcatDB.App.OfflineEvent {
         if (!navigator.onLine) return;
 
         LcatDB.InputBlock.start();
-        $.post(
-            this.data.formUrl,
-            this.data.formData,
-            (data, status) => {
+
+        let xhr = new XMLHttpRequest();
+
+        $.ajax({
+            url: this.data.formUrl,
+            data: this.data.formData,
+            method: 'POST',
+            dataType: 'html',
+            xhr: () => xhr,
+            success: (data, status) => {
                 this.response = {
                     data: data,
-                    status: status
+                    status: status,
+                    responseURL: xhr.responseURL
                 };
                 
-                this.status = "success";
                 if (status != "success") {
                     this.fail();
                     return finish(false);
                 }
                 
+                this.status = "success";
                 finish(true);
+            },
+            error: data => {
+                if (data.responseJSON)
+                    this.response = { data: data.responseJSON };
+        
+                this.fail();
+                finish(false);
             }
-        ).fail(data => {
-            if (data.responseJSON)
-                this.response = { data: data.responseJSON };
-
-            this.fail();
-            finish(false);
         });
     }
+
+    infoHtml() { return (
+`<pre><code>
+    ${JSON.stringify(this.data, null, 2)}
+</pre></code>`
+    ) }
 };

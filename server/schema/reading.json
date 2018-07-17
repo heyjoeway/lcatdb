@@ -1,5 +1,5 @@
 {
-    "offlineInfo": true,
+    "userInfo": true,
     "id": "/Reading",
     "type": "object",
     "properties": {
