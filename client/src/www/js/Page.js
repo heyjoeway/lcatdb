@@ -24,6 +24,7 @@ LcatDB.Pages = class {
         LcatDB.App.initElements();
 
 		$('.selectpicker').selectpicker();
+		$('input[type="password"]').password();
 	}
 
 	static reload() {
