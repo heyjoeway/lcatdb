@@ -15,16 +15,15 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
 
     submit(callback, force) {
         function finish(success) {
+            LcatDB.InputBlock.finish();
             if (callback) callback({
                 "success": success
             });
-            
-            LcatDB.InputBlock.finish();
         }
 
-        if ((this.status == "success") && !force) return;
+        if ((this.status == "success") && !force) return callback(true);
 
-        if (!navigator.onLine) return;
+        if (!navigator.onLine) return callback(false);
 
         LcatDB.InputBlock.start();
 
@@ -34,7 +33,6 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
             url: this.getUrl(),
             data: this.data.formData,
             method: 'POST',
-            dataType: 'html',
             xhr: () => xhr,
             success: (data, status) => {
                 this.response = {
@@ -58,8 +56,8 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
                     this.response.data = JSON.parse(data.responseText);
                 } catch(e) { }
         
-                this.fail();
                 finish(false);
+                this.fail();
             }
         });
     }
