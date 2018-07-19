@@ -33,7 +33,7 @@ class DataSet {
         data = data || {};
 
         this.name = data.name || "N/A";
-        this.uid = data.uid || LcatDB.Utils.genUid();
+        this.uid = data.uid || LcatDB.Utils.randomString();
 
         this.props = this.defaultProps();
         $.extend(

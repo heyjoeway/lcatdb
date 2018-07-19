@@ -27,9 +27,8 @@ LcatDB.Utils = class {
         return obj;
     }
 
-    static genUid(size = 32) {
+    static randomString(size = 32, charSet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890") {
         let uid = "";
-        let charSet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
         for (let i = 0; i < size; i++)
             uid += charSet[Math.round(Math.random() * (charSet.length - 1))];
         return uid;
@@ -154,6 +153,26 @@ LcatDB.Utils = class {
             if (typeof propVal == "undefined") return;
 
             this.jqValueSet($element, propVal);
+        });
+    }
+
+    static submitFormAjax($form) {
+        let xhr = new XMLHttpRequest();
+
+        LcatDB.InputBlock.start();
+
+        $.ajax({
+            url: $form.prop('action'),
+            method: $form.prop('method'),
+            data: $form.serialize(),
+            dataType: 'html',
+            xhr: () => xhr,
+            success: (data, status) => {
+                LcatDB.InputBlock.finish();
+                if (status != "success") return;
+                LcatDB.Pages.populateContent(data, xhr.responseURL);
+            },
+            failure: () => LcatDB.InputBlock.finish()
         });
     }
 };

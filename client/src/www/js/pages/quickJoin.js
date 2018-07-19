@@ -2,18 +2,14 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
     genPassword() {
         let length = 8;
         
-        let symbols = ['!','@','#','$','%','^','&'];
-        let letters = ['q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m'];
+        let symbols = "!@#$%^&";
+        let letters = "qwertyuiopasdfghjklzxcvbnm";
 
-        let password = [];
-
-        for (let i = 0; i < length; i++) {
-            password[i] = letters[Math.floor(letters.length * Math.random())];
-        }
+        let password = LcatDB.Utils.randomString(length, letters).split("");
 
         let symbolsInserted = 0;
         while (symbolsInserted < 2) {
-            let i = Math.floor(password.length * Math.random());
+            let i = Math.floor(length * Math.random());
             let symbol = symbols[Math.floor(symbols.length * Math.random())];
             
             if (symbols.includes(password[i])) continue;
@@ -24,7 +20,7 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
 
         let numbersInserted = 0;
         while (numbersInserted < 2) {
-            let i = Math.floor(password.length * Math.random());
+            let i = Math.floor(length * Math.random());
             let number = Math.floor(Math.random() * 10);
 
             if (!isNaN(password[i])) continue;
@@ -37,14 +33,7 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
     }
 
     genUsername() {
-        let numbers = 6;
-        let username = 'anon';
-
-        for (let i = 0; i < numbers; i++) {
-            username += Math.floor(Math.random() * 10);
-        }
-
-        return username;
+        return `anon${LcatDB.Utils.randomString(6, "1234567890")}`;
     }
 
     initExists() {
@@ -88,28 +77,12 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
         $("#passwordRetype").val(password);
 
         $("#register").click(() => {
-            LcatDB.LocalStorage.put('anon.username', $("#username").val());
-            LcatDB.LocalStorage.put('anon.password', $("#password").val());
+            LcatDB.LocalStorage.put('anon', {
+                username: $("#username").val(),
+                password: $("#password").val()
+            });
 
-            LcatDB.InputBlock.start();
-
-			let xhr = new XMLHttpRequest();
-
-			$.ajax({
-				url: `${LcatDB.serverUrl}/registerdo?quick=true`,
-				method: 'POST',
-                data: $('#form').serialize(),
-				dataType: 'html',
-				xhr: () => xhr,
-				success: (data, status) => {
-                    LcatDB.InputBlock.finish();
-
-                    if (status != "success") return;
-
-                    LcatDB.Pages.populateContent(data, xhr.responseURL);
-                },
-                failure: () => LcatDB.InputBlock.finish()
-			});
+            LcatDB.Utils.submitFormAjax($('#form'));
         });
     }
 

@@ -184,7 +184,24 @@ require("./pages/newReading.js");
 require("./pages/quickJoin.js");
 require("./pages/sensorNewModal.js");
 require("./pages/visualize.js");
-require("./pages/userEdit.js");
-require("./pages/register.js");
 require("./pages/about.js");
 require("./pages/queue.js");
+
+LcatDB.PageForm = class extends LcatDB.Page {
+    init() {
+        $(document).on('submit', 'form', function(e) {
+            e.preventDefault();
+            LcatDB.Utils.submitFormAjax($(this));
+        });
+    }
+
+    deinit() { $(document).off('submit', 'form'); }
+};
+
+LcatDB.Pages.classes.register			= LcatDB.PageForm;
+LcatDB.Pages.classes.forgot				= LcatDB.PageForm;
+LcatDB.Pages.classes.forgotReq			= LcatDB.PageForm;
+LcatDB.Pages.classes.userEdit			= LcatDB.PageForm;
+LcatDB.Pages.classes.configurationEdit 	= LcatDB.PageForm;
+LcatDB.Pages.classes.sensorEdit			= LcatDB.PageForm;
+LcatDB.Pages.classes.sensorNew			= LcatDB.PageForm;
