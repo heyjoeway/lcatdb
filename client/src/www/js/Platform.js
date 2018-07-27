@@ -58,7 +58,6 @@ LcatDB.Platform = class {
         if (!LcatDB.Platform.inApp()) return callback(result);;
 
         inAppPrefixes.forEach(e => {
-            console.log(e);
             if (result.url.substr(0, e.length) == e)
                 result.url = result.url.substr(e.length);
         });
@@ -74,7 +73,6 @@ LcatDB.Platform = class {
 
             if (result.isLocal) {
                 if (LcatDB.Platform.isiOS()) {
-                    console.log(`${window.cordova.file.applicationDirectory}www/${result.url}`);
                     result.url = `${window.cordova.file.applicationDirectory}www/${result.url}`;
                     return callback(result);
                 }

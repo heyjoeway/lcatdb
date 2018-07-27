@@ -142,12 +142,10 @@ LcatDB.Pages = class {
 				dataType: 'html',
 				xhr: () => this.xhr,
 				success: data => {
-					console.log("success");
 					this.htmlString = data;
 					this.next();	
 				},
 				error: () => {
-					console.log("error");
 					this.htmlString = fs.readFileSync(
 						__dirname + "/templates/error.html"
 					).toString();

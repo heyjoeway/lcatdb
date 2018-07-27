@@ -63,7 +63,6 @@ app.post('/loginDo', (req, res) => {
                 res.redirect('/dashboard.html');
         },
         (error) => { // Failure
-            console.log(req.body);
             if (req.body.infoOnly)
                 res.send({
                     "errorName": "invalid",
