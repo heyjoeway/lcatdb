@@ -169,7 +169,7 @@
     <base target="_blank">
 </head>
 <body class="no-nav">
-    <div class="reading-mini">
+    <div id="content">
         {{#reading}}
         <h5 class="h-inline">Reading</h5>
         &nbsp;&nbsp;
@@ -201,15 +201,12 @@
                 {{location.long}}
             </span>
         </div>
-
+        
         {{#values}}
         {{{html}}}
         <br>
         {{/values}}
-
         {{/reading}}
     </div>
-
-    <!--scripts-->
 </body>
 {{/query.marker}}

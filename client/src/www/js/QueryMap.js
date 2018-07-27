@@ -57,6 +57,9 @@ LcatDB.QueryMap = class {
         let mapConfig = LcatDB.MapsCommon.getMapConfig();
         let layer = L.tileLayer(mapConfig.url, mapConfig.options);
         layer.addTo(this.map);
+
+        this.markerCluster = L.markerClusterGroup();
+        this.map.addLayer(this.markerCluster);
     }
 
     initBuoy() {
@@ -70,7 +73,7 @@ LcatDB.QueryMap = class {
                 shadowUrl: './img/map/markerShadow.png',
                 popupAnchor: [0, -41]
             })
-        }).addTo(this.map);
+        }).addTo(this.markerCluster);
 
         marker.bindPopup(`
             <a  href="https://leibensperger.github.io/buoy.html"
@@ -103,34 +106,48 @@ LcatDB.QueryMap = class {
     }
 
     updateMap() {
-        this.markers.forEach(marker => this.map.removeLayer(marker));
+        this.markers.forEach(marker => this.markerCluster.removeLayer(marker));
         this.markers = [];
         let markerImageIndex = 0;
 
         let dataEmpty = true;
 
-        this.data.forEach((dataSet) => {
-            dataSet.forEach((reading) => {
+        this.data.forEach(dataSet => {
+            dataSet.forEach(reading => {
                 let marker = L.marker([
                     reading.location.lat,
                     reading.location.long
                 ], {
-                        icon: L.icon({
-                            iconUrl: LcatDB.QueryMap.getMapMarkerImages()[markerImageIndex],
-                            iconAnchor: [12, 41],
-                            shadowUrl: './img/map/markerShadow.png',
-                            popupAnchor: [0, -41]
-                        })
-                    }).addTo(this.map);
+                    icon: L.icon({
+                        iconUrl: LcatDB.QueryMap.getMapMarkerImages()[markerImageIndex],
+                        iconAnchor: [12, 41],
+                        shadowUrl: './img/map/markerShadow.png',
+                        popupAnchor: [0, -41]
+                    })
+                }).addTo(this.markerCluster);
 
-                marker.bindPopup(`
-                    <iframe class="map-marker-iframe"
-                        src="${LcatDB.serverUrl}/readings/${reading['_id']}?marker=true">
-                    </iframe>
-                `, {
-                        "minWidth": 200,
-                        "maxHeight": 180
-                    });
+                marker.bindPopup(``, {
+                    "minWidth": 200,
+                    "maxHeight": 180
+                });
+
+                marker.on('popupopen', e => {
+                    e.popup.setContent("Loading...");
+                    $.get(
+                        `${LcatDB.serverUrl}/readings/${reading['_id']}?marker=true`,
+                        (data, status) => {
+                            if (status != "success")
+                                e.popup.setContent("Failed to load reading.");
+                                
+                            let $html = $($("<div></div>").html(data));
+                            e.popup.setContent(
+                                $html.find("#content").html()
+                            );
+                            LcatDB.UnitSystem.change();
+                            LcatDB.Platform.initNavigation();
+                        }, 'html'
+                    );
+                });
 
                 this.markers.push(marker);
 

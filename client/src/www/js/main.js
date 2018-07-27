@@ -52,6 +52,7 @@ require("bootstrap-select");
 window.Mustache = require("mustache");
 window.vis = require("vis");
 window.L = require('leaflet');
+require('leaflet.markercluster');
 
 require("./lib/L.TileLayer.PouchDBCached.js");
 require("./lib/modernizr-custom.js");

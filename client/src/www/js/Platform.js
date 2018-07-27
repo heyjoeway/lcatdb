@@ -88,7 +88,7 @@ LcatDB.Platform = class {
         });
     }
 
-    static initNavigation(force) {
+    static initNavigation() {
         if (window.parent != window) return;
         
         $('a').each(function() {

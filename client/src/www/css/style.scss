@@ -4,7 +4,10 @@
 @import "./lib/bootstrap/bootstrap-datetimepicker";
 @import "./lib/spinner";
 @import "./lib/vis.min";
+
 @import "./lib/leaflet";
+@import "./lib/MarkerCluster";
+@import "./lib/MarkerCluster.Default";
 
 $large-screen-width: 1200px;
 

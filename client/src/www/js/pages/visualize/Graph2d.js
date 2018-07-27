@@ -100,7 +100,7 @@ class Graph2d extends Graph {
             "dataAxis": {
                 "left": {
                     "title": {
-                        "text": typeNames[this.props.y.var]
+                        "text": this.getDataTypeNames()[this.props.y.var]
                     }
                 }
             }

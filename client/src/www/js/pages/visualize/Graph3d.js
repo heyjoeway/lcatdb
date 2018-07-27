@@ -100,16 +100,16 @@ class Graph3d extends Graph {
         let options = {
             "width": '512px',
             "height": '512px',
-            "xLabel": typeNames[this.props.x.var],
-            "yLabel": typeNames[this.props.y.var],
-            "zLabel": typeNames[this.props.z.var],
-            "legendLabel": typeNames[this.props.style.var],
+            "xLabel": this.getDataTypeNames()[this.props.x.var],
+            "yLabel": this.getDataTypeNames()[this.props.y.var],
+            "zLabel": this.getDataTypeNames()[this.props.z.var],
+            "legendLabel": this.getDataTypeNames()[this.props.style.var],
             "showLegend": true,
             "style": 'dot-color'
             // "dataAxis": {
             //     "left": {
             //         "title": {
-            //             "text": typeNames[this.props.y.var]
+            //             "text": this.getDataTypeNames()[this.props.y.var]
             //         }
             //     }
             // }

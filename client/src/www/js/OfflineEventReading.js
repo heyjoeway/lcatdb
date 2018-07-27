@@ -1,3 +1,5 @@
+const fs = require('fs'); // Browserify transform
+
 LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
     constructor(obj) {
         obj.type = "OfflineEventReading";
@@ -62,10 +64,38 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
         });
     }
 
-    infoHtml() { return (
-        `<button class="btn btn-link"
-            onclick="LcatDB.Pages.navigate('/newReading.html?editqueue=${this.id}')">
-            Edit Reading
-        </button>`
-    ) }
+    infoHtml() {
+        let renderData = {
+            cid: this.data.cid,
+            queueId: this.id,
+            reading: {
+                values: {}
+            }
+        };
+
+        this.data.formData.forEach(field => {
+            let path = field.name.replace(/\[/g, '.').replace(/\]/g, '');
+            LcatDB.Utils.setPropertyByPath(
+                renderData.reading, path, field.value
+            );
+        });
+
+        let valuesArr = Object.keys(renderData.reading.values).map(
+            key => renderData.reading.values[key]
+        );
+        renderData.reading.values = valuesArr;
+
+        let userInfo = LcatDB.userInfo.info();
+
+        renderData.reading.values.forEach(value => {
+            value.html = Mustache.render(
+                userInfo.sensorTypes[value.type].outputTemplate,
+                { value: value }
+            );
+        });
+
+        return Mustache.render(fs.readFileSync(
+            __dirname + "/templates/offlineEventReading.mustache"
+        ).toString(), renderData);
+    }
 };

@@ -1,0 +1,89 @@
+{{#reading}}
+{{#location}}
+<h5>Location</h5>
+
+<div class="row">
+    <div class="col-xs-4 text-right">Latitude</div>
+    <div class="normalize"
+        data-unittype="location"
+        data-unit="degrees"
+        data-unitpref="degMin">
+        {{lat}}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-4 text-right">Longitude</div>
+    <div class="normalize"
+        data-unittype="location"
+        data-unit="degrees"
+        data-unitpref="degMin">
+        {{long}}
+    </div>
+</div>
+
+{{#range}}
+<div class="row">
+    <div class="col-xs-4 text-right">Range</div>
+    <div class="normalize"
+        data-unittype="length"
+        data-unit="meters"
+        data-unitprefsystem="imperial">
+        {{.}}
+    </div>
+</div>
+{{/range}}
+
+
+{{#altitude}}
+<div class="row">
+    <div class="col-xs-4 text-right">Altitude</div>
+    <div class="normalize"
+        data-unittype="length"
+        data-unit="meters"
+        data-unitprefsystem="imperial">
+        {{.}}
+    </div>
+</div>
+{{/altitude}}
+
+{{#altRange}}
+<div class="row">
+    <div class="col-xs-4 text-right">Altitude Range</div>
+    <div class="normalize"
+        data-unittype="length"
+        data-unit="meters"
+        data-unitprefsystem="imperial">
+        {{.}}
+    </div>
+</div>
+{{/altRange}}
+
+{{/location}}
+
+<hr>
+
+<h5 class="h-inline">Values</h5>&nbsp;&nbsp;
+<select id="unit-system-picker" class="selectpicker">
+    <option value="imperial" selected="selected">Imperial Units</option>
+    <option value="metric">Metric Units</option>
+</select>
+<div class="row">
+    {{#values}}
+    <div class="col-lg-6 col-xs-12">
+        <div class="panel reading-panel">
+            <a href="/sensors/{{sensor}}" class="extra-small text-muted reading-sid">{{sensor}}</a>
+            {{{html}}}
+        </div>
+    </div>
+    {{/values}}
+    {{^values}}
+    <p>No values found for this reading.</p>
+    {{/values}}
+</div>
+{{/reading}}
+
+<button class="btn btn-link"
+        onclick="LcatDB.Pages.navigate('/newReading.html?editqueue={{queueId}}')">
+    Edit Reading
+</button>
