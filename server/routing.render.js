@@ -5,7 +5,7 @@ const Configurations = require('./configurations.js');
 const Sensor = require('./sensor.js');
 const Reading = require('./reading.js');
 const SensorTypes = require('./sensorTypes.js');
-const Utils = require('./utils.js');
+const Utils = require('./Utils.js');
 const Chain = Utils.Chain;
 
 const RoutingCore = require('./routing.core.js');

@@ -1,5 +1,5 @@
 const Configurations = require('./configurations.js');
-const Utils = require('./utils.js');
+const Utils = require('./Utils.js');
 const Chain = Utils.Chain;
 const RoutingCore = require('./routing.core.js');
 

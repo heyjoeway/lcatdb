@@ -11,7 +11,7 @@ const deepmerge = require('deepmerge');
 // Champy-DB specific modules
 // ----------------------------------------------------------------------------
 
-const Utils = require('./utils.js');
+const Utils = require('./Utils.js');
 const Schema = require('./schema.js');
 const Configurations = require('./configurations.js');
 const Db = require('./DBHandler.js');

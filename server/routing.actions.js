@@ -1,7 +1,7 @@
 const Winston = require('winston');
 const ObjectId = require('mongodb').ObjectId; 
 
-const Utils = require('./utils.js');
+const Utils = require('./Utils.js');
 const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
 const Sensor = require('./sensor.js');

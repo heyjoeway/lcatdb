@@ -14,7 +14,7 @@ const Schema = require('./schema.js');
 const Db = require('./DBHandler.js');
 const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js');
-const Utils = require('./utils.js');
+const Utils = require('./Utils.js');
 const Auth = require('./auth.js');
 const Reading = require('./reading.js');
 

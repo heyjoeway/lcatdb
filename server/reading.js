@@ -15,7 +15,7 @@ const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js')
 const Configurations = require('./configurations.js');
 const Db = require('./DBHandler.js');
-const Utils = require('./utils.js');
+const Utils = require('./Utils.js');
 const Chain = Utils.Chain;
 
 // ----------------------------------------------------------------------------

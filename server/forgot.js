@@ -6,7 +6,7 @@ const Winston = require('winston');
 const Auth = require('./auth.js');
 const Email = require('./email.js');
 const Config = require('./config.json');
-const Utils = require('./utils.js');
+const Utils = require('./Utils.js');
 const Chain = Utils.Chain;
 
 exports.emailRequest = function(user, randomId, callback) {
