@@ -11,7 +11,7 @@ const deepmerge = require('deepmerge');
 // ----------------------------------------------------------------------------
 
 const Schema = require('./schema.js');
-const Db = require('./db.js');
+const Db = require('./DBHandler.js');
 const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js');
 const Utils = require('./utils.js');

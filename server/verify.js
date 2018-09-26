@@ -1,5 +1,5 @@
 const hat = require('hat');
-const Db = require('./db.js');
+const Db = require('./DBHandler.js');
 const Bcrypt = require('bcryptjs');
 const Winston = require('winston');
 

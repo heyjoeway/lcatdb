@@ -13,6 +13,11 @@
  */
 
 /**
+ * Generic success callback.
+ * @callback genericSuccess
+ */
+
+/**
  * Generic failure callback.
  * @callback genericFailure
  * @param {error} error 

@@ -15,7 +15,7 @@ const hat = require('hat');
 
 const Schema = require('./schema.js');
 const Config = require('./config.json');
-const Db = require('./db.js');
+const Db = require('./DBHandler.js');
 const Utils = require('./utils.js');
 const Chain = Utils.Chain;
 

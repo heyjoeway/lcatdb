@@ -1,15 +1,3 @@
-/*
- * Alright, let's just get some conventions out of the way, both for myself and
- * for anyone working with this in the future:
- * 
- * - UseCamelCase. No_snake_case.
- * - Do not do ANYTHING synchronously. Do everything async.
- *   - In terms of I/O, anyway.
- *   - Except for the initial config loading.
- * - Always use Winston for logging. Only use console.log for >>very<<
- *   temporary debugging.
-*/
-
 const STATIC = __dirname + '/www/';
 
 // ============================================================================
@@ -18,7 +6,7 @@ const STATIC = __dirname + '/www/';
 
 const fs = require('fs');
 
-var configTmp;
+let configTmp;
 
 try {
     configTmp = require('./config.json');
@@ -27,9 +15,7 @@ try {
         console.log('Did not find config file. Copying from "./config.example.json".')
         configTmp = require('./config.example.json');
         fs.writeFileSync('./config.json', JSON.stringify(configTmp, null, '\t'));
-    } else {
-        throw e;
-    }
+    } else throw e;
 };
 
 const Config = JSON.parse(JSON.stringify(configTmp));
@@ -44,7 +30,7 @@ Winston.level = Config.log.level;
 
 const MongoClient = require('mongodb').MongoClient;
 // Used for getting internal MongoDB post ids
-const ObjectId = require('mongodb').ObjectId; 
+const ObjectId = require('mongodb').ObjectId;
 
 const Express = require('express');
 const app = Express();
@@ -61,7 +47,7 @@ const Crypto = require('crypto');
 
 const Schema = require('./schema.js');
 const Configurations = require('./configurations.js');
-const Db = require('./db.js');
+const Db = require('./DBHandler');
 const Sensor = require('./sensor.js');
 const SensorTypes = require('./sensorTypes.js');
 const Reading = require('./reading.js');
@@ -87,8 +73,7 @@ Db.connect(
         app.listen(Config.port, () => {
             Winston.info('Server listening.', { "port" : Config.port });
         });
-    },
-    (error) => { }
+    }
 );
 
 // ============================================================================
@@ -125,14 +110,14 @@ Api.init(app);
 // ERROR HANDLING
 // ============================================================================
 
-app.use(function(err, req, res, next) {
-    var errorText;
+app.use((err, req, res, next) => {
+    let errorText;
 
     if (Config.errors.showData) {
         if (!Config.errors.encryptData) {
             errorText = "WARNING: RAW STACK SENT\n\n" + err.stack;
         } else {
-            var cipher = Crypto.createCipher(
+            let cipher = Crypto.createCipher(
                 Config.errors.encryptAlgorithm,
                 Config.errors.encryptPassword
             );
@@ -147,6 +132,6 @@ app.use(function(err, req, res, next) {
     });
 });
 
-app.use(function (req, res) {
+app.use((req, res) => {
     res.status(404).sendFile(STATIC + "404.html");
 });
