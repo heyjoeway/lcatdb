@@ -2,9 +2,9 @@ const Winston = require('winston');
 
 const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
-const Sensor = require('./sensor.js');
+const Sensor = require('./Sensors.js');
 const Reading = require('./reading.js');
-const SensorTypes = require('./sensorTypes.js');
+const SensorTypes = require('./SensorTypes.js');
 const Utils = require('./Utils.js');
 const Chain = Utils.Chain;
 
@@ -22,8 +22,17 @@ function testAllowAnon(data, options) {
 function mustachifyGeneral(data, options, callback) {
     let needs = options.mustacheDeps.general || [];
 
-    if (needs.includes('sensorTypes'))
-        data.sensorTypes = SensorTypes.getTypesMustache();
+    if (needs.includes('sensorTypes')) {
+        let types = SensorTypes.types;
+        data.sensorTypes = [];
+
+        Object.keys(types).forEach(key => {
+            data.sensorTypes.push({
+                "key": key,
+                "type": types[key]
+            });
+        });
+    }
 
     if (needs.includes('time'))
         data.time = (new Date()).getTime();
@@ -44,7 +53,10 @@ function mustachifyReading(data, options, callback) {
     if (needs.includes('htmlOut')) {
         reading.values.forEach((value) => {
             try {
-                value.html = SensorTypes.renderOutputTemplate(value);
+                value.html = mustache.render(
+                    types[value.type].outputTemplate,
+                    { "value": value }
+                );
             } catch(e) {
                 value.html = '<span class="error">ERROR: Could not retrieve template for value.</span>';
                 fail({
@@ -76,17 +88,17 @@ function mustachifyUser(data, options, callback) {
 
         if (needs.includes('sensors')) {
             Sensor.getList(user, 
-                (docs) => { // Success
+                docs => { // Success
                     user.sensors = docs;
                     if (needs.includes('sensors.typeData')) {
-                        user.sensors.forEach((sensor) => {
+                        user.sensors.forEach(sensor => {
                             sensor.typeData = SensorTypes.getTypeData(sensor.type);
                         });
                         this.next();
                     }
                     this.next();
                 },
-                (error) => { // Failure
+                error => { // Failure
                     fail({
                         "errorName": "userSensorList",
                         "errorNameFull": "Routing.render.mustachifyUser.userSensorList",
@@ -121,10 +133,10 @@ function mustachifyConfiguration(data, options, callback) {
 
         if (needs.includes('sensors')) {
             Configurations.getSensorList(configuration,
-                (sensors) => {
+                sensors => {
                     configuration.sensors = sensors;
                     if (needs.includes('sensors.typeData')) {
-                        sensors.forEach((sensor) => {
+                        sensors.forEach(sensor => {
                             sensor.typeData = SensorTypes.getTypeData(sensor.type);
                         });
                         this.next();
@@ -133,8 +145,13 @@ function mustachifyConfiguration(data, options, callback) {
 
                     if (needs.includes('sensors.htmlIn')) {
                         sensors.forEach((sensor, i) => {
-                            sensor.html = SensorTypes.renderInputTemplate(
-                                sensor.type, data.user, configuration, sensor
+                            sensor.html = mustache.render(
+                                SensorTypes.types[sensor.type].inputTemplate,
+                                {
+                                    "user": data.user,
+                                    "configuration": configuration,
+                                    "sensor": sensor
+                                }
                             );
                             sensor.index = i;
                         });
@@ -143,7 +160,7 @@ function mustachifyConfiguration(data, options, callback) {
 
                     this.next();
                 },
-                (error) => {
+                error => {
                     if (!hasFailed) {
                         fail({
                             "errorName": "sensorList",
@@ -234,7 +251,7 @@ function mustachifySensor(data, options, callback) {
         // ----
 
         if (needs.includes('typeName')) {
-            sensor.typeName = SensorTypes.getTypeName(sensor.type);
+            sensor.typeName = SensorTypes.types[sensor.type].data.name;
             this.next();
         }
 

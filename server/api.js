@@ -1,4 +1,4 @@
-const SensorTypes = require('./sensorTypes.js');
+const SensorTypes = require('./SensorTypes.js');
 const Schema = require('./schema.js');
 const Reading = require('./reading.js');
 const Utils = require('./Utils.js');
@@ -6,7 +6,7 @@ const Chain = Utils.Chain;
 const Winston = require('winston');
 const Auth = require ('./auth.js');
 const Configurations = require('./configurations.js');
-const Sensor = require('./sensor.js');
+const Sensor = require('./Sensors.js');
 
 function fail(req, res, error) {
     Winston.debug("Error processing API request.", {
@@ -19,7 +19,7 @@ exports.init = function(app) {
 
 // List all sensor types; model information included
 app.all('/api/sensorTypes', (req, res) => {
-    res.send(SensorTypes.getTypes());
+    res.send(SensorTypes.types);
 });
 
 let readingsInstructions = `\
@@ -162,7 +162,7 @@ app.post(`/api/offlineData`, (req, res) => {
 
         this.next();
     }, function() {
-        data.sensorTypes = SensorTypes.getTypes();
+        data.sensorTypes = SensorTypes.types;
         data.time = new Date().getTime();
         res.send(data);
     });

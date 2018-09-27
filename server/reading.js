@@ -11,8 +11,8 @@ const ObjectId = require('mongodb').ObjectId;
 // ----------------------------------------------------------------------------
 
 const Schema = require('./schema.js');
-const Sensor = require('./sensor.js');
-const SensorTypes = require('./sensorTypes.js')
+const Sensor = require('./Sensors.js');
+const SensorTypes = require('./SensorTypes.js')
 const Configurations = require('./configurations.js');
 const Db = require('./DBHandler.js');
 const Utils = require('./Utils.js');
@@ -151,7 +151,7 @@ exports.validate = function(reading) {
         let valueValidity;
         reading.values.some((val) => {
             valueValidity = Schema.validate(
-                SensorTypes.getSchemaId(val.type),
+                SensorTypes.types[val.type].schemaId;
                 val.data            
             );
 

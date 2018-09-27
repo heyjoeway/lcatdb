@@ -4,12 +4,12 @@ const ObjectId = require('mongodb').ObjectId;
 const Utils = require('./Utils.js');
 const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
-const Sensor = require('./sensor.js');
-const SensorTypes = require('./sensorTypes.js');
+const Sensor = require('./Sensors.js');
+const SensorTypes = require('./SensorTypes.js');
 const Reading = require('./reading.js');
 const Chain = Utils.Chain;
 const Forgot = require('./forgot.js');
-const Verify = require('./verify.js');
+const Verify = require('./Verify.js');
 const RoutingCore = require('./routing.core.js');
 const Config = require('./config.json');
 
@@ -18,7 +18,7 @@ exports.init = function(app) {
 
 if (Config.debugMode) {
     app.get('/oops', (req, res) => {
-        var test = app.dsdsdsadsadds.dsas;
+        throw "a fit"; 
     });
 }
 

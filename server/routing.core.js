@@ -2,7 +2,7 @@ const Winston = require('winston');
 
 const Auth = require('./auth.js');
 const Configurations = require('./configurations.js');
-const Sensor = require('./sensor.js');
+const Sensor = require('./Sensors.js');
 const Reading = require('./reading.js');
 const Forgot = require('./forgot.js');
 
