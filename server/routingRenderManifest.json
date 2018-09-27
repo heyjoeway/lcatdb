@@ -1,0 +1,178 @@
+[{
+    "url": "/forgot/([0-9a-f]{32})",
+    "template": "forgotReq",
+    "steps": [
+        "user",
+        "forgot",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/user/apiKey",
+    "template": "userApiKey",
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/user/edit",
+    "template": "userEdit",
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/sensors/new",
+    "template": "sensorNew",
+    "mustacheDeps": {
+        "general": ["sensorTypes"]
+    },
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/sensors",
+    "template": "sensorList",
+    "mustacheDeps": {
+        "user": ["sensors", "sensors.typeData"]
+    },
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/forgot",
+    "template": "forgot",
+    "allowAnon": "only",
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/register",
+    "template": "register",
+    "allowAnon": "only",
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/tutorial",
+    "template": "tutorial",
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/sensors/([0-9a-f]{24})",
+    "template": "sensor",
+    "allowAnon": true,
+    "mustacheDeps": {
+        "sensor": ["typeName", "owner"]
+    },
+    "steps": [
+        "user",
+        "sensor",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/sensors/([0-9a-f]{24})/edit",
+    "template": "sensorEdit",
+    "mustacheDeps": {
+        "sensor": ["typeModels"]
+    },
+    "steps": [
+        "user",
+        "sensor",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/configurations/([0-9a-f]{24})",
+    "template": "configuration",
+    "mustacheDeps": {
+        "configuration": ["sensors", "sensors.typeData", "owner"]
+    },
+    "steps": [
+        "user",
+        "configuration",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/configurations/([0-9a-f]{24})/tutorial",
+    "template": "configurationTutorial",
+    "mustacheDeps": {
+        "configuration": ["sensors", "sensors.typeData"]
+    },
+    "steps": [
+        "user",
+        "configuration",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/configurations/([0-9a-f]{24})/edit",
+    "template": "configurationEdit",
+    "steps": [
+        "user",
+        "configuration",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/configurations/([0-9a-f]{24})/readings",
+    "template": "configurationReadingList",
+    "mustacheDeps": {
+        "configuration": ["readings"]
+    },
+    "steps": [
+        "user",
+        "configuration",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/configurations/([0-9a-f]{24})/removeSensor",
+    "template": "configurationRemoveSensor",
+    "steps": [
+        "user",
+        "configuration",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/configurations/([0-9a-f]{24})/addSensor",
+    "template": "configurationAddSensor",
+    "mustacheDeps": {
+        "user": ["sensors", "sensors.typeData"]
+    },
+    "steps": [
+        "user",
+        "configuration",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/readings/([0-9a-f]{24})",
+    "template": "reading",
+    "allowAnon": true,
+    "mustacheDeps": {
+        "reading": ["htmlOut"]
+    },
+    "steps": [
+        "user",
+        "reading",
+        "query",
+        "mustachify"
+    ]
+}]

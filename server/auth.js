@@ -13,7 +13,7 @@ const hat = require('hat');
 // Champy-DB specific modules
 // ----------------------------------------------------------------------------
 
-const Schema = require('./schema.js');
+const Schema = require('./Schema.js');
 const Config = require('./config.json');
 const Db = require('./DBHandler.js');
 const Utils = require('./Utils.js');

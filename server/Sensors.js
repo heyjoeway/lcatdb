@@ -3,7 +3,7 @@ const ObjectId = require('mongodb').ObjectId;
 const deepmerge = require('deepmerge');
 
 const Utils = require('./Utils.js');
-const Schema = require('./schema.js');
+const Schema = require('./Schema.js');
 const Configurations = require('./configurations.js');
 const Db = require('./DBHandler.js');
 const SensorTypes = require('./SensorTypes.js');
@@ -152,7 +152,7 @@ class Sensors {
         let properties = [];
         validityErrors.forEach(value =>
             // Grab the actual property name instead of ".<property>"
-            properties.push(value.dataPath.split('.')[1]);
+            properties.push(value.dataPath.split('.')[1])
         );
 
         return {

@@ -45,7 +45,7 @@ const Crypto = require('crypto');
 // Champy-DB specific modules
 // ----------------------------------------------------------------------------
 
-const Schema = require('./schema.js');
+const Schema = require('./Schema.js');
 const Configurations = require('./configurations.js');
 const Db = require('./DBHandler');
 const Sensor = require('./Sensors');

@@ -127,9 +127,14 @@ class Chain {
      */
     constructor() {
         this.index = -1;
-        this.links = arguments;
         this.pauseAmt = 0;
-        this.next();
+
+        if (typeof arguments[0] == "object")
+            this.links = arguments[0];
+        else {
+            this.links = arguments;
+            this.next();
+        }
     }
 
     /**

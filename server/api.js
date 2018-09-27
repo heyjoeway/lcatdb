@@ -1,5 +1,5 @@
 const SensorTypes = require('./SensorTypes.js');
-const Schema = require('./schema.js');
+const Schema = require('./Schema.js');
 const Reading = require('./reading.js');
 const Utils = require('./Utils.js');
 const Chain = Utils.Chain;

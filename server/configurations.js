@@ -10,7 +10,7 @@ const deepmerge = require('deepmerge');
 // Champy-DB specific modules
 // ----------------------------------------------------------------------------
 
-const Schema = require('./schema.js');
+const Schema = require('./Schema.js');
 const Db = require('./DBHandler.js');
 const Sensor = require('./Sensors.js');
 const SensorTypes = require('./SensorTypes.js');

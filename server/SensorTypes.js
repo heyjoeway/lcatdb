@@ -1,4 +1,4 @@
-const Schema = require('./schema.js');
+const Schema = require('./Schema.js');
 const fs = require('fs');
 const mustache = require('mustache');
 
@@ -9,15 +9,15 @@ class SensorTypes {
      */
     static init() {
         fs.readdirSync('./sensors/').forEach(path => {
-            let schema = require("./sensors/" + path + "/schema.json");
+            let schema = require(`./sensors/${path}/schema.json`);
             Schema.addSchema(schema);
 
             SensorTypes.types[path] = {
                 "schemaId": schema.id,
                 "schema": schema,
-                "data": require("./sensors/" + path + "/data.json"),
-                "inputTemplate": fs.readFileSync("./sensors/" + path + "/input.mustache", "utf8"),
-                "outputTemplate": fs.readFileSync("./sensors/" + path + "/output.mustache", "utf8")
+                "data": require(`./sensors/${path}/data.json`),
+                "inputTemplate": fs.readFileSync(`./sensors/${path}/input.mustache`, "utf8"),
+                "outputTemplate": fs.readFileSync(`./sensors/${path}/output.mustache`, "utf8")
             };
         });
     }
@@ -29,7 +29,7 @@ class SensorTypes {
      * @param {string} typeKey
      * @param {object}
      */
-    static getTypeData(type) {
+    static getTypeData(typeKey) {
         let types = SensorTypes.types;
 
         if (types[typeKey])
