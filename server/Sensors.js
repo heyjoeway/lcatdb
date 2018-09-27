@@ -333,7 +333,7 @@ class Sensors {
             let completeValidity = Schema.validate('/Sensor', sensor);
             if (!completeValidity) return fail({
                 "errorName": "completeValidity",
-                "errorName": "Sensor.edit.completeValidity",
+                "errorNameFull": "Sensor.edit.completeValidity",
                 "errorData": {
                     "schemaErrors": Schema.errors()
                 }
