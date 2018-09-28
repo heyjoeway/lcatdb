@@ -1,7 +1,9 @@
 [{
     "url": "/forgot/([0-9a-f]{32})",
     "template": "forgotReq",
+    "allowAnon": true,
     "steps": [
+        "user",
         "forgot",
         "query",
         "mustachify"

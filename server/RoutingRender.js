@@ -361,7 +361,7 @@ RoutingRender.steps = {
         RoutingCore.stepForgot(
             req, res, data, options,
             () => {
-                if (typeof data.forgot != 'undefined')
+                if (data.forgot.exists)
                     this.next(req, res, data, options);
                 else
                     res.render('forgotNF', data);
