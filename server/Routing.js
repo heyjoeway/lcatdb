@@ -1,6 +1,6 @@
-const RoutingRender = require('./RoutingRender.js');
-const RoutingMisc = require('./routing.misc.js');
-const RoutingActions = require('./routing.actions.js');
+const RoutingRender = require('./RoutingRender');
+const RoutingMisc = require('./RoutingMisc');
+const RoutingActions = require('./RoutingActions');
 
 class Routing {
     static init(app) {

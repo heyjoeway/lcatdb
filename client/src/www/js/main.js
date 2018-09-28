@@ -2,7 +2,7 @@ window.LcatDB = {};
 LcatDB.serverUrl = '<!--url-->';
 
 require('./polyfill.js');
-require('./Utils.js');
+require('./Utils');
 
 require('./UnitSystem.js');
 require('./Platform.js');

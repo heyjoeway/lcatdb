@@ -1,4 +1,4 @@
-const Schema = require('./Schema.js');
+const Schema = require('./Schema');
 const fs = require('fs');
 const mustache = require('mustache');
 

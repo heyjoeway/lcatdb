@@ -2,15 +2,15 @@ const Winston = require('winston');
 const fs = require('fs');
 const mustache = require('mustache');
 
-const Auth = require('./auth.js');
-const Configurations = require('./configurations.js');
-const Sensor = require('./Sensors.js');
-const Reading = require('./reading.js');
-const SensorTypes = require('./SensorTypes.js');
-const Utils = require('./Utils.js');
+const Auth = require('./Auth');
+const Configurations = require('./Configurations');
+const Sensor = require('./Sensors');
+const Reading = require('./Reading');
+const SensorTypes = require('./SensorTypes');
+const Utils = require('./Utils');
 const Chain = Utils.Chain;
 
-const RoutingCore = require('./routing.core.js');
+const RoutingCore = require('./RoutingCore');
 
 class RoutingRender {
     static init(app) {
@@ -182,7 +182,7 @@ class RoutingRender {
             }
     
             if (needs.includes('owner')) {
-                Auth.findOid(configuration.owner,
+                Auth.findUid(configuration.owner,
                     owner => { // Success
                         configuration.owner = owner;
                         this.next();
@@ -255,7 +255,7 @@ class RoutingRender {
             }
     
             if (needs.includes('owner')) {
-                Auth.findOid(
+                Auth.findUid(
                     sensor.owner,
                     owner => {
                         sensor.owner = owner;

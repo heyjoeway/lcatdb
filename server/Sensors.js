@@ -2,10 +2,10 @@ const Winston = require('winston');
 const ObjectId = require('mongodb').ObjectId;
 const deepmerge = require('deepmerge');
 
-const Utils = require('./Utils.js');
-const Schema = require('./Schema.js');
-const Configurations = require('./configurations.js');
-const Db = require('./DBHandler.js');
+const Utils = require('./Utils');
+const Schema = require('./Schema');
+const Configurations = require('./Configurations');
+const Db = require('./DBHandler');
 const SensorTypes = require('./SensorTypes.js');
 
 class Sensors {

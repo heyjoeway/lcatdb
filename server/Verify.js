@@ -1,12 +1,12 @@
 const hat = require('hat');
-const Db = require('./DBHandler.js');
+const Db = require('./DBHandler');
 const Bcrypt = require('bcryptjs');
 const Winston = require('winston');
 
-const Auth = require('./auth.js');
-const Email = require('./email.js');
+const Auth = require('./Auth');
+const Email = require('./Email');
 const Config = require('./config.json');
-const Utils = require('./Utils.js');
+const Utils = require('./Utils');
 const Chain = Utils.Chain;
 
 class Verify {

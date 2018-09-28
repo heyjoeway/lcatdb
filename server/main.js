@@ -10,7 +10,7 @@ let configTmp;
 
 try {
     configTmp = require('./config.json');
-} catch (e) {
+} catch(e) {
     if (e.code == 'MODULE_NOT_FOUND') {
         console.log('Did not find config file. Copying from "./config.example.json".')
         configTmp = require('./config.example.json');
@@ -28,14 +28,8 @@ delete configTmp;
 const Winston = require('winston');
 Winston.level = Config.log.level;
 
-const MongoClient = require('mongodb').MongoClient;
-// Used for getting internal MongoDB post ids
-const ObjectId = require('mongodb').ObjectId;
-
 const Express = require('express');
-const app = Express();
 const bodyParser = require('body-parser');
-
 const Session = require('client-sessions');
 
 const mustache = require('mustache-express');
@@ -45,46 +39,24 @@ const Crypto = require('crypto');
 // Champy-DB specific modules
 // ----------------------------------------------------------------------------
 
-const Schema = require('./Schema.js');
-const Configurations = require('./configurations.js');
+const Schema = require('./Schema');
 const Db = require('./DBHandler');
-const Sensor = require('./Sensors');
 const SensorTypes = require('./SensorTypes');
-const Reading = require('./reading.js');
-const Routing = require('./routing.js');
-const Api = require('./api.js');
-
-const Email = require('./email.js');
-Email.init(Config.email);
-
-// ============================================================================
-// SCHEMA INIT
-// ============================================================================
-
-Schema.init();
-SensorTypes.init();
-
-// ============================================================================
-// MONGO/EXPRESS INIT
-// ============================================================================
-
-Db.connect(
-    () => { // Success
-        app.listen(Config.port, () => {
-            Winston.info('Server listening.', { "port" : Config.port });
-        });
-    }
-);
+const Routing = require('./Routing');
+const Api = require('./Api');
+const Email = require('./Email');
 
 // ============================================================================
 // EXPRESS INIT
 // ============================================================================
 
+const app = Express();
+
 app.use(Session({
     cookieName: 'session',
     secret: Config.session.secret,
     duration: Config.session.duration,
-    activeDuration: Config.session.ac
+    activeDuration: Config.session.activeDuration
 }));
 
 app.use(bodyParser.json());
@@ -100,9 +72,24 @@ app.set('views', __dirname + '/views/');
 app.use(Express.static(STATIC));
 
 // ============================================================================
+// MONGO/EXPRESS INIT
+// ============================================================================
+
+Db.connect(
+    () => { // Success
+        app.listen(Config.port, () => {
+            Winston.info('Server listening.', { "port" : Config.port });
+        });
+    }
+);
+
+// ============================================================================
 // ROUTING INIT
 // ============================================================================
 
+Email.init(Config.email);
+Schema.init();
+SensorTypes.init();
 Routing.init(app);
 Api.init(app);
 
