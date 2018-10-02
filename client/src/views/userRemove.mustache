@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - Delete Account</title>
+    <meta name="app:page" content="userRemove"/>
+    <meta name="app:mustLogin" content="true"/>
+    <meta name="app:noUser" content="false"/>
+</head>
+<body>
+    <!--nav_auto-->
+
+    <div id="content"><div class="container">
+        {{#user}}
+        <h2>Delete Account</h2>
+        <hr>
+        <p>You are about to delete your lcatDB user account. <b>This action is 100% irreversible.</b> Some of the consequences of this action are as follows:</p>
+        <ul>
+            <li>You will lose ownership over all sensors, configurations, and readings in your possession, although these will still remain on the site. If you'd like to remove these as well, please remove them manually.</li>
+            <li>You are not be able to transfer possession of any sensors, configurations, and readings to another account.</li>
+            <li>By deleting this account, your current email and username will be available for registration once again. Once re-registered, the new account will <b>NOT</b> have possession of or any association to any configurations, sensors, or readings previously owned by the deleted account.</li>
+        </ul>
+        <form class="container" action="<!--url-->/user/removeDo" method="post">
+            <div>
+                <label class="control-label" for="password">
+                    Password
+                </label>
+                <input autocomplete="off" class="form-control" type="password" name="password">
+            </div>
+            <br>
+            <div class="form-group">
+                <a href="/user/edit" class="btn btn-default">Cancel</a>
+                &nbsp;&nbsp;
+                <button type="submit" name="submit" class="btn btn-danger">Delete Account</button>
+            </div>
+        </form>
+        {{/user}}
+    </div></div>
+
+    <!--scripts-->
+</body>

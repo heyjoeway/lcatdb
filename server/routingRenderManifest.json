@@ -24,6 +24,14 @@
         "query",
         "mustachify"
     ]
+},  {
+    "url": "/user/remove",
+    "template": "userRemove",
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
 }, {
     "url": "/sensors/new",
     "template": "sensorNew",
@@ -103,6 +111,7 @@
     "mustacheDeps": {
         "configuration": ["sensors", "sensors.typeData", "owner"]
     },
+    "allowAnon": true,
     "steps": [
         "user",
         "configuration",
@@ -136,6 +145,7 @@
     "mustacheDeps": {
         "configuration": ["readings"]
     },
+    "allowAnon": true,
     "steps": [
         "user",
         "configuration",

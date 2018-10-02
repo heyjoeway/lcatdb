@@ -5,53 +5,49 @@ const Winston = require('winston');
 
 const Config = require("./config.json");
 
-class Email {
-    static init(transportConf) {
-        Email.transporter = nodemailer.createTransport(transportConf);
+exports.init = function(transportConf) {
+    exports.transporter = nodemailer.createTransport(transportConf);
 
-        Email.templates = {};    
-        fs.readdirSync('./emails/').forEach(path => {
-            let template = fs.readFileSync("./emails/" + path, "utf8");
-            Email.templates[path.split('.')[0]] = template;
-        });
-    }
-    
-    static sendTemplate(options, success, failure) {
-        let template = Email.templates[options.template];
-        let data = options.data;
-    
-        let html = mustache.render(template, data);
-        options.html = html;
-    
-        Email.send(options, success, failure);
-    };
-    
-    static send(options, success, failure) {
-        function fail(error) {
-            Winston.debug("Failed to send email.", {
-                "error": error
-            });
-            failure(false);
-        }
-    
-        options.from = Config.email.auth.user;
-    
-        if (!Config.email.enabled) return fail({
-            "errorName": "disabled",
-            "errorNameFull": "Email.send.disabled"
-        });
-        
-        Email.transporter.sendMail(options, (error, data) => {
-            if (error) return fail({
-                "errorName": "sendMail",
-                "errorNameFull": "Email.send.sendMail",
-                "errorData": {
-                    "errorSend": error
-                }
-            });
-            success(data.response);
-        });
-    }
-}
+    exports.templates = {};    
+    fs.readdirSync('./emails/').forEach(path => {
+        let template = fs.readFileSync("./emails/" + path, "utf8");
+        exports.templates[path.split('.')[0]] = template;
+    });
+};
 
-module.exports = Email;
+exports.sendTemplate = function(options, success, failure) {
+    let template = exports.templates[options.template];
+    let data = options.data;
+
+    let html = mustache.render(template, data);
+    options.html = html;
+
+    exports.send(options, success, failure);
+};
+
+exports.send = function(options, success, failure) {
+    function fail(error) {
+        Winston.debug("Failed to send email.", {
+            "error": error
+        });
+        failure(false);
+    }
+
+    options.from = Config.email.auth.user;
+
+    if (!Config.email.enabled) return fail({
+        "errorName": "disabled",
+        "errorNameFull": "Email.send.disabled"
+    });
+    
+    exports.transporter.sendMail(options, (error, data) => {
+        if (error) return fail({
+            "errorName": "sendMail",
+            "errorNameFull": "Email.send.sendMail",
+            "errorData": {
+                "errorSend": error
+            }
+        });
+        success(data.response);
+    });
+};
