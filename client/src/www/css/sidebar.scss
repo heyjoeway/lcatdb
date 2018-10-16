@@ -122,6 +122,7 @@ body.is-ios.in-app {
         & > a {
             color: #666;
             text-decoration: none;
+            width: 100%;
 
             & > span {
                 padding: 0;
@@ -156,12 +157,12 @@ body.is-ios.in-app {
         padding-left: 256px;
         
         & #content > .container {
-            padding-top: 32px;
+            padding-top: 26px;
         }
     }
 
     .container {
-        width: 914px;
+        width: 930px;
     }
 
 	#sidebar {

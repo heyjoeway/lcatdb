@@ -95,22 +95,20 @@ exports.exists = function(val) {
     return exists;
 };
 
-/**
- * Sets value in object in place from dot-separated path.
- * 
- * @param {object} obj
- * @param {string} path
- * @param {*} val
- */
-exports.setPath = function(obj, path, val) {
-    let pathArray = path.split('.');
-    let lastCrumb = pathArray.pop();
-    pathArray.forEach((crumb) => {
-        if (typeof obj[crumb] == 'undefined')
-            obj[crumb] = {};
-        obj = obj[crumb];
+exports.getPropertyByPath = function(obj, path) {
+    let pathArr;
+    if (typeof path == "string")
+        pathArr = path.split('.');
+    else
+        pathArr = path;
+
+    let error = pathArr.some((key, i, arr) => {
+        obj = obj[key];
+        
+        return typeof obj == 'undefined';
     });
-    obj[lastCrumb] = val;
+
+    if (!error) return obj;
 };
 
 /**

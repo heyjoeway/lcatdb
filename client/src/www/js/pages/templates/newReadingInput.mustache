@@ -1,0 +1,24 @@
+{{#sensor}}
+{{#typeData.display}}
+<label class="control-label">{{title}}</label>
+<div class="input-group">
+    <input  name="values[{{sensor.index}}]{{#path}}[{{.}}]{{/path}}"
+            class="form-control {{#normalize}}normalize{{/normalize}}"
+            {{#inputProps}}{{prop}}="{{val}}" {{/inputProps}}
+            {{^optional}}required{{/optional}}
+            {{#normalize}}
+            data-unittype="{{type}}"
+            data-unit="{{unit}}"
+            data-unitprefsystem="{{prefSystem}}"
+            {{/normalize}}
+            aria-describedby="addon-values-{{sensor.index}}{{#path}}-{{.}}{{/path}}"
+            placeholder="{{title}}">
+    <br>
+    <span   class="input-group-addon"
+            id="addon-values-{{sensor.index}}{{#path}}-{{.}}{{/path}}">
+        {{label}}
+    </span>
+</div>
+<br>
+{{/typeData.display}}
+{{/sensor}}

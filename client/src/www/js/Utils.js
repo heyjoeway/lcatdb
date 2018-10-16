@@ -67,7 +67,13 @@ LcatDB.Utils = class {
     }
 
     static setPropertyByPath(obj, path, val) {
-        path.split('.').forEach((key, i, arr) => {
+        let pathArr;
+        if (typeof path == "string")
+            pathArr = path.split('.');
+        else
+            pathArr = path;
+        
+        pathArr.forEach((key, i, arr) => {
             if (i == arr.length - 1) {
                 obj[key] = val;
                 return;
@@ -81,7 +87,13 @@ LcatDB.Utils = class {
     }
 
     static getPropertyByPath(obj, path) {
-        let error = path.split('.').some((key, i, arr) => {
+        let pathArr;
+        if (typeof path == "string")
+            pathArr = path.split('.');
+        else
+            pathArr = path;
+
+        let error = pathArr.some((key, i, arr) => {
             obj = obj[key];
             
             return typeof obj == 'undefined';
@@ -101,7 +113,7 @@ LcatDB.Utils = class {
 
     // https://stackoverflow.com/a/895231
     static preventEnterKey() {
-        $(window).keydown(function(event){
+        $(window).on('keydown.preventEnterKey', function(event){
             if (event.keyCode == 13) {
                 event.preventDefault();
                 return false;

@@ -11,60 +11,47 @@
 
     <div id="content"><div class="container">
         <h2>Sensor</h2>
-        {{#sensor}}
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">
-                <strong>Name</strong>
-            </div>
-            <div>{{name}}</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">
-                <strong>ID</strong>
-            </div>
-            <div>{{_id}}</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">
-                <strong>Owner</strong>
-            </div>
-            <div>
-                <!--<a href="/profile/{{owner._id}}">{{owner.username}}</a>-->
-                <span>{{owner.username}}</span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">
-                <strong>Creation Time</strong>
-            </div>
-            <div class="normalize"
-                data-unittype="time"
-                data-unit="unix"
-                data-unitpref="human12hr">
-                {{creation}}
-            </div>
-            
-        </div>
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">
-                <strong>Model</strong>
-            </div>
-            <div>{{model}}</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">
-                <strong>Type</strong>
-            </div>
-            <div id="type" data-type="{{type}}">{{typeName}}</div>
-        </div>
-        <!--<div class="row">
-            <div class="col-xs-4 col-sm-2 text-right">
-                <strong>Creation Time</strong>
-            </div>
-            <div>{{creation}}</div>
-        </div>-->
         <br>
-        {{#canEdit}}<a role="button" class="btn btn-primary" href="/sensors/{{_id}}/edit">Edit Details</a><br>{{/canEdit}}
+        {{#sensor}}
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <td>{{name}}</td>
+            </tr>
+            <tr>
+                <th>ID</th>
+                <td>{{_id}}</td>
+            </tr>
+            <tr>
+                <th>Owner</th>
+                <td>{{owner.username}}</td>
+            </tr>
+            <tr>
+                <th>Creation Time</th>
+                <td class="normalize"
+                    data-unittype="time"
+                    data-unit="unix"
+                    data-unitpref="human12hr">
+                    {{creation}}
+                </td>
+            </tr>
+            <tr>
+                <th>Model</th>
+                <td>{{model}}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td id="type" data-type="{{type}}">
+                    {{typeName}}
+                </td>
+            </tr>
+        </table>
+        {{#canEdit}}
+        <a role="button" class="btn btn-primary"
+           href="/sensors/{{_id}}/edit">
+           Edit Details
+        </a><br>
+        {{/canEdit}}
         
         <hr>
         

@@ -12,22 +12,31 @@
     <div id="content"><div class="container">
         {{#configuration}}
         <h2>Edit Configuration</h2>
+        <hr>
         {{#canEdit}}
-        <form action="<!--url-->/configurations/{{_id}}/editDo" method="post" class="form-horizontal"><fieldset class="container">
-            <div class="form-group">
-                <label class="col-xs-2 control-label" for="name">Name</label>
-                <div class="col-xs-10"><input class="form-control" type="text" name="name" value="{{configuration.name}}"></div>
+        <form action="<!--url-->/configurations/{{_id}}/editDo" method="post">
+            <label class="col-xs-2 col-xxs-12" for="name">
+                <strong>Name</strong>
+            </label>
+            <div class="col-xs-10 col-xxs-12">
+                <input  class="form-control"
+                        type="text" name="name"
+                        value="{{configuration.name}}">
+                <br>
             </div>
-            <div class="form-group">
-                <div class="col-xs-10 col-xs-offset-2">
-                    <a href="/configurations/{{_id}}" class="btn btn-default">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
+        
+            <div class="text-right">
+                <a href="/configurations/{{_id}}" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
-        </fieldset></form>
+        </form>
         {{/canEdit}}
         {{^canEdit}}
         <p>Sorry, you do not have permission to edit this configuration.</p>
+
+        <div class="text-right">
+            <a href="/configurations/{{_id}}" class="btn btn-default">Cancel</a>
+        </div>
         {{/canEdit}}
         {{/configuration}}
     </div></div>

@@ -15,8 +15,7 @@ exports.init = function() {
             "schemaId": schema.id,
             "schema": schema,
             "data": require(`./sensors/${path}/data.json`),
-            "inputTemplate": fs.readFileSync(`./sensors/${path}/input.mustache`, "utf8"),
-            "outputTemplate": fs.readFileSync(`./sensors/${path}/output.mustache`, "utf8")
+            "display": require(`./sensors/${path}/display.json`),
         };
     });
 };

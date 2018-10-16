@@ -12,151 +12,157 @@
 
     <div id="content"><div class="container">
         {{#reading}}
-        <div class="row">
-            <div class="col-xs-12 col-sm-6">
-                <h2>Reading</h2>
-                {{#user}}
-                <a href="/newReading.html?configuration={{configuration}}" class="btn btn-primary">
-                    Submit New Reading
-                </a>
-                &nbsp;&nbsp;
-                <a href="/configurations/{{configuration}}" class="online_only_disable btn btn-sm btn-secondary">
-                    View Configuration
-                </a>
-                {{/user}}
-                <br>
-
-                <div class="row">
-                    <div class="col-xs-4 text-right">ID</div>
-                    <div>{{_id}}</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-4 text-right">Creator ID</div>
-                    <div>{{creator}}</div>
-                </div>
+        <div class="col-xs-12 col-sm-6">
+            <h2>Reading</h2>
+            {{#user}}
+            <a href="/newReading.html?configuration={{configuration}}"
+               class="btn btn-primary">
+                Submit New Reading
+            </a>
+            <a href="/configurations/{{configuration}}"
+               class="online_only_disable btn btn-secondary">
+                View Configuration
+            </a><br>
+            {{/user}}
+            <br>
+            <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <td>{{_id}}</td>
+                </tr>
+    
+                <tr>
+                    <th>Creator ID</th>
+                    <td>{{creator}}</td>
+                </tr>
                 
-                <div class="row">
-                    <div class="col-xs-4 text-right">Time Created</div>
-                    <div class="normalize"
+                <tr>
+                    <th>Time Created</th>
+                    <td class="normalize"
                         data-unittype="time"
                         data-unit="unix"
                         data-unitpref="human12hr">
                         {{timeCreated}}
-                    </div>
-                </div>
-
+                    </td>
+                </tr>
+    
                 {{#published}}
-                <div class="row">
-                    <div class="col-xs-4 text-right">Time Published</div>
-                    <div class="normalize"
+                <tr>
+                    <th>Time Published</th>
+                    <td class="normalize"
                         data-unittype="time"
                         data-unit="unix"
                         data-unitpref="human12hr">
                         {{timePublished}}
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-4 text-right">Publisher ID</div>
-                    <div>{{publisher}}</div>
-                </div>
+                    </td>
+                </tr>
                 {{/published}}
-
-                <hr>
-
+        
                 {{#location}}
-                <h2>Location</h2>
-
-                <div class="row">
-                    <div class="col-xs-4 text-right">Latitude</div>
-                    <div class="normalize"
+                <tr>
+                    <th>Latitude</th>
+                    <td class="normalize"
                         data-unittype="location"
                         data-unit="degrees"
                         data-unitpref="degMin">
                         {{lat}}
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-4 text-right">Longitude</div>
-                    <div class="normalize"
+                    </td>
+                </tr>
+    
+                <tr>
+                    <th>Longitude</th>
+                    <td class="normalize"
                         data-unittype="location"
                         data-unit="degrees"
                         data-unitpref="degMin">
                         {{long}}
-                    </div>
-                </div>
-
+                    </td>
+                </tr>
+    
                 {{#range}}
-                <div class="row">
-                    <div class="col-xs-4 text-right">Range</div>
-                    <div class="normalize"
+                <tr>
+                    <th>Range</th>
+                    <td class="normalize"
                         data-unittype="length"
                         data-unit="meters"
                         data-unitprefsystem="imperial">
                         {{.}}
-                    </div>
-                </div>
+                    </td>
+                </tr>
                 {{/range}}
-
-
+    
+    
                 {{#altitude}}
-                <div class="row">
-                    <div class="col-xs-4 text-right">Altitude</div>
-                    <div class="normalize"
+                <tr>
+                    <th>Altitude</th>
+                    <td class="normalize"
                         data-unittype="length"
                         data-unit="meters"
                         data-unitprefsystem="imperial">
                         {{.}}
-                    </div>
-                </div>
+                    </td>
+                </tr>
                 {{/altitude}}
-
+    
                 {{#altRange}}
-                <div class="row">
-                    <div class="col-xs-4 text-right">Altitude Range</div>
-                    <div class="normalize"
+                <tr>
+                    <th>Altitude Range</th>
+                    <td class="normalize"
                         data-unittype="length"
                         data-unit="meters"
                         data-unitprefsystem="imperial">
                         {{.}}
-                    </div>
-                </div>
+                    </td>
+                </tr>
                 {{/altRange}}
-
                 {{/location}}
+            </table>
 
-                <hr>
+            <hr>
 
-                <h2 class="h-inline">Values</h2>
-                <select id="unit-system-picker" class="selectpicker">
-                    <option value="imperial" selected="selected">Imperial Units</option>
-                    <option value="metric">Metric Units</option>
-                </select>
-                <div class="row">
-                    {{#values}}
-                    <div class="col-lg-6 col-xs-12">
-                        <div class="panel reading-panel">
-                            <a href="/sensors/{{sensor}}" class="extra-small text-muted reading-sid">{{sensor}}</a>
-                            {{{html}}}
-                        </div>
-                    </div>
-                    {{/values}}
-                    {{^values}}
-                    <p>No values found for this reading.</p>
-                    {{/values}}
-                </div>
-                
-                <hr>
-            </div>
-            <div class="col-xs-12 col-sm-6">
-                <h3 class="h-inline">Map</h3>
-                <div id="map-time" class="map-iframe" data-reading="{{_id}}"></div>
-                <br><br>
-            </div>
-        {{/reading}}
+            <h3>Values</h3>
+            <select id="unit-system-picker" class="selectpicker">
+                <option value="imperial" selected="selected">Imperial Units</option>
+                <option value="metric">Metric Units</option>
+            </select>
+            
+            <table class="table">
+                {{#values}}
+                {{#display}}
+                {{#data}}
+                <tr>
+                    <th>{{title}}</th>
+                    <td>
+                        <span class="{{#normalize}}normalize{{/normalize}}"
+                            data-unittype="{{normalize.type}}"
+                            data-unit="{{normalize.unit}}"
+                            data-unitprefsystem="{{normalize.prefSystem}}"
+                            aria-describedby="addon-values-{{index}}{{#path}}-{{.}}{{/path}}">
+                            {{data}}
+                        </span>
+                        <span id="addon-values-{{index}}{{#path}}-{{.}}{{/path}}">
+                            {{label}}
+                        </span>
+                    </td>
+                </tr>
+                {{/data}}
+                {{/display}}
+                {{/values}}
+                {{^values}}
+                <p>No values found for this reading.</p>
+                {{/values}}
+            </table>
+
+            <hr class="visible-xs-block">
         </div>
+
+        <div class="col-xs-12 col-sm-6">
+            <h3 class="h-inline">Map</h3>
+            <div id="map-time" class="map-iframe" data-reading="{{_id}}"></div>
+            <br><br>
+        </div>
+
+        {{/reading}}
     </div></div>
 
     <!--scripts-->
@@ -172,7 +178,7 @@
     <div id="content">
         {{#reading}}
         <h5 class="h-inline">Reading</h5>
-        &nbsp;&nbsp;
+        &nbsp;
         <a class="btn btn-tiny btn-primary" href="/readings/{{_id}}">
             More Info
         </a>
@@ -201,10 +207,28 @@
                 {{location.long}}
             </span>
         </div>
-        
+                
         {{#values}}
-        {{{html}}}
-        <br>
+        {{#display}}
+        {{#data}}
+        <div>
+            <strong>{{title}}</strong> &bull; 
+            <span class="{{#normalize}}normalize{{/normalize}}"
+                data-unittype="{{normalize.type}}"
+                data-unit="{{normalize.unit}}"
+                data-unitprefsystem="{{normalize.prefSystem}}"
+                aria-describedby="addon-values-{{index}}{{#path}}-{{.}}{{/path}}">
+                {{data}}
+            </span>
+            <span id="addon-values-{{index}}{{#path}}-{{.}}{{/path}}">
+                {{label}}
+            </span>
+        </div>
+        {{/data}}
+        {{/display}}
+        {{/values}}
+        {{^values}}
+        <p>No values found for this reading.</p>
         {{/values}}
         {{/reading}}
     </div>

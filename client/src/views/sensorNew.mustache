@@ -19,15 +19,27 @@
             </ul>
 
             <div class="tab-content">
+                <br>
                 {{#sensorTypes}}
                 <div id="{{key}}" class="tab-pane">
                     <ul id="modal-sensor-models" class="list-group">
                         {{#type.data.models}}
-                        <li><a data-type="{{key}}" data-model="{{name}}" href="#" class="model list-group-item">{{name}}</a></li>
+                        <li>
+                            <a  data-type="{{key}}"
+                                data-model="{{name}}"
+                                href="#"
+                                class="model list-group-item">
+                                {{name}}
+                            </a>
+                        </li>
                         {{/type.data.models}}
                     </ul>
                 </div>
                 {{/sensorTypes}}
+
+                <div class="tab-pane active">
+                    <p>Please select a sensor type from the above tabs.</p>
+                </div>
             </div>
         </div>
 
@@ -71,8 +83,13 @@
             </div>
             <div class="form-group">
                 <div class="col-xs-10 col-xs-offset-2">
-                    <a href="{{#query.configuration}}/configurations/{{.}}/{{/query.configuration}}{{^query.configuration}}/sensors{{/query.configuration}}" class="btn btn-default">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <a  href="{{#query.configuration}}/configurations/{{.}}/{{/query.configuration}}{{^query.configuration}}/sensors{{/query.configuration}}"
+                        class="btn btn-default">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        Submit
+                    </button>
                 </div>
             </div>
         </fieldset></form>

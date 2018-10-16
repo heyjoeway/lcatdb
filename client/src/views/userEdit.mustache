@@ -25,9 +25,11 @@
         </div>
         {{/query.unknownError}}
 
-        <form id="form-edit" action="<!--url-->/user/editDo" method="post" class="row">
+        <form id="form-edit" action="<!--url-->/user/editDo" method="post">
 
-            <label class="col-xs-2 col-xxs-12"><strong>Email</strong></label>
+            <label class="col-xs-2 col-xxs-12" for="email">
+                <strong>Email</strong>
+            </label>
             <div class="col-xs-10 col-xxs-12">
                 <input  class="form-control"
                         type="email" name="email"
@@ -138,13 +140,13 @@
                 <br>
             </div>
 
-            <a href="/user/remove" class="btn btn-danger">Delete Account</a>
-            &nbsp;&nbsp;
-            <a href="/user/apiKey" class="btn btn-default">View/Change API Key</a>
-            <br>
-            <a href="/dashboard.html" class="btn btn-default">Cancel</a>
-            &nbsp;&nbsp;
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <div class="text-right">
+                <a href="/user/remove" class="btn btn-danger">Delete Account</a>
+                <a href="/user/apiKey" class="btn btn-default">View/Change API Key</a>
+                <br><br>
+                <a href="/dashboard.html" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
             <br>
         </form>
         {{/user}}

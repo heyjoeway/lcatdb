@@ -164,12 +164,14 @@ a.disabled {
     pointer-events: none;
 }
 
-.navbar-toggle > svg {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    fill: #fff;
-}  
+.navbar-toggle {
+    & > svg {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        fill: #fff;
+    }  
+}
 
 .container-flex {
     height: 100%;
@@ -226,10 +228,8 @@ a.disabled {
 
 .btn {
     margin-bottom: 12px;
-}
-
-.btn-sm {
-    margin-bottom: 8px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .modal-body {
@@ -279,20 +279,45 @@ body.is-ios:not(.body-transparentnavbar) .navbar {
 }
 
 .collapse-arrow {
+    transform: rotate(90deg);
+    transition: transform .25s;
     vertical-align: top;
-}
 
-.collapse-arrow::before {
-    content: "keyboard_arrow_down";
+    &::before {
+        content: "keyboard_arrow_right";
+    }
 }
 
 .collapsed {
-    .collapse-arrow::before {
-        content: "keyboard_arrow_right";
+    .collapse-arrow {
+        transform: rotate(0deg);
     }
 }
 
 .panel-body-collapse {
     padding-left: 15px;
     padding-right: 15px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.open > .dropdown-menu {
+    animation-name: fadeIn;
+    animation-duration: 0.25s;
+}
+
+.modal-dialog {
+    max-height: 100vh;
+    padding: 50px 0;
+}
+
+.modal-content {
+    border-radius: 16px;
+}
+
+.close {
+    font-size: 24px;
 }

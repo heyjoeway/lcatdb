@@ -1,0 +1,38 @@
+[{
+    "title": "Temperature",
+    "path": ["data", "temperature"],
+    "inputProps": [
+        {
+            "prop": "type",
+            "val": "number"
+        }, {
+            "prop": "step",
+            "val": "any"
+        }
+    ],
+    "normalize": {
+        "type": "temperature",
+        "unit": "celcius",
+        "prefSystem": "imperial"
+    },
+    "label": "Meters"
+}, {
+    "optional": true,
+    "title": "Temperature Range",
+    "path": ["data", "temperatureRange"],
+    "inputProps": [
+        {
+            "prop": "type",
+            "val": "number"
+        }, {
+            "prop": "step",
+            "val": "any"
+        }
+    ],
+    "normalize": {
+        "type": "temperature",
+        "unit": "celcius",
+        "prefSystem": "imperial"
+    },
+    "label": "Meters"
+}]

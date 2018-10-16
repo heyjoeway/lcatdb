@@ -18,7 +18,7 @@
                         <option value="imperial" selected="selected">Imperial Units</option>
                         <option value="metric">Metric Units</option>
                     </select>
-                    &nbsp;&nbsp;&nbsp;
+                    &nbsp;
                     <select id="configuration-picker" class="selectpicker"></select>
 
                     <div class="configuration-notchosen">
@@ -29,7 +29,8 @@
                         <!-- Location + Time -->
                         <div id="location_mobile" style="display:none">
                             <p>Choose a location by using GPS, dragging the marker to the desired spot, or by inputting coordinates in the boxes below.</p>
-                            <button id="button-getlocation" type="button" class="btn btn-sm btn-primary">Get Location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button id="button-getlocation" type="button" class="btn btn-sm btn-primary">Get Location</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <label class="custom-control custom-checkbox">
                                 <input type="checkbox" id="location_auto" class="custom-control-input">
                                 <span class="custom-control-indicator"></span>
@@ -138,17 +139,16 @@
                         </div>
                     
                     </div>
-                        
+                    <hr class="visible-sm-block visible-xs-block">                        
                 </div>
-                <br>
+
                 <div class="col-xs-12 col-md-5 configuration-chosen">
+                    <hr class="visible-md-block visible-lg-block">
                     <div id="configuration-sensors"></div>
                     <hr>
                     <div class="text-right">
                         <a href="./dashboard.html" class="btn btn-default">Cancel</a>
-                        &nbsp;&nbsp;
                         <button type="button" id="queue" class="btn btn-secondary">Add To Queue</button>
-                        &nbsp;&nbsp;
                         <button type="button" id="edit" class="btn btn-primary" style="display:none">
                             Edit and View Queue
                         </button>

@@ -1,28 +1,40 @@
 {{#configuration}}
 <h3 class="h-inline">Sensors</h3>
-<a id="sensor-new" href="/sensors/new?configuration={{configuration._id}}" class="btn btn-sm btn-primary online_only_disable nav-ignore">Add New</a>
-&nbsp;&nbsp;
-<a id="sensor-existing" href="/configurations/{{_id}}/addSensor" class="btn btn-sm btn-secondary online_only_disable nav-ignore">Add Existing</a>
-<br>
+<a  id="sensor-new"
+    href="/sensors/new?configuration={{configuration._id}}"
+    class="btn btn-sm online_only_disable nav-ignore">
+    Add New
+</a>
+<a  id="sensor-existing"
+    href="/configurations/{{_id}}/addSensor"
+    class="btn btn-sm online_only_disable nav-ignore">
+    Add Existing
+</a>
 <div id="sensors">
     {{#sensors}}
     <div class="sensor row" id="sensor_{{_id}}">
-        <br>
         <input class="hide" name="values[{{index}}][sensor]" value="{{_id}}" />
         <input class="hide" name="values[{{index}}][type]" value="{{type}}" />
 
         <div class="col-xs-10">
             <h4 class="h-inline">{{model}}</h4>
             &nbsp;&nbsp;&nbsp;
-            <h6 class="h-inline"><a href="/sensors/{{_id}}" class="online_only_disable">{{name}}</a></h6>
+            <h6 class="h-inline">
+                <a  href="/sensors/{{_id}}"
+                    class="online_only_disable">
+                    {{name}}
+                </a>
+            </h6>
         </div>
+
         <div class="col-xs-2 text-right extra-small text-muted">
             <a  href="/configurations/{{configuration._id}}/removeSensor?sid={{_id}}"
-                class="sensor-remove btn btn-secondary btn-sm online_only_disable nav-ignore"
+                class="sensor-remove btn btn-sm online_only_disable nav-ignore"
                 data-sid="{{_id}}">
                 <span class="glyphicon glyphicon-trash"></span>
             </a>
         </div>
+        
         <div class="col-xs-12">
             {{{html}}}
         </div>

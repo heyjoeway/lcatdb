@@ -71,23 +71,22 @@ exports.mustachifyReading = function(data, options, callback) {
     let needs = options.mustacheDeps.reading || [];
     let reading = data.reading;
 
-    if (needs.includes('htmlOut')) {
-        reading.values.forEach(value => {
-            try {
-                value.html = mustache.render(
-                    SensorTypes.types[value.type].outputTemplate,
-                    { "value": value }
+    if (needs.includes('display')) {
+        reading.values.forEach((value, i) => {
+            value.index = i;
+            value.display = SensorTypes.types[value.type].display;
+
+            if (typeof value.display == "undefined") return fail({
+                "errorName": "noDisplay",
+                "errorNameFull": "RoutingRender.mustachifyReading.noDisplay"
+            });
+
+            value.display.forEach(displayNode => {
+                displayNode.data = Utils.getPropertyByPath(
+                    value,
+                    displayNode.path
                 );
-            } catch(e) {
-                value.html = '<span class="error">ERROR: Could not retrieve template for value.</span>';
-                fail({
-                    "errorName": "noTemplate",
-                    "errorNameFull": "RoutingRender.mustachifyReading.noTemplate",
-                    "errorData": {
-                        "exception": e
-                    }
-                });
-            }
+            });
         });
     }
     

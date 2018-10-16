@@ -1,0 +1,38 @@
+[{
+    "title": "Depth",
+    "path": ["data", "depth"],
+    "inputProps": [
+        {
+            "prop": "type",
+            "val": "number"
+        }, {
+            "prop": "step",
+            "val": "any"
+        }
+    ],
+    "normalize": {
+        "type": "length",
+        "unit": "meters",
+        "prefSystem": "imperial"
+    },
+    "label": "Meters"
+}, {
+    "optional": true,
+    "title": "Depth",
+    "path": ["data", "depthRange"],
+    "inputProps": [
+        {
+            "prop": "type",
+            "val": "number"
+        }, {
+            "prop": "step",
+            "val": "any"
+        }
+    ],
+    "normalize": {
+        "type": "length",
+        "unit": "meters",
+        "prefSystem": "imperial"
+    },
+    "label": "Meters"
+}]

@@ -29,8 +29,8 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
     // Change the current configuration and render the sensors section
     changeConfig() {
-        let template = fs.readFileSync(
-            __dirname + "/templates/configurationSensors.mustache"
+        let sensorsTemplate = fs.readFileSync(
+            __dirname + "/templates/newReadingSensors.mustache"
         ).toString();
 
         let configurationIndex = $("#configuration-picker").val();
@@ -43,16 +43,20 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
             a["_id"].localeCompare(b["_id"])
         );
 
+        let inputTemplate = fs.readFileSync(
+            __dirname + "/templates/newReadingInput.mustache"
+        ).toString();
         configuration.sensors.forEach((sensor, i) => {
             sensor.index = i;
+            sensor.typeData = data.sensorTypes[sensor.type];
             sensor.html = Mustache.render(
-                data.sensorTypes[sensor.type].inputTemplate,
-                sensor
+                inputTemplate,
+                { sensor: sensor }
             );
         });
 
         $('#configuration-sensors').html(
-            Mustache.render(template, {
+            Mustache.render(sensorsTemplate, {
                 "configuration": configuration
             })
         );

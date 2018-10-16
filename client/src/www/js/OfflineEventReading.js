@@ -74,24 +74,35 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
         };
 
         this.data.formData.forEach(field => {
+            // replacements convert a string like this:
+            // values[0][foo][bar]
+            // to
+            // values.0.foo.bar
             let path = field.name.replace(/\[/g, '.').replace(/\]/g, '');
             LcatDB.Utils.setPropertyByPath(
-                renderData.reading, path, field.value
+                renderData.reading,
+                path,
+                field.value
             );
         });
 
-        let valuesArr = Object.keys(renderData.reading.values).map(
+        // Convert object with numbered keys to array
+        renderData.reading.values = Object.keys(renderData.reading.values).map(
             key => renderData.reading.values[key]
         );
-        renderData.reading.values = valuesArr;
 
         let userInfo = LcatDB.userInfo.info();
+        let sensorTypes = userInfo.sensorTypes;
 
-        renderData.reading.values.forEach(value => {
-            value.html = Mustache.render(
-                userInfo.sensorTypes[value.type].outputTemplate,
-                { value: value }
-            );
+        renderData.reading.values.forEach((value, i) => {
+            value.index = i;
+            value.display = sensorTypes[value.type].display;
+            value.display.forEach(displayNode => {
+                displayNode.data = LcatDB.Utils.getPropertyByPath(
+                    value,
+                    displayNode.path
+                );
+            });
         });
 
         return Mustache.render(fs.readFileSync(

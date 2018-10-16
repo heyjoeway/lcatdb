@@ -178,7 +178,7 @@
     "template": "reading",
     "allowAnon": true,
     "mustacheDeps": {
-        "reading": ["htmlOut"]
+        "reading": ["display"]
     },
     "steps": [
         "user",
