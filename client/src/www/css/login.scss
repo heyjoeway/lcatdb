@@ -1,4 +1,21 @@
-.container-center {
-    display:flex;
-    justify-content:center;
+.page-login {
+    background: #212121;
+    height: 100vh;
+
+    .navbar {
+        background: none;
+        box-shadow: none;
+    } 
+    
+    .navbar-header > * {
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 1));
+    }
+
+    #navbar-top-bg {
+        display: none;
+    }
+}
+
+.pos-absolute {
+    position: absolute;
 }

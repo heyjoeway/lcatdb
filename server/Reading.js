@@ -134,7 +134,7 @@ exports.validate = function(reading) {
         let valueValidity;
         reading.values.some((val) => {
             valueValidity = Schema.validate(
-                SensorTypes.types[val.type].schemaId,
+                SensorTypes.types[val.type].schema.id,
                 val.data            
             );
 

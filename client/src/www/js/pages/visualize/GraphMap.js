@@ -23,7 +23,7 @@ class GraphMap extends Graph {
 
     createGraph() {
         let $element = $('<div></div>', {
-            "class": "graph_map map-iframe"
+            "class": "visualize-graph-map"
         });
         
         let map = new LcatDB.QueryMap({

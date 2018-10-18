@@ -13,17 +13,20 @@
         {{#user}}
         <h2>API Key</h2>
         <hr>
+        <p>For information on how to use the <!--title--> API, please view the <a href="<!--url-->/api.html">API reference</a>.</p>
         <form action="<!--url-->/user/apiKeyDo" method="post" class="row">
-
-            <label class="col-xs-2 col-xxs-12"><strong>Current Key</strong></label>
-            <div class="col-xs-10 col-xxs-12">
+            <label class="col-xs-3 col-xxs-12" for="apiKey">
+                <strong>Current Key</strong>
+            </label>
+            <div class="col-xs-9 col-xxs-12">
                 <input  class="form-control"
                         type="text" readonly
+                        name="apiKey"
                         value="{{apiKey}}">
                 <br>
             </div>
 
-            <div class="col-xs-10 col-xxs-12 col-xs-offset-2">
+            <div class="text-right">
                 <a href="<!--url-->/user/edit" class="btn btn-default">Back</a>
                 <button type="submit" class="btn btn-primary">Generate New Key</button>
             </div>

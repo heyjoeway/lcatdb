@@ -183,14 +183,14 @@ LcatDB.Platform = class {
 
         LcatDB.Platform.loginModalIsOpen = true;
         
-        (new LcatDB.Modal(
-            "Login",
-            "./loginModal.html",
-            modal => {
+        (new LcatDB.Modal({
+            title: "Login",
+            url: "./loginModal.html",
+            callback: () => {
                 LcatDB.Platform.loginModalIsOpen = false;
                 LcatDB.Pages.reload();
             }
-        )).lock();
+        })).lock();
     }
 
     static version() { return "<!--version-->"; }

@@ -11,8 +11,8 @@
     <div class="container no-js">
         <p>The visualization tool requires Javascript to function. Please make sure it is enabled and that you are using a compatible browser.</p>
     </div>
-    <div class="container js"><div class="row">
-        <div class="col-xs-12 col-md-6">
+    <div class="container container-nopad js"><div class="row">
+        <div id="visualize-prefs" class="col-xs-12 col-md-6">
             <br>
             <h2 class="h-inline">Visualize</h2>
             <button class="btn btn-lg btn-primary hide">Quick Setup</button>
@@ -32,7 +32,7 @@
                         </div>
                         <div class="col-xs-3 col-xxs-4">
                             <button id="new_set" class="btn btn-sm btn-primary">+</button>
-                            <button id="delete_set" class="btn btn-sm btn-secondary">-</button>
+                            <button id="delete_set" class="btn btn-sm btn-default">-</button>
                         </div>
                     </div>
                 </div>
@@ -298,7 +298,7 @@
                                     </li>
                                 </div>
                             </div>
-                            <button id="delete_graph" class="btn btn-sm btn-secondary">-</button>
+                            <button id="delete_graph" class="btn btn-sm btn-default">-</button>
                         </div>
                     </div>
                 </div>
@@ -335,7 +335,7 @@
                             </div>
                             <select multiple id="list_setsgraphcur" class="form-control"></select>
                             <br>
-                            <button id="removeset_graph" class="btn btn-secondary">Remove Selected</button>
+                            <button id="removeset_graph" class="btn btn-default">Remove Selected</button>
                         </div>
 
                         <div class="tab-pane" id="property_graph_typeprefs">
@@ -422,19 +422,13 @@
                 </div>
             </div>
             <hr>
-        </div>
-        <div class="col-xs-12 col-md-6">
-            <br>
-            <h3 class="h-inline">Output</h3>
             <button id="create_graph"
                     class="btn btn-sm btn-primary"
                     disabled>
                 Generate Graph
             </button>
-            <br>
-            <div id="output"></div>
-            <br>
         </div>
+        <div id="visualize-output" class="col-xs-12 col-md-6"></div>
     </div></div></div>
 
     <!--nav_nouser-->

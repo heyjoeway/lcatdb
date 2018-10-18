@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<head>
+    <!--head-->
+    <title><!--title--> - API Reference</title>
+    <meta name="app:page" content="api"/>
+    <meta name="app:mustLogin" content="false"/>
+    <meta name="app:noUser" content="false"/>
+</head>
+<body>
+    <div id="content">
+        <div class="container">
+            <h2>API Reference</h2>
+            <hr>
+            URL: /api/sensorTypes
+            Input: N/A
+            Returns: Data about the available types of sensors.
+            Return Format:
+            {
+                "{Type identifier}": {
+                    "schema": {
+                        "id": "{Schema identifier}",
+                        "type": "object",
+                        "properties": {
+                            "{Property name}": {
+                                "type": "{Data type}",
+                                "description": "{Human-readable property Description}"
+                            },
+                            ...
+                        },
+                        "required": [
+                            "{Property name}"
+                            ...
+                        ]
+                    },
+                    "data": {
+                        "name": "{Human-readable sensor type name}",
+                        "models": [
+                            {
+                                "id": "{Model ID}",
+                                "name": "{Human-readable model name}",
+                                "description": "{Human-readable description}",
+                                "img": "{Path to image of sensor}"
+                            },
+                            ...
+                        ]
+                    },
+                    "display": [
+                        {
+                            "optional": {Whether property is optional or not (Boolean)},
+                            "title": "{Human-readable property name}",
+                            "path": [
+                                "{Section of path to property data in value object}",
+                                ...
+                            ],
+                            "inputProps": [
+                                {
+                                    "prop": "{HTML property name for input element}",
+                                    "val": "{HTML property value for input element}"
+                                },
+                                ...
+                            ],
+                            "normalize": {
+                                "type": "{Type of measurement}",
+                                "unit": "{Unit which measurement is stored in internally}",
+                                "prefSystem": "{Preferred unit system}"
+                            },
+                            "label": "{Human-readable default unit label}"
+                        },
+                        ...
+                    ]
+                }
+            }
+            Return Example;
+            {
+                "depth": {
+                    "schemaId": "/SensorDepth",
+                    "schema": {
+                        "id": "/SensorDepth",
+                        "type": "object",
+                        "properties": {
+                            "depth": {
+                                "type": "number",
+                                "description": "Stored in meters."
+                            },
+                            "depthRange": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ],
+                                "description": "Max possible distance from depth. Stored in meters."
+                            }
+                        },
+                        "required": [
+                            "depth"
+                        ]
+                    },
+                    "data": {
+                        "name": "Depth",
+                        "models": [
+                            {
+                                "id": "other",
+                                "name": "Other Depth Sensor",
+                                "description": "A generic depth sensor.",
+                                "img": "/img/sensors/depth/other.png"
+                            },
+                            {
+                                "id": "fishhawk_x4d",
+                                "name": "Fish Hawk X4D",
+                                "description": "Depth measurements from the Fish Hawk X4D.",
+                                "img": "/img/sensors/depth/fishhawk/x4d.png"
+                            },
+                            {
+                                "id": "fishhawk_td",
+                                "name": "Fish Hawk TD",
+                                "description": "Depth measurements from the Fish Hawk TD.",
+                                "img": "/img/sensors/depth/fishhawk/td.png"
+                            }
+                        ]
+                    },
+                    "display": [
+                        {
+                            "title": "Depth",
+                            "path": [
+                                "data",
+                                "depth"
+                            ],
+                            "inputProps": [
+                                {
+                                    "prop": "type",
+                                    "val": "number"
+                                },
+                                {
+                                    "prop": "step",
+                                    "val": "any"
+                                }
+                            ],
+                            "normalize": {
+                                "type": "length",
+                                "unit": "meters",
+                                "prefSystem": "imperial"
+                            },
+                            "label": "Meters"
+                        },
+                        {
+                            "optional": true,
+                            "title": "Depth",
+                            "path": [
+                                "data",
+                                "depthRange"
+                            ],
+                            "inputProps": [
+                                {
+                                    "prop": "type",
+                                    "val": "number"
+                                },
+                                {
+                                    "prop": "step",
+                                    "val": "any"
+                                }
+                            ],
+                            "normalize": {
+                                "type": "length",
+                                "unit": "meters",
+                                "prefSystem": "imperial"
+                            },
+                            "label": "Meters"
+                        }
+                    ]
+                }
+            }
+
+            URL: /api/readings
+            Input Format: 
+            {
+                "filter": {Query filter},
+                "projection": {Projection},
+                "pageSize": {Number of items (Optional)},
+                "page": {Page number (Optional)}
+            }
+            Please refer to the MongoDB documentation for the query format. (https://docs.mongodb.com/manual/tutorial/query-documents/)
+            
+        </div>
+    </div>
+
+    <!--nav_nouser-->
+
+    <!--scripts-->
+</body>

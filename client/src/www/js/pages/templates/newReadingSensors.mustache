@@ -2,12 +2,12 @@
 <h3 class="h-inline">Sensors</h3>
 <a  id="sensor-new"
     href="/sensors/new?configuration={{configuration._id}}"
-    class="btn btn-sm online_only_disable nav-ignore">
+    class="btn btn-default btn-sm online_only_disable nav-ignore">
     Add New
 </a>
 <a  id="sensor-existing"
     href="/configurations/{{_id}}/addSensor"
-    class="btn btn-sm online_only_disable nav-ignore">
+    class="btn btn-default btn-sm online_only_disable nav-ignore">
     Add Existing
 </a>
 <div id="sensors">
@@ -29,7 +29,7 @@
 
         <div class="col-xs-2 text-right extra-small text-muted">
             <a  href="/configurations/{{configuration._id}}/removeSensor?sid={{_id}}"
-                class="sensor-remove btn btn-sm online_only_disable nav-ignore"
+                class="sensor-remove btn btn-sm btn-default online_only_disable nav-ignore"
                 data-sid="{{_id}}">
                 <span class="glyphicon glyphicon-trash"></span>
             </a>

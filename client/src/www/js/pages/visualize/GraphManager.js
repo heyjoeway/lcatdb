@@ -177,7 +177,7 @@ class GraphManager {
     createGraph() {
         let graphCurrent = this.graphs[this.graphCurrent];
         graphCurrent.getData(() => {
-            $('#output').html(graphCurrent.createGraph());
+            $('#visualize-output').html(graphCurrent.createGraph());
         });
     }
 

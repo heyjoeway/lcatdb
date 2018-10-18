@@ -1,8 +1,31 @@
-.graph_map {
+.visualize-graph-map {
     width: 100%;
-    height: 500px;
+    height: 100%;
 }
 
 .visualize-graph-3d {
-    width: 100% !important;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+}
+
+@media (min-width: 1200px) {
+    .page-visualize {
+        #visualize-prefs {
+            width: calc((100vw - 256px) / 2);
+            position: absolute;
+            left: 256px;
+            padding: 0 48px;
+        }
+    
+        #visualize-output {
+            padding: 0;
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: calc((100vw - 256px) / 2);
+            height: 100vh;
+            background: #2d2d2d;
+        }
+    }
 }

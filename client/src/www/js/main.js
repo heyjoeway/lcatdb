@@ -61,6 +61,28 @@ window.PouchDB = require("./lib/pouchdb-5.4.5.min.js");
 // ============================================================================
 
 LcatDB.init = function() {
+    $.notifyDefaults({
+        allow_dismiss: true,
+        newest_on_top: true,
+        placement: {
+            from: "bottom",
+            align: "center"
+        },
+        delay: 5000,
+        template: 
+`<div data-notify="container" class="notify alert-{0} row" role="alert">
+    <div class="col-xs-10 no-pad" data-notify="message">{2}</div>
+    <div class="col-xs-2 no-pad text-right">
+        <button type="button"
+                aria-hidden="true"
+                class="btn btn-link"
+                data-notify="dismiss">
+            OK
+        </button>
+    </div>
+</div>`
+    });
+
     LcatDB.InputBlock.init();
     
     if (window.parent == window)

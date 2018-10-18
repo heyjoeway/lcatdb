@@ -91,7 +91,7 @@ class Graph2d extends Graph {
             "width": 512,
             "height": 512
         });
-        $('#output').html($element)
+        $('#visualize-output').html($element)
         let container = $element[0];
       
         let dataset = new vis.DataSet(this.data);

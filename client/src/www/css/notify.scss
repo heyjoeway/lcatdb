@@ -1,0 +1,58 @@
+.notify {
+    max-width: 360px;
+    border-radius: 6px;
+    display: flex !important;
+    display: -webkit-flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 4px 8px 20px;
+    margin: 16px;
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: 0 5px 16px rgba(0, 0, 0, 0.4);
+
+    button {
+        position: relative !important;
+        margin: 0;
+        right: unset !important;
+        top: unset !important;
+    }
+
+    button:not(:hover) {
+        color: #fff;
+    }
+}
+
+.fadeInDown {
+    animation-name: fadeInDown;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+}
+
+@keyframes fadeInDown{
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+
+.fadeOutUp {
+    animation-name: fadeOutUp !important;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+}
+
+@keyframes fadeOutUp{
+    from {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+}

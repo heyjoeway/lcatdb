@@ -114,14 +114,14 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
                 let cid = this.configurationId;
                 let sid = $(e.target).data('sid');
 
-                new LcatDB.Modal(
-                    data.title,
-                    data.url(cid, sid),
-                    modal => {
+                new LcatDB.Modal({
+                    title: data.title,
+                    url: data.url(cid, sid),
+                    callback: modal => {
                         this.updateConfigList();
                         modal.hide();
                     }
-                );
+                });
             });
         });
     }
@@ -177,7 +177,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     }
 
     // Validate input and display an error message if invalid
-    validateInput() {
+    validateInput(suppress) {
         let $form = $('#form');
         let hasFailed = $("#form").find("input").toArray().some(input => {
             let $input = $(input);
@@ -189,7 +189,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
             return !isValid || (isRequired && isEmpty);
         });  
 
-        if (hasFailed)
+        if (hasFailed && !suppress)
             $.notify({
                 "message": "Please make sure all fields are properly filled out."
             }, {
@@ -333,17 +333,21 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
         $("#viewqueue").click(e => {
             e.preventDefault();
-            if (!this.validateInput()) {
-                new LcatDB.Modal(
-                    "Warning",
+            if (!this.validateInput(true)) {
+                new LcatDB.Modal({
+                    title: "Warning",
+                    body:
 `The current reading seems to be invalid. Make sure all fields are filled out and try again.<br>
-If you don't want to submit the current reading, press the button below to continue. Your other readings will remain in the queue.
-<br><br>
-<button type="button" class="pull-right btn btn-warning" onclick="window.parent.postMessage('modal.done', '*')">Discard Reading and View Queue</button>
-<br><br>`,
-                    () => LcatDB.Pages.navigate("./queue.html"),
-                    false
-                );
+If you don't want to submit the current reading, press the button below to continue. Your other readings will remain in the queue.`,
+                    callback: () => LcatDB.Pages.navigate("./queue.html"),
+                    buttons: [{
+                        text: "Cancel"
+                    }, {
+                        text: "Discard Reading and View Queue",
+                        type: "warning",
+                        action: modal => modal.done()
+                    }]
+                });
             } else {
                 this.queue();
                 LcatDB.Pages.navigate("./queue.html");
@@ -408,12 +412,6 @@ If you don't want to submit the current reading, press the button below to conti
 
         this.initMap();
 
-        $("body").addClass("page-newReading");
-
         $("#button-getlocation").click(() => this.getLocation());
-    }
-    
-    deinit() {
-        $("body").removeClass("page-newReading");
     }
 };

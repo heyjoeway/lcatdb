@@ -92,14 +92,11 @@ class Graph3d extends Graph {
     }
 
     createGraph() {
-        let $element = $('<div></div>');
-        $('#output').html($element)
+        let $element = $('#visualize-output');
         let container = $element[0];
       
         let dataset = new vis.DataSet(this.data);
         let options = {
-            "width": '512px',
-            "height": '512px',
             "xLabel": this.getDataTypeNames()[this.props.x.var],
             "yLabel": this.getDataTypeNames()[this.props.y.var],
             "zLabel": this.getDataTypeNames()[this.props.z.var],

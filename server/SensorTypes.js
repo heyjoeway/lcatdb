@@ -12,7 +12,6 @@ exports.init = function() {
         Schema.addSchema(schema);
 
         exports.types[path] = {
-            "schemaId": schema.id,
             "schema": schema,
             "data": require(`./sensors/${path}/data.json`),
             "display": require(`./sensors/${path}/display.json`),

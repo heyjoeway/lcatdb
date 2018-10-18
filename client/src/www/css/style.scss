@@ -9,8 +9,6 @@
 @import "./lib/MarkerCluster";
 @import "./lib/MarkerCluster.Default";
 
-$large-screen-width: 1200px;
-
 body:not(.no-nav) {
     #content, .navbar, #navbar-top-bg  {
         padding-top: constant(safe-area-inset-top);
@@ -31,7 +29,6 @@ body:not(.no-nav) {
     }
 }
 
-
 @import "fonts";
 @import "home";
 @import "spoiler";
@@ -43,6 +40,9 @@ body:not(.no-nav) {
 @import "sidebar";
 @import "dashboard";
 @import "content";
+@import "modal";
+@import "login";
+@import "notify";
 
 @media (max-width: 1199px) {
     body:not(.no-nav) #content > .container {
@@ -79,11 +79,6 @@ h2, h3 {
     vertical-align: top;
 }
 
-.modal iframe {
-    width: 100%;
-    border: none;
-}
-
 .dropdown-item {
     cursor: pointer;
 }
@@ -115,7 +110,7 @@ h2, h3 {
     left: 0;
 
     z-index: 99999;
-    background: #333;
+    background: #000;
 
     &.disabled {
         opacity: 0;
@@ -193,62 +188,14 @@ a.disabled {
     }
 }
 
-.container-login {
-    max-width: 455px;
-    margin: 8px;
-    margin-bottom: 64px;
-    background: white;
-    padding: 1px 32px 16px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 64px -8px rgba(0, 0, 0, 1);
-}
-
-.body-fullheight {
-    height: 100vh;
-}
-
-.body-transparentnavbar {
-    .navbar {
-        background: none;
-        box-shadow: none;
-    } 
-    
-    .navbar-header {
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 1));
-    }
-
-    #navbar-top-bg {
-        display: none;
-    }
-}
-
-.body-darkbg {
-    background: #212121;
-}
-
 .btn {
     margin-bottom: 12px;
     margin-left: 5px;
     margin-right: 5px;
 }
 
-.modal-body {
-    padding-top: 0;
-    padding-bottom: 0;
-
-    & > iframe {
-        transition: height 0.2s;
-    }
-}
-
-.modal {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.appBanner {
-    display: none;
+.btn-sm, .margin-bottom-0 {
+    margin-bottom: 0;
 }
 
 .no-pad {
@@ -262,13 +209,6 @@ a.disabled {
     height: 64px;
     width: 100%;
     box-sizing: content-box;
-}
-
-
-body.is-ios:not(.body-transparentnavbar) .navbar {
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    background-color: rgba(33, 150, 243, 0.6);
 }
 
 .no-nav {
@@ -309,15 +249,20 @@ body.is-ios:not(.body-transparentnavbar) .navbar {
     animation-duration: 0.25s;
 }
 
-.modal-dialog {
-    max-height: 100vh;
-    padding: 50px 0;
+body.is-ios:not(.page-login) .navbar {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background-color: rgba(33, 150, 243, 0.6);
 }
 
-.modal-content {
-    border-radius: 16px;
+.leaflet-top, .leaflet-bottom {
+    z-index: 999;
 }
 
-.close {
-    font-size: 24px;
+.panel {
+    border-radius: 10px;
+}
+
+.bootstrap-select {
+    margin-bottom: 0;
 }

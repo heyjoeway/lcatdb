@@ -22,27 +22,9 @@ app.all('/api/sensorTypes', (req, res) => {
     res.send(SensorTypes.types);
 });
 
-let readingsInstructions = `\
-Please provide your POST request in the following format:
-
-{
-"filter": <query filter>,
-"projection": <projection>,
-"pageSize": <# of items, optional>,
-"page": <page #, optional>
-}
-
-Please refer to the MongoDB documentation for the query format. (https://docs.mongodb.com/manual/tutorial/query-documents/)`;
-
-// Allow only post requests on API
+// Allow only post requests on readings API
 app.get('/api/readings', (req, res) => {
-    fail(req, res, {
-        "errorName": "instruction",
-        "errorNameFull": "Api.readings.instruction",
-        "errorData": {
-            "instructions": readingsInstructions
-        }
-    });
+    res.redirect('/api.html');
 });
 
 // Get readings from request
@@ -62,18 +44,16 @@ app.post(`/api/readings`, (req, res) => {
 
     query.filter = query.filter || {};
 
-    if (query.filter['_id'])
-        Reading.find(
-            query.filter['_id'],
-            reading => res.send([reading]),
-            error => fail(req, res, error)
-        );
-    else
-        Reading.findQuery(
-            query,
-            list => res.send(list),
-            error => fail(req, res, error)
-        );
+    if (query.filter['_id']) Reading.find(
+        query.filter['_id'],
+        reading => res.send([reading]),
+        error => fail(req, res, error)
+    );
+    else Reading.findQuery(
+        query,
+        list => res.send(list),
+        error => fail(req, res, error)
+    );
 });
 
 app.post(`/api/offlineData`, (req, res) => {

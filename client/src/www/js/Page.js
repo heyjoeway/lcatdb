@@ -11,7 +11,15 @@ LcatDB.Pages = class {
 	}
 
 	static initPage() {
+		let $body = $('body'); 
+		let classesCurrent = $body.attr('class') || ''; 
+		classesCurrent.split(' ').forEach(className => {
+			if (className.startsWith('page-'))
+				$body.removeClass(className);
+		});
+
 		let className = $('meta[name="app:page"]').prop("content");
+		$body.addClass(`page-${className}`);
 		let classRef = LcatDB.Pages.classes[className];
 
 		if (typeof classRef != "undefined")
