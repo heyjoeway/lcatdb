@@ -21,7 +21,10 @@
 }
 
 .dashboard-container {
+    display: flex;
+    height: 100%;
     flex-direction: column;
+    padding: 0;
 
     .map-iframe {
         position: absolute;

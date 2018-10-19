@@ -178,10 +178,6 @@ a.disabled {
     align-items: center;
 }
 
-.container-nopad {
-    padding: 0px;
-}
-
 @media (min-width: 1200px) {
     .container-nopad {
         width: calc(100vw - 256px);
@@ -196,10 +192,6 @@ a.disabled {
 
 .btn-sm, .margin-bottom-0 {
     margin-bottom: 0;
-}
-
-.no-pad {
-    padding: 0 !important;
 }
 
 #navbar-top-bg {
@@ -266,3 +258,10 @@ body.is-ios:not(.page-login) .navbar {
 .bootstrap-select {
     margin-bottom: 0;
 }
+
+.flex { display: flex; }
+.flex-center-v { align-items: center; }
+.flex-center-h { justify-content: center; }
+
+.no-pad { padding: 0 !important; }
+.no-margin { margin: 0 !important; }
