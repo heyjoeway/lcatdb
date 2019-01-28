@@ -1,28 +1,24 @@
 import PageForm from "./PageForm";
 
-let PageClasses = {
-    configurationAddSensor:         require("./pages/configurationAddSensor.js").default,
-    configurationAddSensorModal:    require("./pages/configurationAddSensorModal.js").default,
-    configurationRemoveSensorModal: require("./pages/configurationRemoveSensorModal.js").default,
-    configurationTutorial:          require("./pages/configurationTutorial.js").default,
-    home:                           require("./pages/home.js").default,
-    login:                          require("./pages/login.js").default,
-    loginModal:                     require("./pages/loginModal.js").default,
-    newReading:                     require("./pages/newReading.js").default,
-    quickJoin:                      require("./pages/quickJoin.js").default,
-    sensorNewModal:                 require("./pages/sensorNewModal.js").default,
-    visualize:                      require("./pages/visualize.js").default,
-    about:                          require("./pages/about.js").default,
-    queue:                          require("./pages/queue.js").default,
-    dashboard:                      require("./pages/dashboard.js").default,
-    startup:                        require("./pages/startup.js").default, // Used for cordova builds
-    register:                       PageForm,
-    forgot:                         PageForm,
-    forgotReq:                      PageForm,
-    userEdit:                       PageForm,
-    configurationEdit:              PageForm,
-    sensorEdit:                     PageForm,
-    sensorNe:                       PageForm
-};
-
-export default PageClasses;
+export {default as configurationAddSensor}          from "./pages/configurationAddSensor.js";
+export {default as configurationAddSensorModal}     from "./pages/configurationAddSensorModal.js";
+export {default as configurationRemoveSensorModal}  from "./pages/configurationRemoveSensorModal.js";
+export {default as configurationTutorial}           from "./pages/configurationTutorial.js";
+export {default as home}                            from "./pages/home.js";
+export {default as login}                           from "./pages/login.js";
+export {default as loginModal}                      from "./pages/loginModal.js";
+export {default as newReading}                      from "./pages/newReading.js";
+export {default as quickJoin}                       from "./pages/quickJoin.js";
+export {default as sensorNewModal}                  from "./pages/sensorNewModal.js";
+export {default as visualize}                       from "./pages/visualize.js";
+export {default as about}                           from "./pages/about.js";
+export {default as queue}                           from "./pages/queue.js";
+export {default as dashboard}                       from "./pages/dashboard.js";
+export {default as startup}                         from "./pages/startup.js"; // Used for cordova builds
+export {PageForm as register};
+export {PageForm as forgot};
+export {PageForm as forgotReq};
+export {PageForm as userEdit};
+export {PageForm as configurationEdit};
+export {PageForm as sensorEdit};
+export {PageForm as sensorNew};

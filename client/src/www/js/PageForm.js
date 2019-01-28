@@ -1,4 +1,5 @@
 import Page from "./Page";
+import AppNavigator from "./AppNavigator";
 
 class PageForm extends Page {
     init() {

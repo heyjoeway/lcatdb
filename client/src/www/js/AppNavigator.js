@@ -7,7 +7,7 @@ import InputBlock from "./InputBlock";
 import Utils from "./Utils";
 import Sidebar from "./Sidebar";
 import UnitSystem from "./UnitSystem";
-import PageClasses from "./PageClasses";
+import * as PageClasses from "./PageClasses";
 
 class AppNavigator {
     static updateLinks() {

@@ -1,6 +1,7 @@
 import Modal from "./Modal";
 import InputBlock from "./InputBlock";
 import Platform from "./Platform";
+import AppNavigator from "./AppNavigator";
 
 class ModalsCommon {
     static init() {
