@@ -1,3 +1,5 @@
+import Utils from "../../Utils";
+
 class DataSet {
     defaultProps() { return {
         "time": {
@@ -33,7 +35,7 @@ class DataSet {
         data = data || {};
 
         this.name = data.name || "N/A";
-        this.uid = data.uid || LcatDB.Utils.randomString();
+        this.uid = data.uid || Utils.randomString();
 
         this.props = this.defaultProps();
         $.extend(
@@ -42,7 +44,7 @@ class DataSet {
             data.props
         );
 
-        this.callbacks = new LcatDB.Utils.CallbackChannel();
+        this.callbacks = new Utils.CallbackChannel();
     }
 
     toJSON() { return {
@@ -54,12 +56,12 @@ class DataSet {
     toString() { return JSON.stringify(this.toJSON()) }
 
     controlsToProps() {
-        let newProps = LcatDB.Utils.getProps('.set-control', this.props);
+        let newProps = Utils.getProps('.set-control', this.props);
         this.callbacks.run("DataSet.props");
     }
 
     propsToControls() {
-        LcatDB.Utils.setProps('.set-control', this.props);
+        Utils.setProps('.set-control', this.props);
 
         $('.set-control_time').attr(
             'disabled',

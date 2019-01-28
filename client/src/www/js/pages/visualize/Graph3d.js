@@ -1,4 +1,5 @@
 import Graph from "./Graph.js";
+import Utils from "../../Utils.js";
 
 class Graph3d extends Graph {
     static get typeName() { return "3-D Plot"; }
@@ -16,13 +17,13 @@ class Graph3d extends Graph {
     }
 
     controlsToProps() {
-        LcatDB.Utils.getProps('.graph-control-3d', this.props);
+        Utils.getProps('.graph-control-3d', this.props);
     }
 
     propsToControls() {
         super.propsToControls();
         $('.graph_typeprefs#3d').show();
-        LcatDB.Utils.setProps('.graph-control-3d', this.props);
+        Utils.setProps('.graph-control-3d', this.props);
     }
 
     organizeData(dataRaw) {
@@ -41,7 +42,7 @@ class Graph3d extends Graph {
                     let valueVar = props[axis].var;
                     let isValue = valueVar.startsWith('values');
                     if (!isValue) {
-                        valueOrganized = LcatDB.Utils.getPropertyByPath(readingRaw, valueVar);
+                        valueOrganized = Utils.getPropertyByPath(readingRaw, valueVar);
                     } else {
                         let valueType = valueVar.split('.')[1];
                         readingRaw.values.some(value => {

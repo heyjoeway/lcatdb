@@ -1,3 +1,6 @@
+import Utils from "../../Utils";
+import Platform from "../../Platform";
+
 class Graph {
     getDataTypeNames() { return {
         "values.depth": "Depth",
@@ -21,7 +24,7 @@ class Graph {
             data.props // src
         );
 
-        this.callbacks = new LcatDB.Utils.CallbackChannel();
+        this.callbacks = new Utils.CallbackChannel();
 
         this.type = "none";
 
@@ -86,7 +89,7 @@ class Graph {
         this.sets.forEach(set => {
             let query = set.propsToQuery();
 
-            $.post(`${LcatDB.serverUrl}/api/readings`, query, (data, status) => {
+            $.post(`${Platform.serverUrl}/api/readings`, query, (data, status) => {
                 if (status == 'success') gotData(data);
             });
         });

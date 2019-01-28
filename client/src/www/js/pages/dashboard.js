@@ -1,9 +1,12 @@
-LcatDB.Pages.classes.dashboard = class extends LcatDB.Page {
+import Utils from "../Utils";
+import Page from "../Page";
+
+export default class extends Page {
 	init() {
-	    let queryObj = LcatDB.Utils.urlQueryObj(window.location.href);
+	    let queryObj = Utils.urlQueryObj(window.location.href);
 
 	    ["verifySuccess", "verifyFailure"].forEach(function(key) {
 	        if (queryObj[key]) $('#' + key).show();
 	    });		
 	}
-};
+}

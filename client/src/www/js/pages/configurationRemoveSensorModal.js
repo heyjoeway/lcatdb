@@ -1,4 +1,8 @@
-LcatDB.Pages.classes.configurationRemoveSensorModal = class extends LcatDB.Page {
+import Utils from "../Utils";
+import Page from "../Page";
+import Platform from "../Platform";
+
+export default class extends Page {
     init() {
         $('#step-1').show();
         $('#loading').hide();
@@ -11,11 +15,11 @@ LcatDB.Pages.classes.configurationRemoveSensorModal = class extends LcatDB.Page 
             
             window.parent.postMessage('modal.lock', '*');
 
-            let queryObj = LcatDB.Utils.urlQueryObj(location.toString());
+            let queryObj = Utils.urlQueryObj(location.toString());
 
             let configurationId = location.pathname.split('/')[2];
 
-            $.post(`${LcatDB.serverUrl}/configurations/${configurationId}/removeSensorDo`,
+            $.post(`${Platform.serverUrl}/configurations/${configurationId}/removeSensorDo`,
                 { "sid": queryObj.sid},
                 () => window.parent.postMessage('modal.done', '*')
             );

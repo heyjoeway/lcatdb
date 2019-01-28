@@ -1,4 +1,7 @@
-LcatDB.Pages.classes.configurationAddSensorModal = class extends LcatDB.Page {
+import Page from "../Page";
+import Platform from "../Platform";
+
+export default class extends Page {
     init() {
         $('#step-1').show();
         $('#loading').hide();
@@ -15,7 +18,7 @@ LcatDB.Pages.classes.configurationAddSensorModal = class extends LcatDB.Page {
 
             let configurationId = location.pathname.split('/')[2];
 
-            $.post(`${LcatDB.serverUrl}/configurations/${configurationId}/addSensorDo`,
+            $.post(`${Platform.serverUrl}/configurations/${configurationId}/addSensorDo`,
                 { "sid": $this.attr('id') },
                 (data, success) => window.parent.postMessage('modal.done', '*')
             );

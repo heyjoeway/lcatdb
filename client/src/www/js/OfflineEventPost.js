@@ -1,13 +1,12 @@
-LcatDB.OfflineEventPost = class extends LcatDB.OfflineEvent {
-    constructor(obj) {
-        obj.type = "OfflineEventPost";
-        super(obj);
+import OfflineEvent from "./OfflineEvent";
+import InputBlock from "./InputBlock";
 
-        // obj.data = {
-        //     "formUrl": "form url",
-        //     "formData": "form data"
-        // }
-    }
+class OfflineEventPost extends OfflineEvent {
+    get type() { return "OfflineEventPost"; } 
+    // obj.data = {
+    //     "formUrl": "form url",
+    //     "formData": "form data"
+    // }
 
     submit(callback, force) {
         function finish(success) {
@@ -15,14 +14,14 @@ LcatDB.OfflineEventPost = class extends LcatDB.OfflineEvent {
                 "success": success
             });
             
-            LcatDB.InputBlock.finish();
+            InputBlock.finish();
         }
 
         if ((this.status == "success") && !force) return callback(true);
 
         if (!navigator.onLine) return callback(false);
 
-        LcatDB.InputBlock.start();
+        InputBlock.start();
 
         let xhr = new XMLHttpRequest();
 
@@ -33,7 +32,7 @@ LcatDB.OfflineEventPost = class extends LcatDB.OfflineEvent {
             xhr: () => xhr,
             success: (data, status) => {
                 this.response = {
-                    data: data,
+                data: data,
                     status: status,
                     responseURL: xhr.responseURL
                 };
@@ -64,4 +63,6 @@ LcatDB.OfflineEventPost = class extends LcatDB.OfflineEvent {
     ${JSON.stringify(this.data, null, 2)}
 </pre></code>`
     ) }
-};
+}
+
+export default OfflineEventPost;

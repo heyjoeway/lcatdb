@@ -1,4 +1,8 @@
-LcatDB.Pages.classes.loginModal = class extends LcatDB.Page {
+import AppStorage from "../AppStorage";
+import Page from "../Page";
+import Platform from "../Platform";
+
+export default class extends Page {
     postSuccess(data, status) {
         if (data.success) window.parent.postMessage('modal.done', '*');
         else {
@@ -24,21 +28,21 @@ LcatDB.Pages.classes.loginModal = class extends LcatDB.Page {
             $("#step-1").hide();
             $("#loading").show();
 
-            $.post(`${LcatDB.serverUrl}/loginDo`, {
+            $.post(`${Platform.serverUrl}/loginDo`, {
                 "username": $('input[name=username]').val(),
                 "password": $('input[name=password]').val(),
                 "infoOnly": true
             }, this.postSuccess).fail(this.postFailure);
         });
 
-        if (LcatDB.LocalStorage.get('anon.username')) {
+        if (AppStorage.get('anon.username')) {
             $("#button-quicklogin").click(() => {
                 $("#step-1").hide();
                 $("#loading").show();
     
-                $.post(`${LcatDB.serverUrl}/loginDo`, {
-                    "username": LcatDB.LocalStorage.get('anon.username'),
-                    "password": LcatDB.LocalStorage.get('anon.password'),
+                $.post(`${Platform.serverUrl}/loginDo`, {
+                    "username": AppStorage.get('anon.username'),
+                    "password": AppStorage.get('anon.password'),
                     "infoOnly": true
                 }, this.postSuccess).fail(this.postFailure);   
             });

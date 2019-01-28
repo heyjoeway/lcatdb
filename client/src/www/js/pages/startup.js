@@ -1,14 +1,19 @@
-LcatDB.Pages.classes.startup = class extends LcatDB.Page {
+import AppStorage from "../AppStorage";
+import UserInfo from "../UserInfo";
+import AppNavigator from "../AppNavigator";
+import Page from "../Page";
+
+export default class extends Page {
     onDeviceReady() {
         let navUrl = "./home.html";
-        if (LcatDB.LocalStorage.get("userInfo"))
+        if (AppStorage.get("userInfo"))
             navUrl = './dashboard.html';
 
-        LcatDB.Pages.navigate(navUrl, true, true);
+        AppNavigator.go(navUrl, true, true);
     }
 
     init() {
-        LcatDB.userInfo.get(gotNewInfo => {
+        UserInfo.get(gotNewInfo => {
             if (window.cordova) this.onDeviceReady();
             else document.addEventListener(
                 'deviceready', () => this.onDeviceReady(), false

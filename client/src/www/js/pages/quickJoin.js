@@ -1,11 +1,18 @@
-LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
+import AppStorage from "../AppStorage";
+import AppNavigator from "../AppNavigator";
+import InputBlock from "../InputBlock";
+import Utils from "../Utils";
+import Page from "../Page";
+import Platform from "../Platform";
+
+export default class extends Page {
     genPassword() {
         let length = 8;
         
         let symbols = "!@#$%^&";
         let letters = "qwertyuiopasdfghjklzxcvbnm";
 
-        let password = LcatDB.Utils.randomString(length, letters).split("");
+        let password = Utils.randomString(length, letters).split("");
 
         let symbolsInserted = 0;
         while (symbolsInserted < 2) {
@@ -33,26 +40,26 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
     }
 
     genUsername() {
-        return `anon${LcatDB.Utils.randomString(6, "1234567890")}`;
+        return `anon${Utils.randomString(6, "1234567890")}`;
     }
 
     initExists() {
-        $("#usernameExists").val(LcatDB.LocalStorage.get('anon.username'));
-        $("#passwordExists").val(LcatDB.LocalStorage.get('anon.password'));
+        $("#usernameExists").val(AppStorage.get('anon.username'));
+        $("#passwordExists").val(AppStorage.get('anon.password'));
         $('#exists').show();
 
         $('#login').click(e => {
             e.preventDefault();
 
-            LcatDB.InputBlock.start();
+            InputBlock.start();
 
-            $.post(`${LcatDB.serverUrl}/loginDo`, {
-                "username": LcatDB.LocalStorage.get('anon.username'),
-                "password": LcatDB.LocalStorage.get('anon.password'),
+            $.post(`${Platform.serverUrl}/loginDo`, {
+                "username": AppStorage.get('anon.username'),
+                "password": AppStorage.get('anon.password'),
                 "infoOnly": true
             }, (data, status) => {
-                LcatDB.InputBlock.finish();
-                if (data.success) LcatDB.Pages.navigate("./dashboard.html");
+                InputBlock.finish();
+                if (data.success) AppNavigator.go("./dashboard.html");
                 else {
                     ["forgotSent", "invalid", "reset"].forEach(
                         key => $(`#${key}`).hide()
@@ -62,7 +69,7 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
                 }
             }).fail(() => {
                 $(`#server`).show();
-                LcatDB.InputBlock.finish();
+                InputBlock.finish();
             });
         });
     }
@@ -77,17 +84,17 @@ LcatDB.Pages.classes.quickJoin = class extends LcatDB.Page {
         $("#passwordRetype").val(password);
 
         $("#register").click(() => {
-            LcatDB.LocalStorage.put('anon', {
+            AppStorage.put('anon', {
                 username: $("#username").val(),
                 password: $("#password").val()
             });
 
-            LcatDB.Utils.submitFormAjax($('#form'));
+            AppNavigator.submitFormAjax($('#form'));
         });
     }
 
     init() {
-        if (LcatDB.LocalStorage.get('anon.username')) this.initExists();
+        if (AppStorage.get('anon.username')) this.initExists();
         else this.initNotExists();
     }
 };

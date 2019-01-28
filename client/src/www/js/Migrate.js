@@ -1,11 +1,14 @@
-LcatDB.Migrate = class {
+import AppStorage from "./AppStorage";
+import Platform from "./Platform";
+
+class Migrate {
     static init() {
-        let previousVersion = LcatDB.LocalStorage.get("migrate.version") || '';
-        let currentVersion = LcatDB.Platform.version();
+        let previousVersion = AppStorage.get("migrate.version") || '';
+        let currentVersion = Platform.version;
 
-        LcatDB.LocalStorage.put("migrate.version", currentVersion);
+        AppStorage.put("migrate.version", currentVersion);
 
-        let steps = LcatDB.Migrate.getMigrateSteps();
+        let steps = Migrate.migrateSteps;
         
         if (previousVersion.localeCompare(currentVersion) == -1) {
             Object.keys(steps).forEach(version => {
@@ -15,9 +18,9 @@ LcatDB.Migrate = class {
         }
     }
 
-    static getMigrateSteps() { return {
+    static get migrateSteps() { return {
         "2.1.0": () => {
-            LcatDB.LocalStorage.put('anon', {
+            AppStorage.put('anon', {
                 username: localStorage["anon.username"],
                 password: localStorage["anon.password"]
             });
@@ -26,4 +29,6 @@ LcatDB.Migrate = class {
             delete localStorage["anon.password"];
         }
     } }
-};
+}
+
+export default Migrate;

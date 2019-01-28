@@ -1,4 +1,10 @@
-LcatDB.Pages.classes.login = class extends LcatDB.Page {
+import AppNavigator from "../AppNavigator";
+import InputBlock from "../InputBlock";
+import Utils from "../Utils";
+import Page from "../Page";
+import Platform from "../Platform";
+
+export default class extends Page {
     init() {
         // If in modal, session must be invalid.
         // Refresh parent to kick it back to login screen.
@@ -12,7 +18,7 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
             './img/home/bg4.jpg'
         ], {duration: 5000, fade: 750});
 
-        let queryObj = LcatDB.Utils.urlQueryObj(window.location.href);
+        let queryObj = Utils.urlQueryObj(window.location.href);
 
         ["forgotSent", "invalid", "reset"].forEach(function(key) {
             if (queryObj[key]) $('#' + key).show();
@@ -21,16 +27,16 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
         $('input[type=submit]').click(e => {
             e.preventDefault();
 
-            LcatDB.InputBlock.start();
+            InputBlock.start();
 
-            $.post(`${LcatDB.serverUrl}/loginDo`, {
+            $.post(`${Platform.serverUrl}/loginDo`, {
                 "username": $('input[name=username]').val(),
                 "password": $('input[name=password]').val(),
                 "infoOnly": true
             }, (data, status) => {
-                LcatDB.InputBlock.finish();
+                InputBlock.finish();
                 
-                if (data.success) LcatDB.Pages.navigate("./dashboard.html");
+                if (data.success) AppNavigator.go("./dashboard.html");
                 else {
                     ["forgotSent", "invalid", "reset"].forEach(
                         key => $('#' + key).hide()
@@ -40,7 +46,7 @@ LcatDB.Pages.classes.login = class extends LcatDB.Page {
                 }
             }).fail(function() {
                 $(`#server`).show();
-                LcatDB.InputBlock.finish();
+                InputBlock.finish();
             });
         });
     }

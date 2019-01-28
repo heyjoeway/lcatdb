@@ -1,5 +1,14 @@
-LcatDB.LocalStorage = class {
-    static getCurrentData() {
+import Utils from "./Utils";
+
+// import UserInfo from "./UserInfo";
+
+class AppStorage {
+    /**
+     * Get all currently stored LS data relevant to this app. (aka all data in localStorage['LcatDB'])
+     * 
+     * @returns {object}
+     */
+    static get currentData() {
         let currentData = {};
         try {
             currentData = JSON.parse(localStorage["LcatDB"]);
@@ -7,26 +16,27 @@ LcatDB.LocalStorage = class {
         return currentData;
     }
 
+
     static getUserPath(path, user) {
         if (!user) return path
-        else if (user === true)
-            user = LcatDB.userInfo.getCurrentUserId();
+        // else if (user === true)
+            // user = UserInfo.currentUserId;
         
         return path = `users.${user}.${path}`;
     }
 
     static get(path = '', user) {
-        return LcatDB.Utils.getPropertyByPath(
-            LcatDB.LocalStorage.getCurrentData(),
-            LcatDB.LocalStorage.getUserPath(path, user)
+        return Utils.getPropertyByPath(
+            AppStorage.currentData,
+            AppStorage.getUserPath(path, user)
         );
     }
 
     static put(path, val, user) {
-        let currentData = LcatDB.LocalStorage.getCurrentData();
-        LcatDB.Utils.setPropertyByPath(
+        let currentData = AppStorage.currentData;
+        Utils.setPropertyByPath(
             currentData,
-            LcatDB.LocalStorage.getUserPath(path, user),
+            AppStorage.getUserPath(path, user),
             val
         );
         localStorage["LcatDB"] = JSON.stringify(currentData);
@@ -39,4 +49,6 @@ LcatDB.LocalStorage = class {
     static deleteAll() {
         localStorage["LcatDB"] = '{}';
     }
-};
+}
+
+export default AppStorage;

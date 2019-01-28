@@ -1,4 +1,7 @@
-LcatDB.Pages.classes.home = class extends LcatDB.Page {
+import Platform from "../Platform";
+import Page from "../Page";
+
+export default class extends Page {
 	init() {
 	    $('#home-slideshow').backstretch([
 	        './img/home/bg1.jpg',
@@ -7,8 +10,8 @@ LcatDB.Pages.classes.home = class extends LcatDB.Page {
 	        './img/home/bg4.jpg'
 	    ], {duration: 5000, fade: 750});
 
-	    if (LcatDB.Platform.isWebsite && !LcatDB.Platform.isiOS()) $(".app-banner-google").show();
-		if (LcatDB.Platform.isWebsite) $(".app-banner-apple").show();
+	    if (Platform.isWebsite && !Platform.isiOS) $(".app-banner-google").show();
+		if (Platform.isWebsite) $(".app-banner-apple").show();
 		
 		$("body").addClass("no-nav no-pad");
 	}

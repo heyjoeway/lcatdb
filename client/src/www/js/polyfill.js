@@ -52,7 +52,7 @@ if (!Array.prototype.includes) {
 
 Array.prototype.xor = function(other) {
     let newArray = [];
-    this.forEach((val) => {
+    this.forEach(val => {
         if (!other.includes(val))
             newArray.push(val);
     });

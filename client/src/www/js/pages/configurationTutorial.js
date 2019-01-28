@@ -1,4 +1,6 @@
-LcatDB.Pages.classes.configurationTutorial = class extends LcatDB.Page {
+import Page from "../Page";
+
+export default class extends Page {
     init() {
         let hasTemperature = false;
         let hasDepth = false;

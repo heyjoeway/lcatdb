@@ -1,25 +1,28 @@
-LcatDB.Sidebar = class {
+import UserInfo from "./UserInfo";
+import Platform from "./Platform";
+import AppNavigator from "./AppNavigator";
+import InputBlock from "./InputBlock";
+
+class Sidebar {
     static init() {
-        LcatDB.Sidebar.isOpen = false;
+        Sidebar.isOpen = false;
         
-        $(window).click(LcatDB.Sidebar.hide);
+        $(window).click(Sidebar.hide);
         $("#sidebar_btn").off('click').click(function() {
-            setTimeout(LcatDB.Sidebar.open, 1);
+            setTimeout(Sidebar.open, 1);
         });
 
         $(".logout").off('click').click(e => {
             e.preventDefault();
 
-            LcatDB.InputBlock.start();
+            InputBlock.start();
             
-            $.post(`${LcatDB.serverUrl}/logout`, () => {
-                LcatDB.InputBlock.finish();
-                LcatDB.userInfo.clear();
-                LcatDB.Pages.navigate('./home.html');
+            $.post(`${Platform.serverUrl}/logout`, () => {
+                InputBlock.finish();
+                UserInfo.clear();
+                AppNavigator.go('./home.html');
             });
         });
-
-        LcatDB.App.initElements();
     }
 
     static open() {
@@ -28,13 +31,13 @@ LcatDB.Sidebar = class {
         setTimeout(function() {
             $("#sidebar").addClass("sidebar_show");
             $("#sidebar-overlay").removeClass("disabled");
-            LcatDB.Sidebar.isOpen = true;
+            Sidebar.isOpen = true;
         }, 20);
     }
       
     static hide() {
-        if (!LcatDB.Sidebar.isOpen) return;
-        LcatDB.Sidebar.isOpen = false;
+        if (!Sidebar.isOpen) return;
+        Sidebar.isOpen = false;
         $("#sidebar").removeClass("sidebar_show");
         $("#sidebar-overlay").addClass("disabled");    
         setTimeout(function() {
@@ -47,9 +50,9 @@ LcatDB.Sidebar = class {
      * Remove current sidebar and re-render (with user info).
      */
     static update() {
-        LcatDB.userInfo.get(gotNewInfo => {
+        UserInfo.get(gotNewInfo => {
             let configurationId = $("#configuration-picker").val();
-            let info = LcatDB.userInfo.info();
+            let info = UserInfo.info;
             let noUser = $(`meta[name='app:noUser']`).prop("content") == "true";
 
             let navRender;
@@ -61,14 +64,14 @@ LcatDB.Sidebar = class {
             $('#sidebar').remove();
             $('body').append(navRender);
             
-            LcatDB.Platform.handleOnline(true);
-            LcatDB.Platform.initNavigation();
+            Platform.handleOnline(true);
+            AppNavigator.updateLinks();
             
-            LcatDB.Sidebar.init();
+            Sidebar.init();
         });
     }
 };
 
-
+export default Sidebar;
 
 

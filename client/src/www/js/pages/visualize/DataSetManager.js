@@ -1,4 +1,8 @@
+import AppStorage from "../../AppStorage";
+import UserInfo from "../../UserInfo";
+
 import DataSet from "./DataSet.js";
+import Utils from "../../Utils";
 
 class DataSetManager {
     constructor() {
@@ -24,7 +28,7 @@ class DataSetManager {
         });
 
         this.setUidMap = {};
-        this.callbacks = new LcatDB.Utils.CallbackChannel();
+        this.callbacks = new Utils.CallbackChannel();
         this.load();
     }
 
@@ -56,13 +60,18 @@ class DataSetManager {
             this.switchSet(jsonObj.setCurrent);
     }
 
-    store() {
-        LcatDB.LocalStorage.put("visualize.DataSetManager", this.toJSON(), true);
-    }
+    store() { AppStorage.put(
+        "visualize.DataSetManager",
+        this.toJSON(),
+        UserInfo.currentUserId
+    ); }
 
     load() {
         this.fromJSON(
-            LcatDB.LocalStorage.get("visualize.DataSetManager", true) || {}
+            AppStorage.get(
+                "visualize.DataSetManager",
+                UserInfo.currentUserId
+            ) || {}
         );
     }
 

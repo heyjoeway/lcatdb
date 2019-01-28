@@ -1,23 +1,27 @@
 const fs = require('fs'); // Browserify transform
 
-LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
-    constructor(obj) {
-        obj.type = "OfflineEventReading";
-        super(obj);
+import UserInfo from './UserInfo';
+import InputBlock from './InputBlock';
+import Utils from './Utils';
+import Platform from './Platform';
 
-        // obj.data = {
-        //     "cid": "configuration id",
-        //     "formData": "form data"
-        // }
-    }
+import OfflineEvent from './OfflineEvent';
+
+class OfflineEventReading extends OfflineEvent {
+    get type() { return "OfflineEventReading"; }
+
+    // obj.data = {
+    //     "cid": "configuration id",
+    //     "formData": "form data"
+    // }
 
     getUrl() { return (
-        `${LcatDB.serverUrl}/configurations/${this.data.cid}/readingDo`
+        `${Platform.serverUrl}/configurations/${this.data.cid}/readingDo`
     ) }
 
     submit(callback, force) {
         function finish(success) {
-            LcatDB.InputBlock.finish();
+            InputBlock.finish();
             if (callback) callback({
                 "success": success
             });
@@ -27,7 +31,7 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
 
         if (!navigator.onLine) return callback(false);
 
-        LcatDB.InputBlock.start();
+        InputBlock.start();
 
         let xhr = new XMLHttpRequest();
 
@@ -79,7 +83,7 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
             // to
             // values.0.foo.bar
             let path = field.name.replace(/\[/g, '.').replace(/\]/g, '');
-            LcatDB.Utils.setPropertyByPath(
+            Utils.setPropertyByPath(
                 renderData.reading,
                 path,
                 field.value
@@ -91,14 +95,13 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
             key => renderData.reading.values[key]
         );
 
-        let userInfo = LcatDB.userInfo.info();
-        let sensorTypes = userInfo.sensorTypes;
+        let sensorTypes = UserInfo.info.sensorTypes;
 
         renderData.reading.values.forEach((value, i) => {
             value.index = i;
             value.display = sensorTypes[value.type].display;
             value.display.forEach(displayNode => {
-                displayNode.data = LcatDB.Utils.getPropertyByPath(
+                displayNode.data = Utils.getPropertyByPath(
                     value,
                     displayNode.path
                 );
@@ -109,4 +112,6 @@ LcatDB.OfflineEventReading = class extends LcatDB.OfflineEvent {
             __dirname + "/templates/offlineEventReading.mustache"
         ).toString(), renderData);
     }
-};
+}
+
+export default OfflineEventReading;

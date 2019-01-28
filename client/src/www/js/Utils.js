@@ -1,4 +1,4 @@
-LcatDB.Utils = class {
+class Utils {
     /*
      * Create object from URL query.
      * ex.
@@ -126,7 +126,7 @@ LcatDB.Utils = class {
         $(selector).each((i, element) => {
             let $element = $(element);
             let propType = $element.prop('type');
-            let propVal = LcatDB.Utils.jqValueGet($element);
+            let propVal = Utils.jqValueGet($element);
 
             if (typeof propVal == 'undefined') return;
 
@@ -167,29 +167,9 @@ LcatDB.Utils = class {
             this.jqValueSet($element, propVal);
         });
     }
-
-    static submitFormAjax($form) {
-        let xhr = new XMLHttpRequest();
-
-        LcatDB.InputBlock.start();
-
-        $.ajax({
-            url: $form.prop('action'),
-            method: $form.prop('method'),
-            data: $form.serialize(),
-            dataType: 'html',
-            xhr: () => xhr,
-            success: (data, status) => {
-                LcatDB.InputBlock.finish();
-                if (status != "success") return;
-                LcatDB.Pages.populateContent(data, xhr.responseURL);
-            },
-            failure: () => LcatDB.InputBlock.finish()
-        });
-    }
 };
 
-LcatDB.Utils.CallbackChannel = class {
+Utils.CallbackChannel = class {
     clear() {
         this.callbacks = {};
         this.callbackOnceKeys = [];
@@ -224,7 +204,7 @@ LcatDB.Utils.CallbackChannel = class {
  * Class to create a chain of events.
  * Helps to avoid deep nesting.
  */
-LcatDB.Utils.Chain = class {
+Utils.Chain = class {
     /**
      * Create a chain.
      * @param {...function} func
@@ -261,3 +241,5 @@ LcatDB.Utils.Chain = class {
         return 0;
     }
 };
+
+export default Utils;

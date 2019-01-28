@@ -1,7 +1,11 @@
-LcatDB.OfflineEvent = class {
+import Platform from "./Platform";
+import LoginModal from "./LoginModal";
+
+class OfflineEvent {
+    get type() { return "OfflineEvent"; };
+    
     constructor(obj) {
         obj = obj || {};
-        this.type = obj.type || "OfflineEvent";
         this.name = obj.name || "Unknown";
         this.data = obj.data || {};
         this.timeCreated = obj.timeCreated || (new Date()).getTime();
@@ -49,9 +53,11 @@ LcatDB.OfflineEvent = class {
 
         try {
             if (this.response.data.errorName == "noUser")
-                LcatDB.Platform.openLoginModal();
+                LoginModal.open();
         } catch (e) { }
     }
 
     infoHtml() { }
-};
+}
+
+export default OfflineEvent;

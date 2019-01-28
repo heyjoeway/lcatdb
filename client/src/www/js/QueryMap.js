@@ -1,16 +1,19 @@
-LcatDB.QueryMap = class {
+import MapsConfig from "./MapsConfig";
+import UserInfo from "./UserInfo";
+import UnitSystem from "./UnitSystem";
+import AppNavigator from "./AppNavigator";
+import Platform from "./Platform";
+
+class QueryMap {
     constructor(obj) {
         if (obj.element) this.element = obj.element;
         else this.element = $(`#${obj.selector}`)[0];
 
         this.$element = $(this.element);
-
-        this.markers = [];
-
+       this.markers = [];
         this.initMap();
 
-        if (obj.buoy)
-            this.initBuoy();
+        if (obj.buoy) this.initBuoy();
 
         if (obj.useElementData) {
             this._ensureDefaultQuery();
@@ -28,11 +31,8 @@ LcatDB.QueryMap = class {
                 this.initBuoy();
         }
        
-        if (obj.timePicker)
-            this.addTimePicker(obj.timePicker, true);
-
-        if (obj.userPicker)
-            this.addUserPicker(obj.userPicker, true);
+        if (obj.timePicker) this.addTimePicker(obj.timePicker, true);
+        if (obj.userPicker) this.addUserPicker(obj.userPicker, true);
 
         this.setQueries(obj.queries);
     }
@@ -54,8 +54,7 @@ LcatDB.QueryMap = class {
             11 // zoom
         );
 
-        let mapConfig = LcatDB.MapsCommon.getMapConfig();
-        let layer = L.tileLayer(mapConfig.url, mapConfig.options);
+        let layer = L.tileLayer(MapsConfig.url, MapsConfig.options);
         layer.addTo(this.map);
 
         this.markerCluster = L.markerClusterGroup();
@@ -91,7 +90,7 @@ LcatDB.QueryMap = class {
         let queriesLeft = this.queries.length;
 
         this.queries.forEach((query, arr, i) => {
-            $.post(`${LcatDB.serverUrl}/api/readings`, query, (dataSet, textStatus) => {
+            $.post(`${Platform.serverUrl}/api/readings`, query, (dataSet, textStatus) => {
                 if (textStatus == 'success') {
                     this.data.push(dataSet);
                     queriesLeft--;
@@ -119,7 +118,7 @@ LcatDB.QueryMap = class {
                     reading.location.long
                 ], {
                     icon: L.icon({
-                        iconUrl: LcatDB.QueryMap.getMapMarkerImages()[markerImageIndex],
+                        iconUrl: this.mapMarkerImages[markerImageIndex],
                         iconAnchor: [12, 41],
                         shadowUrl: './img/map/markerShadow.png',
                         popupAnchor: [0, -41]
@@ -134,7 +133,7 @@ LcatDB.QueryMap = class {
                 marker.on('popupopen', e => {
                     e.popup.setContent("Loading...");
                     $.get(
-                        `${LcatDB.serverUrl}/readings/${reading['_id']}?marker=true`,
+                        `${Platform.serverUrl}/readings/${reading['_id']}?marker=true`,
                         (data, status) => {
                             if (status != "success")
                                 e.popup.setContent("Failed to load reading.");
@@ -143,8 +142,8 @@ LcatDB.QueryMap = class {
                             e.popup.setContent(
                                 $html.find("#content").html()
                             );
-                            LcatDB.UnitSystem.change();
-                            LcatDB.Platform.initNavigation();
+                            UnitSystem.change();
+                            AppNavigator.updateLinks();
                         }, 'html'
                     );
                 });
@@ -153,7 +152,7 @@ LcatDB.QueryMap = class {
 
                 dataEmpty = false;
             });
-            markerImageIndex = (markerImageIndex + 1) % LcatDB.QueryMap.getMapMarkerImages().length;
+            markerImageIndex = (markerImageIndex + 1) % this.mapMarkerImages.length;
         });
 
         if (dataEmpty) return;
@@ -212,7 +211,7 @@ LcatDB.QueryMap = class {
         if (typeof creator == "undefined" || creator == 'all')
             delete this.queries[0].filter.creator;
         else if (creator == "me") 
-            this.queries[0].filter.creator = userInfo.info().user["_id"];
+            this.queries[0].filter.creator = UserInfo.info.user["_id"];
         else 
             this.queries[0].filter.creator = creator;
     
@@ -229,7 +228,7 @@ LcatDB.QueryMap = class {
         this.$userPicker.change(this._onUserPickerChange.bind(this));
     }
 
-    static getMapMarkerImages() { return [
+    get mapMarkerImages() { return [
         './img/map/markerRed.png',
         './img/map/markerYellow.png',
         './img/map/markerBlue.png',
@@ -243,3 +242,5 @@ LcatDB.QueryMap = class {
         './img/map/markerBlack.png'
     ] }
 };
+
+export default QueryMap;

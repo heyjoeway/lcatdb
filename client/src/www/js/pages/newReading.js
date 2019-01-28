@@ -1,16 +1,30 @@
 const fs = require('fs'); // Browserify transform
 
-LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
+import MapsConfig from "../MapsConfig";
+import AppStorage from "../AppStorage";
+import UserInfo from "../UserInfo";
+import Modal from "../Modal";
+import AppNavigator from "../AppNavigator";
+import Page from "../Page";
+import Platform from "../Platform";
+
+import OfflineEventReading from "../OfflineEventReading";
+import InputBlock from "../InputBlock";
+import Utils from "../Utils";
+import OfflineEventQueue from "../OfflineEventQueue";
+import UnitSystem from "../UnitSystem";
+
+export default class extends Page {
     // Update the list of configurations trigger a configuration change
     updateConfigList(init) {
-        LcatDB.userInfo.get(gotNewInfo => {
+        UserInfo.get(gotNewInfo => {
             let html = '';
 
             let configurationIndex = $('#configuration-picker').val() || 0;
 
-            // Exception occurs if userinfo.info() does not exist (logged out) 
+            // Exception occurs if userinfo.info does not exist (logged out) 
             try {
-                LcatDB.userInfo.info().configurations.forEach((configuration, i) => {
+                UserInfo.info.configurations.forEach((configuration, i) => {
                     html += `<option value="${i}">${configuration.name}</option>`;
     
                     if (init && configuration['_id'] == this.configurationId)
@@ -35,8 +49,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
         let configurationIndex = $("#configuration-picker").val();
 
-        let data = LcatDB.userInfo.info();
-        let configuration = data.configurations[configurationIndex]; 
+        let configuration = UserInfo.info.configurations[configurationIndex]; 
         this.configurationId = configuration['_id'];
 
         configuration.sensors.sort((a, b) =>
@@ -48,7 +61,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         ).toString();
         configuration.sensors.forEach((sensor, i) => {
             sensor.index = i;
-            sensor.typeData = data.sensorTypes[sensor.type];
+            sensor.typeData = UserInfo.info.sensorTypes[sensor.type];
             sensor.html = Mustache.render(
                 inputTemplate,
                 { sensor: sensor }
@@ -62,19 +75,19 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         );
         $('#configuration-link').prop(
             'href',
-            `${LcatDB.serverUrl}/configurations/${configuration['_id']}`
+            `${Platform.serverUrl}/configurations/${configuration['_id']}`
         );
         $('.configuration-chosen').show();
         $('.configuration-notchosen').hide();
 
         $('#configuration-sensors .spoiler').spoiler();
         
-        LcatDB.Platform.initNavigation();
+        AppNavigator.updateLinks();
         
         this.initSensorBtns();
         this.initEventForm();
   
-        LcatDB.UnitSystem.change();
+        UnitSystem.change();
     }
 
     // Update the map's current position
@@ -98,15 +111,15 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         [{
             selector: '#sensor-new',
             title: 'Add New Sensor',
-            url: cid => `${LcatDB.serverUrl}/sensors/new?configuration=${cid}&modal=true`,
+            url: cid => `${Platform.serverUrl}/sensors/new?configuration=${cid}&modal=true`,
         }, {
             selector: '#sensor-existing',
             title: 'Add Existing Sensor',
-            url: cid => `${LcatDB.serverUrl}/configurations/${cid}/addSensor?modal=true`,
+            url: cid => `${Platform.serverUrl}/configurations/${cid}/addSensor?modal=true`,
         }, {
             selector: '.sensor-remove',
             title: 'Remove Sensor',
-            url: (cid, sid) => `${LcatDB.serverUrl}/configurations/${cid}/removeSensor?modal=true&sid=${sid}`,
+            url: (cid, sid) => `${Platform.serverUrl}/configurations/${cid}/removeSensor?modal=true&sid=${sid}`,
         }].forEach(data => {
             $(data.selector).off('click').click(e => {
                 e.preventDefault();
@@ -114,7 +127,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
                 let cid = this.configurationId;
                 let sid = $(e.target).data('sid');
 
-                new LcatDB.Modal({
+                new Modal({
                     title: data.title,
                     url: data.url(cid, sid),
                     callback: modal => {
@@ -128,7 +141,10 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
 
     // Get current location (mobile only to ensure accuracy)
     getLocation(auto) {
-        let autoEnabled = LcatDB.LocalStorage.get('location.auto', true);
+        let autoEnabled = AppStorage.get(
+            'location.auto',
+            UserInfo.currentUserId
+        );
         if (auto && !autoEnabled) return;
 
         // Location probably not precise on desktop/laptop
@@ -203,7 +219,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     queue() {
         if (!this.validateInput()) return;
 
-        LcatDB.offlineEventQueue.addEvent(new LcatDB.OfflineEventReading({
+        OfflineEventQueue.addEvent(new OfflineEventReading({
             data: {
                 cid: this.configurationId,
                 formData: $('#form').serializeArray()
@@ -218,9 +234,9 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
     submit() {
         if (!this.validateInput()) return;
 
-        LcatDB.InputBlock.start();
+        InputBlock.start();
         
-        let event = new LcatDB.OfflineEventReading({
+        let event = new OfflineEventReading({
             data: {
                 cid: this.configurationId,
                 formData: $('#form').serializeArray()
@@ -229,16 +245,17 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         });
 
         event.submit(data => {
-            LcatDB.InputBlock.finish();
+            InputBlock.finish();
 
             if (data.success) {
-                LcatDB.Pages.populateContent(
+                
+                AppNavigator.populateContent(
                     event.response.data,
                     event.response.responseURL
                 );
             } else {
-                LcatDB.offlineEventQueue.addEvent(event);
-                LcatDB.Pages.navigate('./queue.html');
+                OfflineEventQueue.addEvent(event);
+                AppNavigator.go('./queue.html');
             }
         });
     }
@@ -258,8 +275,7 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         });
         map.setView(pos, 11);
 
-        let mapConfig = LcatDB.MapsCommon.getMapConfig();
-        let layer = L.tileLayer(mapConfig.url, mapConfig.options);
+        let layer = L.tileLayer(MapsConfig.url, MapsConfig.options);
         layer.addTo(map);
 
         let marker = L.marker(pos, {
@@ -334,12 +350,12 @@ LcatDB.Pages.classes.newReading = class extends LcatDB.Page {
         $("#viewqueue").click(e => {
             e.preventDefault();
             if (!this.validateInput(true)) {
-                new LcatDB.Modal({
+                new Modal({
                     title: "Warning",
                     body:
 `The current reading seems to be invalid. Make sure all fields are filled out and try again.<br>
 If you don't want to submit the current reading, press the button below to continue. Your other readings will remain in the queue.`,
-                    callback: () => LcatDB.Pages.navigate("./queue.html"),
+                    callback: () => AppNavigator.go("./queue.html"),
                     buttons: [{
                         text: "Cancel"
                     }, {
@@ -350,7 +366,7 @@ If you don't want to submit the current reading, press the button below to conti
                 });
             } else {
                 this.queue();
-                LcatDB.Pages.navigate("./queue.html");
+                AppNavigator.go("./queue.html");
             }
 
         });
@@ -369,7 +385,7 @@ If you don't want to submit the current reading, press the button below to conti
     initEvent() {
         if (typeof this.eventId == "undefined") return;
 
-        this.event = LcatDB.offlineEventQueue.getEventById(this.eventId);
+        this.event = OfflineEventQueue.getEventById(this.eventId);
         this.configurationId = this.event.data.cid;
 
         $("#publish").hide();
@@ -380,15 +396,15 @@ If you don't want to submit the current reading, press the button below to conti
             e.preventDefault();
             if (!this.validateInput()) return;
 
-            LcatDB.offlineEventQueue.removeEvent(this.event);
+            OfflineEventQueue.removeEvent(this.event);
 
             this.queue();
-            LcatDB.Pages.navigate("./queue.html");
+            AppNavigator.go("./queue.html");
         });
     }
 
     init() {
-        let queryObj = LcatDB.Utils.urlQueryObj(location.href);
+        let queryObj = Utils.urlQueryObj(location.href);
         this.configurationId = queryObj.configuration;
         this.eventId = queryObj.editqueue;
 
@@ -397,7 +413,7 @@ If you don't want to submit the current reading, press the button below to conti
         this.initMobile();
         this.initDatetime();
         this.initSubmitBtns();
-        LcatDB.Utils.preventEnterKey();
+        Utils.preventEnterKey();
 
         $('.spoiler').spoiler();
 
@@ -405,9 +421,20 @@ If you don't want to submit the current reading, press the button below to conti
             .val((new Date).getTime())
             .change();
 
-        $("#location_auto").prop('checked', LcatDB.LocalStorage.get('location.auto', true));
+        $("#location_auto").prop(
+            'checked',
+            AppStorage.get(
+                'location.auto',
+                UserInfo.currentUserId
+            )
+        );
+
         $("#location_auto").change(function() {
-            LcatDB.LocalStorage.put('location.auto', $(this).prop('checked', true));
+            AppStorage.put(
+                'location.auto',
+                $(this).prop('checked'),
+                UserInfo.currentUserId
+            );
         });
 
         this.initMap();

@@ -1,45 +1,52 @@
-LcatDB.OfflineEventQueue = class {
-    constructor(name) {
-        this.events = [];
-        this.name = name || 'default';
-        this.updateCallbacks = new LcatDB.Utils.CallbackChannel();
-        this.loadEvents();
+import AppStorage from "./AppStorage";
+import UserInfo from "./UserInfo";
+
+import OfflineEventReading from "./OfflineEventReading";
+import Utils from "./Utils";
+
+class OfflineEventQueue {
+    static init(name) {
+        OfflineEventQueue.initialized = true;
+
+        OfflineEventQueue.events = [];
+        OfflineEventQueue.updateCallbacks = new Utils.CallbackChannel();
+        OfflineEventQueue.loadEvents();
     }
 
-    autoSubmit() {
-        this.events.forEach((event) => {
-            this.submitEvent(event);
+    static autoSubmit() {
+        OfflineEventQueue.events.forEach((event) => {
+            OfflineEventQueue.submitEvent(event);
         });
     }
 
-    submitEvent(event, manual) {
+    static submitEvent(event, manual) {
         if (event.status == 'success')
-            return this.removeEvent(event);
+            return OfflineEventQueue.removeEvent(event);
 
         if (!event.autoSubmit && !manual) return;
     
         if ((event.status == 'pending') || manual) {
             event.submit(result => {
                 if (result.success) 
-                    return this.removeEvent(event);
-                this.saveEvents();
+                    return OfflineEventQueue.removeEvent(event);
+                OfflineEventQueue.saveEvents();
             });
         }
 
-        this.updateCallbacks.run('submit');
+        OfflineEventQueue.updateCallbacks.run('submit');
     }
 
-    submitEventId(id, manual) {
-        this.submitEvent(this.getEventById(id), manual);
+    static submitEventId(id, manual) {
+        OfflineEventQueue.submitEvent(OfflineEventQueue.getEventById(id), manual);
     }
 
-    removeEvent(event) {
-        this.removeEventId(event.id);
+    static removeEvent(event) {
+        OfflineEventQueue.removeEventId(event.id);
     }
 
-    getEventIndexById(id) {
+    static getEventIndexById(id) {
         let indexFinal = -1;
-        this.events.some((event, i) => {
+        OfflineEventQueue.events.some((event, i) => {
             if (event.id == id) {
                 indexFinal = i;
                 return true;
@@ -48,9 +55,9 @@ LcatDB.OfflineEventQueue = class {
         return indexFinal;
     }
 
-    getEventById(id) {
+    static getEventById(id) {
         let eventFinal;
-        this.events.some(event => {
+        OfflineEventQueue.events.some(event => {
             if (event.id == id) {
                 eventFinal = event;
                 return true;
@@ -59,49 +66,51 @@ LcatDB.OfflineEventQueue = class {
         return eventFinal;
     }
 
-    removeEventId(id) {
-        this.removeEventIndex(this.getEventIndexById(id));
+    static removeEventId(id) {
+        OfflineEventQueue.removeEventIndex(OfflineEventQueue.getEventIndexById(id));
     }
     
-    removeEventIndex(index) {
+    static removeEventIndex(index) {
         if (index <= -1) return;
         if (typeof index == 'undefined') return;
-        this.events.splice(index, 1);
-        this.saveEvents();
+        OfflineEventQueue.events.splice(index, 1);
+        OfflineEventQueue.saveEvents();
     }
     
-    clearEvents() {
-        this.events = [];
-        this.saveEvents();
+    static clearEvents() {
+        OfflineEventQueue.events = [];
+        OfflineEventQueue.saveEvents();
     }
 
-    addEvent(event) {
-        this.events.push(event);
-        this.saveEvents();        
+    static addEvent(event) {
+        OfflineEventQueue.events.push(event);
+        OfflineEventQueue.saveEvents();        
     }
 
-    toArray() {
+    static toArray() {
         let eventsArray = [];
-        this.events.forEach((event) => {
+        OfflineEventQueue.events.forEach((event) => {
             eventsArray.push(event.toObj());
         });
         return eventsArray;
     }
 
-    saveEvents() {
-        let path = `offlineEvents.${this.name}`;
-        LcatDB.LocalStorage.put(path, this.toArray(), true);
-        this.updateCallbacks.run('save');
+    static saveEvents() {
+        let path = `offlineEvents.default`;
+        AppStorage.put(path, OfflineEventQueue.toArray(), UserInfo.currentUserId);
+        OfflineEventQueue.updateCallbacks.run('save');
     }
 
-    loadEvents() {
-        let path = `offlineEvents.${this.name}`;
-        let eventsArray = LcatDB.LocalStorage.get(path, true) || [];
+    static loadEvents() {
+        let path = `offlineEvents.default`;
+        let eventsArray = AppStorage.get(path, UserInfo.currentUserId) || [];
 
-        this.events = [];        
+        OfflineEventQueue.events = [];        
         eventsArray.forEach(eventData => {
-            this.events.push(new LcatDB.OfflineEventReading(eventData)); // TODO
+            OfflineEventQueue.events.push(new OfflineEventReading(eventData)); // TODO
         });
-        this.updateCallbacks.run('load');
+        OfflineEventQueue.updateCallbacks.run('load');
     }
-};
+}
+
+export default OfflineEventQueue;

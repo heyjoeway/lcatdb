@@ -1,4 +1,7 @@
- LcatDB.Pages.classes.sensorNewModal = class extends LcatDB.Page {
+import Page from "../Page";
+import Platform from "../Platform";
+ 
+export default class extends Page {
     init() {
         $('#step-1').show();
         $('#loading').hide();
@@ -13,7 +16,7 @@
 
             window.parent.postMessage('modal.lock', '*');
 
-            $.post(`${LcatDB.serverUrl}/sensors/newDo`,
+            $.post(`${Platform.serverUrl}/sensors/newDo`,
                 {
                     "type": $this.data('type'),
                     "model": $this.data('model'),

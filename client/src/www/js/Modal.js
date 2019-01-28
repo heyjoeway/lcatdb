@@ -1,10 +1,13 @@
-LcatDB.Modal = class {
+import Platform from "./Platform";
+import AppNavigator from "./AppNavigator";
+
+class Modal {
     constructor(options) {
         this._options = options;
         this.data = this._options.data;
 
         if (this._options.url)
-            LcatDB.Platform.resolveAppUrl(this._options.url, urlResolution => {
+            Platform.resolveAppUrl(this._options.url, urlResolution => {
                 this._options.body = `<iframe src="${urlResolution.url}" scrolling="no"></iframe>`;
                 this.init();
             });
@@ -113,7 +116,7 @@ LcatDB.Modal = class {
         this.close();
     }
     reload() {
-        LcatDB.Pages.reload();
+        AppNavigator.reload();
         this.close();
     }
     lock() {
@@ -151,4 +154,6 @@ LcatDB.Modal = class {
     on(eventName, callback) {
         this._$modal.on(`${eventName}.bs.modal`, callback);
     }
-};
+}
+
+export default Modal;

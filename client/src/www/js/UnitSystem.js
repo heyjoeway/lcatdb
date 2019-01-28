@@ -1,19 +1,22 @@
-LcatDB.UnitSystem = class {
+import AppStorage from "./AppStorage";
+import UserInfo from "./UserInfo";
+
+class UnitSystem {
     /*
      * Initialize elements that use unit normalization.
      */
     static init() {
-        let unitSystem = LcatDB.LocalStorage.get("unitSystem", true);
+        let unitSystem = AppStorage.get("unitSystem", UserInfo.currentUserId);
         
         if (!unitSystem) {
             unitSystem = 'imperial';
-            LcatDB.LocalStorage.put("unitSystem", 'imperial', true);
+            AppStorage.put("unitSystem", 'imperial', UserInfo.currentUserId);
         }
-        LcatDB.UnitSystem.change(unitSystem);
+        UnitSystem.change(unitSystem);
 
         $('#unit-system-picker').change(function() {
             let system = $(this).val();
-            LcatDB.UnitSystem.change(system);
+            UnitSystem.change(system);
         });
     }
 
@@ -21,7 +24,7 @@ LcatDB.UnitSystem = class {
      * Refresh elements that rely on unit normalization.
      */
     static change(system) {
-        if (!system) system = LcatDB.LocalStorage.get("unitSystem", true);
+        if (!system) system = AppStorage.get("unitSystem", UserInfo.currentUserId);
 
         let $normalize = $('.normalize');
         $normalize.unitnorm('deinit');
@@ -32,7 +35,9 @@ LcatDB.UnitSystem = class {
                 $this.attr('data-unitprefsystem', system);
         });
         $normalize.unitnorm();
-        LcatDB.LocalStorage.put("unitSystem", system, true);
+        AppStorage.put("unitSystem", system, UserInfo.currentUserId);
         $('#unit-system-picker').val(system);
     }
-};
+}
+
+export default UnitSystem;

@@ -1,4 +1,5 @@
 import Graph from "./Graph.js";
+import QueryMap from "../../QueryMap";
 
 class GraphMap extends Graph {
     static get typeName() { return "Map"; }
@@ -26,7 +27,7 @@ class GraphMap extends Graph {
             "class": "visualize-graph-map"
         });
         
-        let map = new LcatDB.QueryMap({
+        let map = new QueryMap({
             element: $element[0] ,
             queries: this.data
         });

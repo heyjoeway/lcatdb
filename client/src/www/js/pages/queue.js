@@ -1,19 +1,25 @@
 const fs = require('fs'); // Browserify transform
 
-LcatDB.Pages.classes.queue = class extends LcatDB.Page {
+import Platform from "../Platform";
+import OfflineEventQueue from "../OfflineEventQueue";
+import UnitSystem from "../UnitSystem";
+import Page from "../Page";
+import AppNavigator from "../AppNavigator";
+
+export default class extends Page {
     init() {
         this.updateList();
         $('#queue_submit').click(() =>
-            LcatDB.offlineEventQueue.autoSubmit()
+            OfflineEventQueue.autoSubmit()
         );
     
-        this.queueCallback = LcatDB.offlineEventQueue.updateCallbacks.add(
+        this.queueCallback = OfflineEventQueue.updateCallbacks.add(
             () => this.updateList()
         );
     }
 
     deinit() {
-        LcatDB.offlineEventQueue.updateCallbacks.remove(this.queueCallback);
+        OfflineEventQueue.updateCallbacks.remove(this.queueCallback);
     }
     
     updateList() {
@@ -23,21 +29,21 @@ LcatDB.Pages.classes.queue = class extends LcatDB.Page {
 
         $('#queue_list').html(
             Mustache.render(template, {
-                "queueList": LcatDB.offlineEventQueue.toArray()
+                "queueList": OfflineEventQueue.toArray()
             })
         );
 
-        LcatDB.Platform.handleOnline(true);
-        LcatDB.UnitSystem.change();
-
+        Platform.handleOnline(true);
+        UnitSystem.change();
+        AppNavigator.updateLinks();
         $('.event-submit').off('click').click(function() {
             let eventId = parseInt($(this).data('eventid'));
-            LcatDB.offlineEventQueue.submitEventId(eventId, true);
+            OfflineEventQueue.submitEventId(eventId, true);
         });
 
         $('.event-remove').off('click').click(function() {
             let eventId = parseInt($(this).data('eventid'));
-            LcatDB.offlineEventQueue.removeEventId(eventId);
+            OfflineEventQueue.removeEventId(eventId);
         });
     }
 };

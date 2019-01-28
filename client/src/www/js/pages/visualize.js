@@ -1,7 +1,9 @@
+import Page from "../Page";
+
 import DataSetManager from "./visualize/DataSetManager.js";
 import GraphManager from "./visualize/GraphManager.js";
 
-LcatDB.Pages.classes.visualize = class extends LcatDB.Page {
+export default class extends Page {
     init() {
         this.dataSetManager = new DataSetManager();
         this.graphManager = new GraphManager(this.dataSetManager);

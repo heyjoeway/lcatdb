@@ -1,3 +1,6 @@
+import AppStorage from "../../AppStorage";
+import UserInfo from "../../UserInfo";
+
 import Graph2d from "./Graph2d.js";
 import Graph3d from "./Graph3d.js";
 import GraphMap from "./GraphMap.js";
@@ -216,15 +219,16 @@ class GraphManager {
             this.switchGraph(jsonObj.graphCurrent);
     }
 
-    store() {
-        LcatDB.LocalStorage.put("visualize.GraphManager", this.toJSON(), true);
-    }
+    store() { AppStorage.put(
+        "visualize.GraphManager",
+        this.toJSON(),
+        UserInfo.currentUserId
+    ); }
 
-    load() {
-        this.fromJSON(
-            LcatDB.LocalStorage.get("visualize.GraphManager", true) || {}
-        );
-    }
+    load() { this.fromJSON(AppStorage.get(
+        "visualize.GraphManager",
+        UserInfo.currentUserId
+    ) || {}); }
 }
 
 export default GraphManager;
