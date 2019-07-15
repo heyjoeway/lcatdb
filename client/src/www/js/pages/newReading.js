@@ -111,15 +111,15 @@ export default class extends Page {
         [{
             selector: '#sensor-new',
             title: 'Add New Sensor',
-            url: cid => `${Platform.serverUrl}/sensors/new?configuration=${cid}&modal=true`,
+            url: cid => `${Platform.serverUrl}/sensors/newModal?configuration=${cid}`,
         }, {
             selector: '#sensor-existing',
             title: 'Add Existing Sensor',
-            url: cid => `${Platform.serverUrl}/configurations/${cid}/addSensor?modal=true`,
+            url: cid => `${Platform.serverUrl}/configurations/${cid}/addSensorModal`,
         }, {
             selector: '.sensor-remove',
             title: 'Remove Sensor',
-            url: (cid, sid) => `${Platform.serverUrl}/configurations/${cid}/removeSensor?modal=true&sid=${sid}`,
+            url: (cid, sid) => `${Platform.serverUrl}/configurations/${cid}/removeSensorModal?sid=${sid}`,
         }].forEach(data => {
             $(data.selector).off('click').click(e => {
                 e.preventDefault();

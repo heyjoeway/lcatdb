@@ -109,14 +109,6 @@ class Platform {
             [navigator.onLine ? 'addClass' : 'removeClass']('disabled');
     }
 
-    /*
-     * Show/hide elements tied to JS availability.
-     */
-    static initJs() {
-        $('.js').removeClass('js');
-        $('.no-js').hide();
-    }
-
     static initHandleOnline() {
         Platform.handleOnline();
         setInterval(Platform.handleOnline, 1000);
@@ -132,11 +124,16 @@ class Platform {
         $('base').attr("href", `${window.cordova.file.applicationDirectory}www/`);
     }
 
+    static initApp() {
+        if (!Platform.inApp) return;
+        $("body").addClass("in-app");
+    }
+
     static init() {
         Platform.initLocalFiles();
         Platform.initHandleOnline();
-        Platform.initJs();
         Platform.handleOnline(true);
+        Platform.initApp();
         Platform.initiOSApp();
     }
 

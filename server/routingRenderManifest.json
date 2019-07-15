@@ -44,6 +44,17 @@
         "mustachify"
     ]
 }, {
+    "url": "/sensors/newModal",
+    "template": "sensorNewModal",
+    "mustacheDeps": {
+        "general": ["sensorTypes"]
+    },
+    "steps": [
+        "user",
+        "query",
+        "mustachify"
+    ]
+}, {
     "url": "/sensors",
     "template": "sensorList",
     "mustacheDeps": {
@@ -174,8 +185,33 @@
         "mustachify"
     ]
 }, {
+    "url": "/configurations/([0-9a-f]{24})/addSensorModal",
+    "template": "configurationAddSensorModal",
+    "mustacheDeps": {
+        "user": ["sensors", "sensors.typeData"]
+    },
+    "steps": [
+        "user",
+        "configuration",
+        "query",
+        "mustachify"
+    ]
+}, {
     "url": "/readings/([0-9a-f]{24})",
     "template": "reading",
+    "allowAnon": true,
+    "mustacheDeps": {
+        "reading": ["display"]
+    },
+    "steps": [
+        "user",
+        "reading",
+        "query",
+        "mustachify"
+    ]
+}, {
+    "url": "/readingMarkers/([0-9a-f]{24})",
+    "template": "readingMarker",
     "allowAnon": true,
     "mustacheDeps": {
         "reading": ["display"]

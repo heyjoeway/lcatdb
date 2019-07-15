@@ -133,7 +133,7 @@ class QueryMap {
                 marker.on('popupopen', e => {
                     e.popup.setContent("Loading...");
                     $.get(
-                        `${Platform.serverUrl}/readings/${reading['_id']}?marker=true`,
+                        `${Platform.serverUrl}/readingMarkers/${reading['_id']}`,
                         (data, status) => {
                             if (status != "success")
                                 e.popup.setContent("Failed to load reading.");

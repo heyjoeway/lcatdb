@@ -39,7 +39,11 @@ const CORDOVA_ROOT = "./cordova";
 const CORDOVA_ANDROID_FINAL = CORDOVA_ROOT + "/merges/android";
 const CORDOVA_IOS_FINAL = CORDOVA_ROOT + "/merges/ios";
 
-var config = {};
+// ============================================================================
+
+let config = {};
+
+// ============================================================================
 
 config.clean = {};
 config.clean.cordova = [
@@ -65,6 +69,8 @@ config.clean.emails = [
     "./tmp/emails/**/*.*"
 ];
 
+// ============================================================================
+
 config.sass = {};
 config.sass.www = {
     files: [{
@@ -76,7 +82,11 @@ config.sass.www = {
     }]
 };
 
+// ============================================================================
+
 config.gitinfo = {};
+
+// ============================================================================
 
 // <!--nav--> must come before <!--nav_nouser--> and <!--nav_user-->!!!!!
 
@@ -224,6 +234,8 @@ config.replace.emails = {
     }]
 };
 
+// ============================================================================
+
 config.htmlmin = {
     options: {
         removeComments: false, // KEEP THIS, needed to set cordova base
@@ -271,6 +283,8 @@ config.htmlmin.emails = {
         "ext": ".mustache"
     }]
 };
+
+// ============================================================================
 
 let browserifyReplacements = [{
     from: /<!--head-->/,
@@ -353,7 +367,7 @@ let browserifyPrefs = {
 
 config.browserify = {};
 
-config.browserify["www_dev-watch"] = {
+config.browserify["www-dev-watch"] = {
     src: browserifyPrefs.src.www,
     dest: browserifyPrefs.dest.www,
     options: {
@@ -404,6 +418,8 @@ config.browserify.cordova_release = {
     }
 };
 
+// ============================================================================
+
 config.copy = {};
 config.copy.www = {
     files: [{
@@ -453,6 +469,10 @@ config.copy.cordova_ios_final = {
     }]
 };
 
+// ============================================================================
+
+// Folder list is used to let the client understand which locations are avaiable offline
+
 config.folder_list = {};
 config.folder_list.www = {
     options: {
@@ -466,29 +486,39 @@ config.folder_list.www = {
     }]
 };
 
+// ============================================================================
+
 config.concurrent = {};
-config.concurrent.www = [
-    'sass:www',
-    'htmlmin:www'
-];
-config.concurrent['watch-all'] = [
-    "watch:views",
-    "watch:emails",
-    "watch:cordova"
-];
+config.concurrent.www = {
+    options: {
+        logConcurrentOutput: true
+    },
+    tasks: ['sass:www', 'htmlmin:www']
+};
+config.concurrent['watch-all'] = {
+    options: {
+        logConcurrentOutput: true
+    },
+    tasks: ["watch:views", "watch:emails", "watch:www-dev", "browserify:www-dev-watch"]
+};
+
+// ============================================================================
 
 config.watch = {};
-config.watch.www = {
-    files: WWW_SRC + "/**/*",
-    tasks: ["www-clean"]
+config.watch['www-dev'] = {
+    files: [
+        `${WWW_SRC}/**/*`,
+        `!${WWW_SRC}/js/**/*`,
+    ],
+    tasks: ['www-data', 'www-finish']
 };
 config.watch.views = {
     files: VIEWS_SRC + "/**/*",
-    tasks: ["views-clean"]
+    tasks: ["views"]
 };
 config.watch.emails = {
     files: EMAILS_SRC + "/**/*",
-    tasks: ["emails-clean"]
+    tasks: ["emails"]
 };
 config.watch.cordova_android = {
     files: [
@@ -509,30 +539,33 @@ config.watch.cordova_ios = {
     ]
 };
 
-grunt.initConfig(config);
+// ============================================================================
 
+grunt.initConfig(config);
 require('load-grunt-tasks')(grunt); // Automatically loads all grunt tasks.
-// jfc why isn't this just included by default
+
+// ============================================================================
 
 let tasks = {
     www: {
-        release: [
+        data: [
             'clean:www',
             'gitinfo',
             'replace:www',
             'replace:www_recursive',
             'concurrent:www',
+        ],
+        release: [
+            'www-data',
             'browserify:www_release',
-            'copy:www',
-            'folder_list:www'
+            'www-finish'
         ],
         dev: [
-            'clean:www',
-            'gitinfo',
-            'replace:www',
-            'replace:www_recursive',
-            'concurrent:www',
+            'www-data',
             'browserify:www_dev',
+            'www-finish'
+        ],
+        finish: [
             'copy:www',
             'folder_list:www'
         ]
@@ -558,6 +591,13 @@ let tasks = {
             'www-dev',
             'views',
             'emails'
+        ],
+        'dev-watch': [
+            'www-data',
+            'www-finish',
+            'views',
+            'emails',
+            'concurrent:watch-all'
         ]
     },
     cordova: {
@@ -606,7 +646,7 @@ let tasks = {
             'copy:cordova_ios_final'
         ]
     },
-    default: [ 'server-dev' ]
+    default: [ 'server-dev-watch' ]
 }
 
 function generateTasks(node, path = "") {

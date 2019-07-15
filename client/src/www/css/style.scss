@@ -29,6 +29,7 @@ body:not(.no-nav) {
     }
 }
 
+@import "navbar";
 @import "fonts";
 @import "home";
 @import "spoiler";
@@ -48,15 +49,6 @@ body:not(.no-nav) {
     body:not(.no-nav) #content > .container {
         padding-top: 64px;
     }
-}
-
-.js {
-    display: none;
-}
-
-.map {
-    height: 512px;
-    width: 100%;
 }
 
 .h-inline {
@@ -81,10 +73,6 @@ h2, h3 {
 
 .dropdown-item {
     cursor: pointer;
-}
-
-.navbar-brand {
-    padding: 16px 4px;
 }
 
 .extra-small {
@@ -157,15 +145,6 @@ h2, h3 {
 
 a.disabled {
     pointer-events: none;
-}
-
-.navbar-toggle {
-    & > svg {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        fill: #fff;
-    }  
 }
 
 .container-flex {
@@ -241,11 +220,7 @@ a.disabled {
     animation-duration: 0.25s;
 }
 
-body.is-ios:not(.page-login) .navbar {
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    background-color: rgba(33, 150, 243, 0.6);
-}
+
 
 .leaflet-top, .leaflet-bottom {
     z-index: 999;

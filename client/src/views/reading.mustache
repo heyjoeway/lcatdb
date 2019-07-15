@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-{{^query.marker}}
 <head>
     <!--head-->
     <title><!--title--> - Reading</title>
@@ -167,70 +166,3 @@
 
     <!--scripts-->
 </body>
-{{/query.marker}}
-{{#query.marker}}
-<head>
-    <!--head-->
-    <title><!--title--> - Reading</title>
-    <base target="_blank">
-</head>
-<body class="no-nav">
-    <div id="content">
-        {{#reading}}
-        <h5 class="h-inline">Reading</h5>
-        &nbsp;
-        <a class="btn btn-tiny btn-primary" href="/readings/{{_id}}">
-            More Info
-        </a>
-        <br>
-        <div>
-            <span class="normalize"
-                data-unittype="time"
-                data-unit="unix"
-                data-unitpref="human12hr">
-                {{timeCreated}}
-            </span>
-        </div>
-        <div>
-            <strong>Latitude</strong> &bull; 
-            <span class="normalize"
-                data-unittype="location"
-                data-unitpref="degMin">
-                {{location.lat}}
-            </span>
-        </div>
-        <div>
-            <strong>Longitude</strong> &bull; 
-            <span class="normalize"
-                data-unittype="location"
-                data-unitpref="degMin">
-                {{location.long}}
-            </span>
-        </div>
-                
-        {{#values}}
-        {{#display}}
-        {{#data}}
-        <div>
-            <strong>{{title}}</strong> &bull; 
-            <span class="{{#normalize}}normalize{{/normalize}}"
-                data-unittype="{{normalize.type}}"
-                data-unit="{{normalize.unit}}"
-                data-unitprefsystem="{{normalize.prefSystem}}"
-                aria-describedby="addon-values-{{index}}{{#path}}-{{.}}{{/path}}">
-                {{data}}
-            </span>
-            <span id="addon-values-{{index}}{{#path}}-{{.}}{{/path}}">
-                {{label}}
-            </span>
-        </div>
-        {{/data}}
-        {{/display}}
-        {{/values}}
-        {{^values}}
-        <p>No values found for this reading.</p>
-        {{/values}}
-        {{/reading}}
-    </div>
-</body>
-{{/query.marker}}

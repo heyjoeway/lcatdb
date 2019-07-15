@@ -1,43 +1,4 @@
 <!DOCTYPE html>
-{{#query.modal}}
-<head>
-    <!--head-->
-    <title><!--title--> - Add Existing Sensor</title>
-    <meta name="app:page" content="configurationAddSensorModal"/>
-    <meta name="app:modal" content="true" />
-    <meta name="app:mustLogin" content="true"/>
-    <meta name="app:noUser" content="false"/>
-</head>
-<body class="no-nav">
-    <div id="content">
-        <div id="step-1" style="display:none">
-            <ul id="sensors" class="list-group">
-                {{#user.sensors}}
-                <li class="list-group-item">
-                    <div class="row small">
-                        <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
-                        <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
-                    </div>
-                    <a href="#" class="sensor" id="{{_id}}">
-                        <span>{{model}} ({{name}})</span>
-                    </a>
-                </li>
-                {{/user.sensors}}
-                {{^user.sensors.length}}
-                <p>No sensors found.</p>
-                {{/user.sensors.length}}
-            </ul>
-        </div>
-
-        <div id="loading">
-            Loading...
-        </div>
-    </div>
-
-    <!--scripts-->
-</body>
-{{/query.modal}}
-{{^query.modal}}
 <head>
     <!--head-->
     <title><!--title--> - Add Existing Sensor</title>
@@ -66,27 +27,22 @@
         </fieldset></form>
         <h3>OR</h3><br>
         <h4>Choose a sensor from the list.</h4>
-        <div class="js">
-            <ul id="sensors" class="list-group">
-                {{#user.sensors}}
-            <li class="list-group-item">
-                <div class="row small">
-                    <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
-                    <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
-                </div>
-                <a href="#" class="sensor" id="{{_id}}">
-                    <span>{{model}} ({{name}})</span>
-                </a>
-            </li>
-                {{/user.sensors}}
-                {{^user.sensors.length}}
-                <p>No sensors found.</p>
-                {{/user.sensors.length}}
-            </ul>
-        </div>
-        <div class="no-js">
-            Please enable Javascript to use this feature.
-        </div>
+        <ul id="sensors" class="list-group">
+            {{#user.sensors}}
+        <li class="list-group-item">
+            <div class="row small">
+                <div class="col-xs-3"><strong>{{typeData.name}}<strong></div>
+                <div class="col-xs-9 text-right extra-small text-muted">{{_id}}</div>
+            </div>
+            <a href="#" class="sensor" id="{{_id}}">
+                <span>{{model}} ({{name}})</span>
+            </a>
+        </li>
+            {{/user.sensors}}
+            {{^user.sensors.length}}
+            <p>No sensors found.</p>
+            {{/user.sensors.length}}
+        </ul>
 
         {{/configuration.canEdit}}
         {{^configuration.canEdit}}
@@ -96,4 +52,3 @@
 
     <!--scripts-->
 </body>
-{{/query.modal}}

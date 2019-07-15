@@ -1,0 +1,27 @@
+.navbar {
+    padding-left: 0;
+
+    .navbar-toggle {
+        margin-left: 0;
+        padding: 0;
+        border: none;
+    
+        & > svg {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            fill: #fff;
+        }  
+    }
+}
+
+
+.navbar-brand {
+    padding: 16px 4px;
+}
+
+body.is-ios .navbar {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background-color: rgba(33, 150, 243, 0.6);
+}

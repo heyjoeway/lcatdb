@@ -1,5 +1,18 @@
 .page-dashboard {
     height: 100vh;
+
+    & > #content > .container {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        padding: 0;
+    
+        .map-iframe {
+            position: absolute;
+            min-height: unset;
+            height: 100%;        
+        }
+    }
 }
 
 .dashboard-nav-container {
@@ -20,21 +33,11 @@
     z-index: 999;
 }
 
-.dashboard-container {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    padding: 0;
-
-    .map-iframe {
-        position: absolute;
-        min-height: unset;
-        height: 100%;        
-    }
-}
-
 @media (min-width: 1200px) {
-    .dashboard-container, .page-dashboard {
-        padding-top: 0 !important;
+    .page-dashboard {
+        &, & > #content > .container {
+            width: 100%;        
+            padding-top: 0 !important;
+        }
     }
 }

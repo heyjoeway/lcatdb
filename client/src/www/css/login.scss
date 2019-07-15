@@ -5,17 +5,22 @@
     .navbar {
         background: none;
         box-shadow: none;
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 1));
     } 
     
-    .navbar-header > * {
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 1));
-    }
 
     #navbar-top-bg {
         display: none;
+    }
+
+    &.is-ios {
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        background-color: rgba(33, 150, 243, 0.6);
     }
 }
 
 .pos-absolute {
     position: absolute;
 }
+

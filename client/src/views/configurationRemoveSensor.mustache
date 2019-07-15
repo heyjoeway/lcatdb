@@ -1,35 +1,3 @@
-{{#query.modal}}
-<!DOCTYPE html>
-<head>
-    <!--head-->
-    <title><!--title--> - Remove Sensor</title>
-    <meta name="app:page" content="configurationRemoveSensorModal"/>
-    <meta name="app:mustLogin" content="true"/>
-    <meta name="app:noUser" content="false"/>
-</head>
-<body class="no-nav">
-    <div id="content">
-    {{#configuration.canEdit}}
-    <div id="step-1" style="display:none">
-        <p>Are you sure you want to remove this sensor from this configuration? The sensor will still exist, and can be re-added at any time.</p>
-        <div class="text-right"><button class="btn btn-danger" id="remove">Remove</button></div>
-        <br>
-    </div>
-
-    <div id="loading">
-        Loading...
-    </div>
-
-    {{/configuration.canEdit}}
-    {{^configuration.canEdit}}
-    <p>Sorry, you do not have permission to edit this configuration.</p>
-    {{/configuration.canEdit}}
-    </div>
-
-    <!--scripts-->
-</body>
-{{/query.modal}}
-{{^query.modal}}
 <!DOCTYPE html>
 <head>
     <!--head-->
@@ -68,4 +36,3 @@
 
     <!--scripts-->
 </body>
-{{/query.modal}}

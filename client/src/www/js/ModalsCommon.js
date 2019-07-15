@@ -16,7 +16,7 @@ class ModalsCommon {
     static get modalsData() { return [{
         selector: '#sensor-new',
         construct: element => new Modal({
-            url: `/sensors/new?configuration=${$('#configuration').text()}&modal=true`,
+            url: `/sensors/newModal?configuration=${$('#configuration').text()}`,
             title: 'Add New Sensor',
             callback: () => AppNavigator.reload()
         })
@@ -24,7 +24,7 @@ class ModalsCommon {
         selector: '#sensor-existing',
         construct: element => new Modal({
             title: 'Add Existing Sensor',
-            url: `/configurations/${$('#configuration').text()}/addSensor?modal=true`,
+            url: `/configurations/${$('#configuration').text()}/addSensorModal`,
             callback: () => AppNavigator.reload()
         })
     }, {
